@@ -1,6 +1,6 @@
 package com.example.vbeat_mobile.backend.user;
 
-public interface User {
+public interface VBeatUser {
     String getEmail();
 
     String getDisplayName();

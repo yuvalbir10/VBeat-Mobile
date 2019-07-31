@@ -2,7 +2,7 @@ package com.example.vbeat_mobile.backend.user;
 
 import com.google.firebase.auth.FirebaseUser;
 
-public class FirebaseUserAdapter implements User {
+public class FirebaseUserAdapter implements VBeatUser {
     private FirebaseUser user;
 
     public FirebaseUserAdapter(FirebaseUser user) {
