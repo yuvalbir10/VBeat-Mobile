@@ -2,6 +2,8 @@ package com.example.vbeat_mobile.backend;
 
 import androidx.annotation.NonNull;
 
+import com.example.vbeat_mobile.backend.user.FirebaseUserAdapter;
+import com.example.vbeat_mobile.backend.user.VBeatUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -73,5 +75,10 @@ public class FirebaseUserManager implements UserManager {
 
         // check to see if we were able to delete the account
         return userDeletionTask.isSuccessful();
+    }
+
+    @Override
+    public VBeatUser getCurrentUser() {
+        return new FirebaseUserAdapter(mAuth.getCurrentUser());
     }
 }
