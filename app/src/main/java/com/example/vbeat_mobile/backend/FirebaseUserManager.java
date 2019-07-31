@@ -57,4 +57,21 @@ public class FirebaseUserManager implements UserManager {
         // return whether or not the task was successful
         return res[0];
     }
+
+    @Override
+    public boolean deleteUser() {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if(user == null) {
+            throw new IllegalStateException("you have to login to delete");
+        }
+
+
+        // wait for task to finish
+        Task<Void> userDeletionTask = user.delete();
+        userDeletionTask.getResult();
+
+        // check to see if we were able to delete the account
+        return userDeletionTask.isSuccessful();
+    }
 }

@@ -4,4 +4,6 @@ public interface UserManager {
     boolean isUserLoggedIn();
 
     boolean createAccount(String email, String password);
+
+    boolean deleteUser();
 }
