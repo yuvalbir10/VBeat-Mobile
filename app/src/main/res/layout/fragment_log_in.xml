@@ -7,11 +7,11 @@
     tools:context=".LogInFragment" >
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/log_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/common_signin_button_text"
+        android:text="Log In"
         app:layout_constraintTop_toBottomOf="@+id/editText7"
         tools:layout_editor_absoluteX="152dp" />
 
