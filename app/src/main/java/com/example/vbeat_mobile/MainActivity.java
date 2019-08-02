@@ -13,11 +13,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LogInFragment logInFragment = new LogInFragment();
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.main_container, logInFragment);
-        transaction.addToBackStack("TAG");
-        transaction.commit();
+        //todelete
+//        LogInFragment logInFragment = new LogInFragment();
+//        FragmentManager manager = getSupportFragmentManager();
+//        FragmentTransaction transaction = manager.beginTransaction();
+//        transaction.add(R.id.main_container, logInFragment);
+//        transaction.addToBackStack("TAG");
+//        transaction.commit();
+
+        //end todelete
     }
 }
