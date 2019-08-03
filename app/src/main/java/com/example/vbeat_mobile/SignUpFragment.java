@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,7 +9,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.vbeat_mobile.backend.FirebaseUserManager;
@@ -20,7 +23,9 @@ import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
  * A simple {@link Fragment} subclass.
  */
 public class SignUpFragment extends Fragment {
-
+    private Button signupButton = null;
+    private ProgressBar prBar = null;
+    private UserManager userManager;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -33,36 +38,79 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         final View v =  inflater.inflate(R.layout.fragment_sign_up, container, false);
 
-        final UserManager userManager = new FirebaseUserManager();
+        // TODO: change to singleton
+        userManager = new FirebaseUserManager();
 
-        v.findViewById(R.id.sign_up_button).setOnClickListener(new View.OnClickListener() {
+        signupButton = v.findViewById(R.id.sign_up_button);
+        prBar = v.findViewById(R.id.indeterminateBar);
+
+        signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //get the email and password strings from UI
-                EditText usernameTB = v.findViewById(R.id.username_textbox);
-                EditText passwordTB = v.findViewById(R.id.password_textbox);
-                final String username = usernameTB.getText().toString();
-                final String password = passwordTB.getText().toString();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            userManager.createAccount(username, password);
-                        } catch(UserRegistrationFailedException e) {
-                            //error if sign up failed
-                            TextView errorTextView = v.findViewById(R.id.error_textView);
-                            errorTextView.setText(e.getMessage());
-                            errorTextView.setVisibility(View.VISIBLE);
-                        } finally {
-
-                        }
-                    }
-                });
+                signUpInBackground();
             }
         });
 
         return v;
+    }
+
+    private void signUpInBackground() {
+        //get the email and password strings from UI
+        final View v = getView();
+
+        if(v == null) {
+            throw new IllegalStateException("no view available can't sign uo background");
+        }
+
+        EditText usernameTB = v.findViewById(R.id.username_textbox);
+        EditText passwordTB = v.findViewById(R.id.password_textbox);
+        final String username = usernameTB.getText().toString();
+        final String password = passwordTB.getText().toString();
+
+        // show progress bar & disable sign up button
+        signupButton.setEnabled(false);
+        prBar.setVisibility(View.VISIBLE);
+
+        // create account in background so
+        // ui won't be stuck!
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Activity a = SignUpFragment.this.getActivity();
+                try {
+                    userManager.createAccount(username, password);
+                } catch(final UserRegistrationFailedException e) {
+                    //error if sign up failed
+                    final TextView errorTextView = v.findViewById(R.id.error_textView);
+
+
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            errorTextView.setText(e.getMessage());
+                            errorTextView.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                } finally {
+
+                    // hide progress bar & show sign up button
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            signupButton.setEnabled(true);
+                            prBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void safeRunOnUiThread(Activity a, Runnable r){
+        if(a != null) {
+            a.runOnUiThread(r);
+        }
     }
 
 }
