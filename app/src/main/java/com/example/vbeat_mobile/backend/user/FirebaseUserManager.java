@@ -73,4 +73,31 @@ public class FirebaseUserManager implements UserManager {
     public VBeatUser getCurrentUser() {
         return new FirebaseUserAdapter(mAuth.getCurrentUser());
     }
+
+    @Override
+    public void login(String email, String password) throws UserLoginFailedException {
+        if(isUserLoggedIn()) {
+            throw new UserLoginFailedException("can't login while user is already logged in");
+        }
+
+        Task<AuthResult> t = mAuth.signInWithEmailAndPassword(email, password);
+
+        // wait for task to complete
+        try {
+            Tasks.await(t);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            Log.d(TAG, "login Tasks.await was interrupted", e);
+        }
+
+        // check if we managed to login or not
+        if(!t.isSuccessful()) {
+            Exception e = t.getException();
+            if (e != null) {
+                throw new UserLoginFailedException(e.getMessage());
+            } else {
+                throw new UserLoginFailedException("unknown reason");
+            }
+        }
+    }
 }
