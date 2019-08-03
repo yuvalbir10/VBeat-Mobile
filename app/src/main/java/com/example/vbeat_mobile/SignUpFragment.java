@@ -60,7 +60,7 @@ public class SignUpFragment extends Fragment {
         final View v = getView();
 
         if(v == null) {
-            throw new IllegalStateException("no view available can't sign uo background");
+            throw new IllegalStateException("no view available can't sign up background");
         }
 
         EditText usernameTB = v.findViewById(R.id.username_textbox);
