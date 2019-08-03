@@ -11,4 +11,6 @@ public interface UserManager {
     boolean deleteUser();
 
     VBeatUser getCurrentUser();
+
+    void login(String email, String password) throws UserLoginFailedException;
 }
