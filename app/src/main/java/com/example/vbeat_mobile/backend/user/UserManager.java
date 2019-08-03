@@ -1,4 +1,4 @@
-package com.example.vbeat_mobile.backend;
+package com.example.vbeat_mobile.backend.user;
 
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 import com.example.vbeat_mobile.backend.user.VBeatUser;

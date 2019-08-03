@@ -15,8 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vbeat_mobile.backend.FirebaseUserManager;
-import com.example.vbeat_mobile.backend.UserManager;
+import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 
 

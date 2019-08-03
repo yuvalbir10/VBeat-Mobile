@@ -1,13 +1,7 @@
-package com.example.vbeat_mobile.backend;
+package com.example.vbeat_mobile.backend.user;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.example.vbeat_mobile.backend.user.FirebaseUserAdapter;
-import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
-import com.example.vbeat_mobile.backend.user.VBeatUser;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
@@ -15,8 +9,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class FirebaseUserManager implements UserManager {
     private static final String TAG = "FirebaseUserManager";
