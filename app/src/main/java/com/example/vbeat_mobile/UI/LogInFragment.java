@@ -1,4 +1,4 @@
-package com.example.vbeat_mobile;
+package com.example.vbeat_mobile.UI;
 
 
 import android.app.Activity;
@@ -15,20 +15,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.UserManager;
-import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SignUpFragment extends Fragment {
-    private Button signupButton = null;
+public class LogInFragment extends Fragment {
+    private Button loginButton = null;
     private ProgressBar prBar = null;
     private UserManager userManager;
 
-    public SignUpFragment() {
+    public LogInFragment() {
         // Required empty public constructor
     }
 
@@ -37,30 +38,29 @@ public class SignUpFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View v =  inflater.inflate(R.layout.fragment_sign_up, container, false);
-
-        // TODO: change to singleton
+        final View v =  inflater.inflate(R.layout.fragment_log_in, container, false);
         userManager = new FirebaseUserManager();
 
-        signupButton = v.findViewById(R.id.sign_up_button);
+        loginButton = v.findViewById(R.id.log_in_button);
         prBar = v.findViewById(R.id.indeterminateBar);
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signUpInBackground();
+                loginInBackground();
             }
         });
-
         return v;
     }
 
-    private void signUpInBackground() {
+
+
+    private void loginInBackground() {
         //get the email and password strings from UI
         final View v = getView();
 
         if(v == null) {
-            throw new IllegalStateException("no view available can't sign up background");
+            throw new IllegalStateException("no view available can't login background");
         }
 
         EditText usernameTB = v.findViewById(R.id.username_textbox);
@@ -68,8 +68,8 @@ public class SignUpFragment extends Fragment {
         final String username = usernameTB.getText().toString();
         final String password = passwordTB.getText().toString();
 
-        // show progress bar & disable sign up button
-        signupButton.setEnabled(false);
+        // show progress bar & disable login button
+        loginButton.setEnabled(false);
         prBar.setVisibility(View.VISIBLE);
 
         // create account in background so
@@ -77,19 +77,19 @@ public class SignUpFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Activity a = SignUpFragment.this.getActivity();
+                Activity a = LogInFragment.this.getActivity();
                 try {
-                    userManager.createAccount(username, password);
+                    userManager.login(username, password);
                     safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(SignUpFragment.this.getContext(),
-                                    "Sign up successful!",
+                            Toast.makeText(LogInFragment.this.getContext(),
+                                    "Logged in successfully!",
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
-                } catch(final UserRegistrationFailedException e) {
-                    //error if sign up failed
+                } catch(final UserLoginFailedException e) {
+                    //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
 
@@ -103,11 +103,11 @@ public class SignUpFragment extends Fragment {
 
                 } finally {
 
-                    // hide progress bar & show sign up button
+                    // hide progress bar & show login button
                     safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
-                            signupButton.setEnabled(true);
+                            loginButton.setEnabled(true);
                             prBar.setVisibility(View.INVISIBLE);
                         }
                     });
@@ -121,5 +121,7 @@ public class SignUpFragment extends Fragment {
             a.runOnUiThread(r);
         }
     }
+
+
 
 }

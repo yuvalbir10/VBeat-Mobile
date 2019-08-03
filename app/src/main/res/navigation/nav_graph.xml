@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/logInFragment"
-        android:name="com.example.vbeat_mobile.LogInFragment"
+        android:name="com.example.vbeat_mobile.UI.LogInFragment"
         android:label="fragment_log_in"
         tools:layout="@layout/fragment_log_in" />
     <fragment
         android:id="@+id/initialFragment"
-        android:name="com.example.vbeat_mobile.InitialFragment"
+        android:name="com.example.vbeat_mobile.UI.InitialFragment"
         android:label="fragment_initial"
         tools:layout="@layout/fragment_initial" >
         <action
@@ -24,7 +24,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.example.vbeat_mobile.SignUpFragment"
+        android:name="com.example.vbeat_mobile.UI.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" />
 </navigation>
