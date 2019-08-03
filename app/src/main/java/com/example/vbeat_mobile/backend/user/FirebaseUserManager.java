@@ -63,7 +63,12 @@ public class FirebaseUserManager implements UserManager {
 
         // wait for task to finish
         Task<Void> userDeletionTask = user.delete();
-        userDeletionTask.getResult();
+        try {
+            Tasks.await(userDeletionTask);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Tasks.await was interrupted", e);
+        }
 
         // check to see if we were able to delete the account
         return userDeletionTask.isSuccessful();
