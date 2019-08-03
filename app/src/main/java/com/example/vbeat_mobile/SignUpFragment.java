@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vbeat_mobile.backend.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.UserManager;
@@ -79,6 +80,14 @@ public class SignUpFragment extends Fragment {
                 Activity a = SignUpFragment.this.getActivity();
                 try {
                     userManager.createAccount(username, password);
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(SignUpFragment.this.getContext(),
+                                    "Sign up successful!",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } catch(final UserRegistrationFailedException e) {
                     //error if sign up failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
