@@ -1,19 +1,26 @@
 package com.example.vbeat_mobile.backend;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.vbeat_mobile.backend.user.FirebaseUserAdapter;
+import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 import com.example.vbeat_mobile.backend.user.VBeatUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class FirebaseUserManager implements UserManager {
+    private static final String TAG = "FirebaseUserManager";
+
     private FirebaseAuth mAuth;
 
     public FirebaseUserManager(){
@@ -27,37 +34,30 @@ public class FirebaseUserManager implements UserManager {
     }
 
     @Override
-    public boolean createAccount(String email, String password) {
+    public void createAccount(String email, String password) throws UserRegistrationFailedException {
         if(isUserLoggedIn()) {
             throw new IllegalStateException("can't create account while user is logged in");
         }
 
-        // we will lock here
-        // and then unlock when it's done
-        // so this method is synchronous
-        final Lock lock = new ReentrantLock();
-        lock.lock();
+        Task<AuthResult> t = mAuth.createUserWithEmailAndPassword(email, password);
 
-        // trick to pass arguments
-        // to the onComplete anonymous class
-        final Boolean[] res = {false};
+        // wait for result
+        try {
+            Tasks.await(t);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Tasks.await was interrupted", e);
+        }
+        // get exception if there was one
+        Exception e = t.getException();
 
-
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                res[0] = task.isSuccessful();
-                lock.unlock();
+        if(!t.isSuccessful()) {
+            if(e != null){
+                throw new UserRegistrationFailedException(e.getMessage());
+            } else {
+                throw new UserRegistrationFailedException("unknown reason");
             }
-        });
-
-        // wait for the task to finish
-        // unlock when we're done
-        lock.lock();
-        lock.unlock();
-
-        // return whether or not the task was successful
-        return res[0];
+        }
     }
 
     @Override
