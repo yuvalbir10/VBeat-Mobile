@@ -40,7 +40,7 @@ public class FirebaseUserManager implements UserManager {
 
         // trick to pass arguments
         // to the onComplete anonymous class
-        final Boolean[] res = {null};
+        final Boolean[] res = {false};
 
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
