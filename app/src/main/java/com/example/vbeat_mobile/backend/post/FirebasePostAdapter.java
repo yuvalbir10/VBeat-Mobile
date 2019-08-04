@@ -20,4 +20,6 @@ public class FirebasePostAdapter implements VBeatPost {
     public VBeatUser getUploader() {
         return null;
     }
+
+    //TODO : add getMusicFile
 }

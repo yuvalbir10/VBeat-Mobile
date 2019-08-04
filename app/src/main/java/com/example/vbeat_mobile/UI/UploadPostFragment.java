@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
+import com.squareup.picasso.Picasso;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -24,9 +25,9 @@ import static android.app.Activity.RESULT_OK;
  */
 public class UploadPostFragment extends Fragment {
     ImageView imageView;
-    Button chooseImageButton;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    Uri imageUri;
+    Button chooseImageButton, chooseMusicButton;
+    private static final int PICK_IMAGE_REQUEST = 1, PICK_MUSIC_REQUEST = 2;
+    Uri imageUri, musicUri;
 
     public UploadPostFragment() {
         // Required empty public constructor
@@ -40,11 +41,19 @@ public class UploadPostFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_upload_post, container, false);
         imageView = v.findViewById(R.id.imageView);
         chooseImageButton = v.findViewById(R.id.choose_image_button);
+        chooseMusicButton = v.findViewById(R.id.choose_music_button);
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pickImageFromGallery();
+            }
+        });
+
+        chooseMusicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickMusicFromGallery();
             }
         });
 
@@ -55,7 +64,12 @@ public class UploadPostFragment extends Fragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void pickMusicFromGallery(){
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_MUSIC_REQUEST);
     }
 
     @Override
@@ -64,8 +78,12 @@ public class UploadPostFragment extends Fragment {
 
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
             imageUri = data.getData();
-
+            imageView.setVisibility(View.VISIBLE);
             Picasso.get().load(imageUri).into(imageView);
+        }
+
+        if(requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK){
+            musicUri = data.getData();
         }
     }
 }
