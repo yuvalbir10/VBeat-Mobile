@@ -79,7 +79,10 @@ public class UploadPostFragment extends Fragment {
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
+
             Picasso.get().load(imageUri).into(imageView);
+            Picasso.get().
+
         }
 
         if(requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK){
