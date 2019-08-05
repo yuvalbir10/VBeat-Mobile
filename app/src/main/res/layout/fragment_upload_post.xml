@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Choose Image"
+        android:text="@string/choose_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description_textView" />
 
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Choose Music"
+        android:text="@string/choose_music"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -58,7 +58,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Post"
+        android:text="@string/post"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.973"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,6 +72,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/choose_image_button"
         app:layout_constraintStart_toEndOf="@+id/choose_image_button"
         app:layout_constraintTop_toTopOf="@+id/choose_image_button"
+        android:text="@string/no_file_chosen"
         app:layout_constraintVertical_bias="0.517" />
 
     <TextView
@@ -79,6 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:text="@string/no_file_chosen"
         app:layout_constraintBottom_toBottomOf="@+id/choose_music_button"
         app:layout_constraintStart_toEndOf="@+id/choose_music_button"
         app:layout_constraintTop_toTopOf="@+id/choose_music_button" />
