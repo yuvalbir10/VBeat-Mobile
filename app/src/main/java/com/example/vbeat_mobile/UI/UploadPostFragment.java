@@ -19,9 +19,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+
+import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -109,6 +113,7 @@ public class UploadPostFragment extends Fragment {
 
                 ImageView image = v.findViewById(R.id.imageView);
                 image.setImageBitmap(bitmap);
+                setTextViewFilename(v, R.id.imagePathTextView, path);;
             }
         }
 
@@ -144,5 +149,9 @@ public class UploadPostFragment extends Fragment {
         }
         cursor.close();
         return filePath;
+    }
+
+    private void setTextViewFilename(View v, int resourceId, String path) {
+        ((TextView)v.findViewById(resourceId)).setText(new File(path).getName());
     }
 }
