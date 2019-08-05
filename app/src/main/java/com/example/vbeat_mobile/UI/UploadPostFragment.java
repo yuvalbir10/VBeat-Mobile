@@ -81,7 +81,6 @@ public class UploadPostFragment extends Fragment {
             imageView.setVisibility(View.VISIBLE);
 
             Picasso.get().load(imageUri).into(imageView);
-            Picasso.get().
 
         }
 
