@@ -126,7 +126,7 @@ public class FirebasePostManager implements PostManager<String> {
             LinkedList<VBeatPost> vbeatPostList =  new LinkedList<>();
 
             for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
-                vbeatPostList.add(new FirebasePostAdapter(snapshot);
+                vbeatPostList.add(new FirebasePostAdapter(snapshot));
             }
 
             String lastPostId = vbeatPostList.getLast().getPostId();
