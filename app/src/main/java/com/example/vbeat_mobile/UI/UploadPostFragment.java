@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.utility.ExifUtil;
 
 import java.io.File;
@@ -41,6 +43,7 @@ public class UploadPostFragment extends Fragment {
     private ImageView imageView;
     private Button chooseImageButton, chooseMusicButton;
     private Uri imageUri, musicUri;
+    private PostManager<String> postManager;
 
     public UploadPostFragment() {
         // Required empty public constructor
@@ -56,6 +59,8 @@ public class UploadPostFragment extends Fragment {
         chooseImageButton = v.findViewById(R.id.choose_image_button);
         chooseMusicButton = v.findViewById(R.id.choose_music_button);
 
+        postManager = new FirebasePostManager();
+
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,7 +75,26 @@ public class UploadPostFragment extends Fragment {
             }
         });
 
+        Button postImageButton = v.findViewById(R.id.post_button);
+
+        postImageButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                postImage();
+            }
+        });
+
         return v;
+    }
+
+    private void postImage(){
+        // get description & verify
+        // verify music uri & image uri
+        // run upload post in background while showing
+        // loading animation using a progress bar or something
+        String description = null;
+
+        postManager.uploadPost(description, imageUri, musicUri);
     }
 
     private void pickImageFromGallery() {
