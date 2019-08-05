@@ -4,4 +4,6 @@ public interface VBeatUser {
     String getEmail();
 
     String getDisplayName();
+
+    String getUserId();
 }

@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,11 +20,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.PostManager;
+import com.example.vbeat_mobile.utility.ExifUtil;
 
 import java.io.File;
 
@@ -40,6 +43,7 @@ public class UploadPostFragment extends Fragment {
     private ImageView imageView;
     private Button chooseImageButton, chooseMusicButton;
     private Uri imageUri, musicUri;
+    private PostManager<String> postManager;
 
     public UploadPostFragment() {
         // Required empty public constructor
@@ -55,6 +59,8 @@ public class UploadPostFragment extends Fragment {
         chooseImageButton = v.findViewById(R.id.choose_image_button);
         chooseMusicButton = v.findViewById(R.id.choose_music_button);
 
+        postManager = new FirebasePostManager();
+
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,17 +75,36 @@ public class UploadPostFragment extends Fragment {
             }
         });
 
+        Button postImageButton = v.findViewById(R.id.post_button);
+
+        postImageButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                postImage();
+            }
+        });
+
         return v;
     }
 
-    private void pickImageFromGallery(){
+    private void postImage(){
+        // get description & verify
+        // verify music uri & image uri
+        // run upload post in background while showing
+        // loading animation using a progress bar or something
+        String description = null;
+
+        postManager.uploadPost(description, imageUri, musicUri);
+    }
+
+    private void pickImageFromGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private void pickMusicFromGallery(){
+    private void pickMusicFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_MUSIC_REQUEST);
     }
@@ -90,55 +115,100 @@ public class UploadPostFragment extends Fragment {
 
         // can't continue if data is null
         // or if we have no context
-        if(data == null || getContext() == null) {
+        if (data == null || getContext() == null) {
             Log.e(TAG, "data || getContext() were null");
             return;
         }
 
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
+        View v = getView();
+        if (v == null) {
+            Log.e(TAG, "view was null");
+            return;
+        }
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            String path = getRealPathFromURI_API19(getContext(), imageUri);
+            String path = getRealPathFromImageURI(getContext(), imageUri);
 
             // if we're getting a good path
             // load into image view
-            if(path != null) {
+            if (path != null) {
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
+                imageUri = Uri.fromFile(new File(path));
 
-                View v = getView();
-                if(v == null){
-                    return;
-                }
+                // prevent memory issues
+                Bitmap scaled = Bitmap.createScaledBitmap(
+                        bitmap,
+                        512,
+                        512,
+                        true);
+
+                Bitmap fixed = ExifUtil.rotateBitmap(path, scaled);
 
                 ImageView image = v.findViewById(R.id.imageView);
-                image.setImageBitmap(bitmap);
-                setTextViewFilename(v, R.id.imagePathTextView, path);;
+
+                image.setImageBitmap(fixed);
+                setTextViewFilename(v, R.id.imagePathTextView, path);
             }
         }
 
-        if(requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK) {
+            // content uri
             musicUri = data.getData();
+
+            String musicPath = getRealPathFromAudioURI(getContext(), musicUri);
+
+            if (musicPath == null) {
+                Log.e(TAG, "musicPath == null");
+                return;
+            }
+
+            musicUri = Uri.fromFile(new File(musicPath));
+            setTextViewFilename(v, R.id.musicPathTextView, musicPath);
         }
     }
 
+    private static String getRealPathFromAudioURI(Context context, Uri musicUri) {
+        ContentResolver contentResolver = context.getContentResolver();
+        String fullPath = null;
+
+        Cursor cursor = contentResolver.query(musicUri, null, null, null, null);
+        if (cursor == null) {
+            Log.e(TAG, "getRealPathFromAudioURI: unable to execute query to resolve music");
+        } else if (!cursor.moveToFirst()) {
+            Log.e(TAG, "getRealPathFromAudioURI: no media on device");
+        } else {
+            fullPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+
+        return fullPath;
+    }
+
     // min sdk is 19 so we're good
-    private static String getRealPathFromURI_API19(Context context, Uri uri){
+    private static String getRealPathFromImageURI(Context context, Uri uri) {
         String filePath = "";
         String wholeID = DocumentsContract.getDocumentId(uri);
 
         // Split at colon, use second item in the array
         String id = wholeID.split(":")[1];
 
-        String[] column = { MediaStore.Images.Media.DATA };
+        String[] column = {MediaStore.Images.Media.DATA};
+
 
         // where id is equal to
         String sel = MediaStore.Images.Media._ID + "=?";
 
         Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{ id }, null);
+                column, sel, new String[]{id}, null);
 
-        if(cursor == null){
+        if (cursor == null) {
             return null;
         }
 
@@ -152,6 +222,6 @@ public class UploadPostFragment extends Fragment {
     }
 
     private void setTextViewFilename(View v, int resourceId, String path) {
-        ((TextView)v.findViewById(resourceId)).setText(new File(path).getName());
+        ((TextView) v.findViewById(resourceId)).setText(new File(path).getName());
     }
 }
