@@ -96,6 +96,12 @@ public class UploadPostFragment extends Fragment {
             return;
         }
 
+        View v = getView();
+        if (v == null) {
+            Log.e(TAG, "view was null");
+            return;
+        }
+
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
@@ -106,11 +112,7 @@ public class UploadPostFragment extends Fragment {
             // load into image view
             if (path != null) {
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
-
-                View v = getView();
-                if (v == null) {
-                    return;
-                }
+                imageUri = Uri.fromFile(new File(path));
 
                 // prevent memory issues
                 Bitmap scaled = Bitmap.createScaledBitmap(
@@ -124,12 +126,23 @@ public class UploadPostFragment extends Fragment {
                 ImageView image = v.findViewById(R.id.imageView);
 
                 image.setImageBitmap(fixed);
-                setTextViewFilename(v, R.id.imagePathTextView, path);;
+                setTextViewFilename(v, R.id.imagePathTextView, path);
             }
         }
 
         if (requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK) {
+            // content uri
             musicUri = data.getData();
+
+            String musicPath = getRealPathFromURI_API19(getContext(), musicUri);
+
+            if(musicPath == null) {
+                Log.e(TAG, "musicPath == null");
+                return;
+            }
+
+            musicUri = Uri.fromFile(new File(musicPath));
+            setTextViewFilename(v, R.id.musicPathTextView, musicPath);
         }
     }
 
