@@ -3,6 +3,7 @@ package com.example.vbeat_mobile.backend.post;
 import android.media.Image;
 
 import com.example.vbeat_mobile.backend.user.VBeatUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ public class FirebasePostAdapter implements VBeatPost {
     private String remoteImagePath;
     private String remoteMusicPath;
     private VBeatUser uploader;
+    private String uploaderId;
     private String postId;
 
     public FirebasePostAdapter(
@@ -28,6 +30,15 @@ public class FirebasePostAdapter implements VBeatPost {
         this.uploader = uploader;
     }
 
+    public FirebasePostAdapter(DocumentSnapshot ds){
+        this.postId = ds.getId();
+        this.description = (String)ds.get("description");
+        this.remoteImagePath = (String)ds.get("storage_image_path");
+        this.remoteMusicPath = (String)ds.get("storage_music_path");
+        this.uploader = null;
+        this.uploaderId = (String)ds.get("uploader_id");
+    }
+
     @Override
     public Image getImage() {
         // download image here? maybe?
@@ -41,6 +52,7 @@ public class FirebasePostAdapter implements VBeatPost {
 
     @Override
     public VBeatUser getUploader() {
+        // lazy get uploader
         return null;
     }
 

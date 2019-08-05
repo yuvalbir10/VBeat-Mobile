@@ -8,6 +8,7 @@ import android.util.Log;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -25,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 
 public class FirebasePostManager implements PostManager<String> {
     private static final String TAG = "FirebasePostManager";
+    private static final String postCollectionName = "posts";
+    private FirebaseFirestore db;
 
     // if we're using the firebase post manager
     // it's safe to say that we're using the
@@ -33,6 +36,7 @@ public class FirebasePostManager implements PostManager<String> {
 
     public FirebasePostManager(){
         userManager = new FirebaseUserManager();
+        db = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -71,11 +75,9 @@ public class FirebasePostManager implements PostManager<String> {
                     userManager.getCurrentUser()
                 );
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         DocumentReference docRef = null;
         try {
-             docRef = Tasks.await(db.collection("posts").add(firebaseMap));
+             docRef = Tasks.await(db.collection(postCollectionName).add(firebaseMap));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "upload post interrupted", e);
@@ -93,7 +95,14 @@ public class FirebasePostManager implements PostManager<String> {
 
     @Override
     public VBeatPost getPost(String postId) {
-        return null;
+        try {
+            DocumentSnapshot documentSnapshot = Tasks.await(db.collection(postCollectionName).document().get());
+            return new FirebasePostAdapter(documentSnapshot);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            Log.d(TAG, "getPost interrupted", e);
+            return null;
+        }
     }
 
     @Override
