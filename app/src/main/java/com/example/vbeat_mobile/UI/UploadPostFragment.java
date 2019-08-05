@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.utility.ExifUtil;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -68,14 +69,14 @@ public class UploadPostFragment extends Fragment {
         return v;
     }
 
-    private void pickImageFromGallery(){
+    private void pickImageFromGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private void pickMusicFromGallery(){
+    private void pickMusicFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_MUSIC_REQUEST);
     }
@@ -86,12 +87,12 @@ public class UploadPostFragment extends Fragment {
 
         // can't continue if data is null
         // or if we have no context
-        if(data == null || getContext() == null) {
+        if (data == null || getContext() == null) {
             Log.e(TAG, "data || getContext() were null");
             return;
         }
 
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
@@ -99,41 +100,50 @@ public class UploadPostFragment extends Fragment {
 
             // if we're getting a good path
             // load into image view
-            if(path != null) {
+            if (path != null) {
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
 
                 View v = getView();
-                if(v == null){
+                if (v == null) {
                     return;
                 }
 
+                // prevent memory issues
+                Bitmap scaled = Bitmap.createScaledBitmap(
+                        bitmap,
+                        512,
+                        512,
+                        true);
+
+                Bitmap fixed = ExifUtil.rotateBitmap(path, scaled);
+
                 ImageView image = v.findViewById(R.id.imageView);
-                image.setImageBitmap(bitmap);
+                image.setImageBitmap(fixed);
             }
         }
 
-        if(requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == PICK_MUSIC_REQUEST && resultCode == RESULT_OK) {
             musicUri = data.getData();
         }
     }
 
     // min sdk is 19 so we're good
-    private static String getRealPathFromURI_API19(Context context, Uri uri){
+    private static String getRealPathFromURI_API19(Context context, Uri uri) {
         String filePath = "";
         String wholeID = DocumentsContract.getDocumentId(uri);
 
         // Split at colon, use second item in the array
         String id = wholeID.split(":")[1];
 
-        String[] column = { MediaStore.Images.Media.DATA };
+        String[] column = {MediaStore.Images.Media.DATA};
 
         // where id is equal to
         String sel = MediaStore.Images.Media._ID + "=?";
 
         Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{ id }, null);
+                column, sel, new String[]{id}, null);
 
-        if(cursor == null){
+        if (cursor == null) {
             return null;
         }
 
