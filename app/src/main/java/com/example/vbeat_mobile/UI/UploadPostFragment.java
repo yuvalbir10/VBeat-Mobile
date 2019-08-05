@@ -117,6 +117,7 @@ public class UploadPostFragment extends Fragment {
         }
     }
 
+    // min sdk is 19 so we're good
     private static String getRealPathFromURI_API19(Context context, Uri uri){
         String filePath = "";
         String wholeID = DocumentsContract.getDocumentId(uri);
