@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -106,7 +106,7 @@ public class UploadPostFragment extends Fragment {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            String path = getRealPathFromURI_API19(getContext(), imageUri);
+            String path = getRealPathFromImageURI(getContext(), imageUri);
 
             // if we're getting a good path
             // load into image view
@@ -134,9 +134,9 @@ public class UploadPostFragment extends Fragment {
             // content uri
             musicUri = data.getData();
 
-            String musicPath = getRealPathFromURI_API19(getContext(), musicUri);
+            String musicPath = getRealPathFromAudioURI(getContext(), musicUri);
 
-            if(musicPath == null) {
+            if (musicPath == null) {
                 Log.e(TAG, "musicPath == null");
                 return;
             }
@@ -146,8 +146,30 @@ public class UploadPostFragment extends Fragment {
         }
     }
 
+    private static String getRealPathFromAudioURI(Context context, Uri musicUri) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String fullPath = null;
+
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        if (cursor == null) {
+            Log.e(TAG, "getRealPathFromAudioURI: unable to execute query to resolve music");
+        } else if (!cursor.moveToFirst()) {
+            Log.e(TAG, "getRealPathFromAudioURI: no media on device");
+        } else {
+            fullPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+
+        return fullPath;
+    }
+
     // min sdk is 19 so we're good
-    private static String getRealPathFromURI_API19(Context context, Uri uri) {
+    private static String getRealPathFromImageURI(Context context, Uri uri) {
         String filePath = "";
         String wholeID = DocumentsContract.getDocumentId(uri);
 
@@ -155,6 +177,7 @@ public class UploadPostFragment extends Fragment {
         String id = wholeID.split(":")[1];
 
         String[] column = {MediaStore.Images.Media.DATA};
+
 
         // where id is equal to
         String sel = MediaStore.Images.Media._ID + "=?";
@@ -176,6 +199,6 @@ public class UploadPostFragment extends Fragment {
     }
 
     private void setTextViewFilename(View v, int resourceId, String path) {
-        ((TextView)v.findViewById(resourceId)).setText(new File(path).getName());
+        ((TextView) v.findViewById(resourceId)).setText(new File(path).getName());
     }
 }
