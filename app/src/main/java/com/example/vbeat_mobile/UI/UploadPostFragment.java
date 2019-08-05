@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
-import com.squareup.picasso.Picasso;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -24,10 +23,11 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 public class UploadPostFragment extends Fragment {
-    ImageView imageView;
-    Button chooseImageButton, chooseMusicButton;
     private static final int PICK_IMAGE_REQUEST = 1, PICK_MUSIC_REQUEST = 2;
-    Uri imageUri, musicUri;
+
+    private ImageView imageView;
+    private Button chooseImageButton, chooseMusicButton;
+    private Uri imageUri, musicUri;
 
     public UploadPostFragment() {
         // Required empty public constructor
@@ -75,12 +75,12 @@ public class UploadPostFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        
 
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            Picasso.get().load(imageUri).into(imageView);
 
         }
 
