@@ -123,7 +123,7 @@ public class UploadPostFragment extends Fragment {
 
                 ImageView image = v.findViewById(R.id.imageView);
 
-                image.setImageBitmap(bitmap);
+                image.setImageBitmap(fixed);
                 setTextViewFilename(v, R.id.imagePathTextView, path);;
             }
         }
