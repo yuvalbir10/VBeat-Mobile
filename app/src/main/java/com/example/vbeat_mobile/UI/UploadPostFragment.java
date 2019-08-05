@@ -148,10 +148,9 @@ public class UploadPostFragment extends Fragment {
 
     private static String getRealPathFromAudioURI(Context context, Uri musicUri) {
         ContentResolver contentResolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String fullPath = null;
 
-        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        Cursor cursor = contentResolver.query(musicUri, null, null, null, null);
         if (cursor == null) {
             Log.e(TAG, "getRealPathFromAudioURI: unable to execute query to resolve music");
         } else if (!cursor.moveToFirst()) {
