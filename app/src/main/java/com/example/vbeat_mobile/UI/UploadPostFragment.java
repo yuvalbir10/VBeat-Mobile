@@ -2,17 +2,20 @@ package com.example.vbeat_mobile.UI;
 
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -27,6 +30,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.utility.ExifUtil;
+import com.example.vbeat_mobile.utility.URIUtils;
 
 import java.io.File;
 
@@ -94,7 +98,7 @@ public class UploadPostFragment extends Fragment {
         // loading animation using a progress bar or something
         String description = null;
 
-        postManager.uploadPost(description, imageUri, musicUri);
+//        postManager.uploadPost(description, imageUri, musicUri);
     }
 
     private void pickImageFromGallery() {
@@ -130,7 +134,7 @@ public class UploadPostFragment extends Fragment {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            String path = getRealPathFromImageURI(getContext(), imageUri);
+            String path = URIUtils.getPath(getContext(), imageUri);
 
             // if we're getting a good path
             // load into image view
@@ -158,7 +162,7 @@ public class UploadPostFragment extends Fragment {
             // content uri
             musicUri = data.getData();
 
-            String musicPath = getRealPathFromAudioURI(getContext(), musicUri);
+            String musicPath = URIUtils.getPath(getContext(), musicUri);
 
             if (musicPath == null) {
                 Log.e(TAG, "musicPath == null");
@@ -168,57 +172,6 @@ public class UploadPostFragment extends Fragment {
             musicUri = Uri.fromFile(new File(musicPath));
             setTextViewFilename(v, R.id.musicPathTextView, musicPath);
         }
-    }
-
-    private static String getRealPathFromAudioURI(Context context, Uri musicUri) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String fullPath = null;
-
-        Cursor cursor = contentResolver.query(musicUri, null, null, null, null);
-        if (cursor == null) {
-            Log.e(TAG, "getRealPathFromAudioURI: unable to execute query to resolve music");
-        } else if (!cursor.moveToFirst()) {
-            Log.e(TAG, "getRealPathFromAudioURI: no media on device");
-        } else {
-            fullPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-
-        return fullPath;
-    }
-
-    // min sdk is 19 so we're good
-    private static String getRealPathFromImageURI(Context context, Uri uri) {
-        String filePath = "";
-        String wholeID = DocumentsContract.getDocumentId(uri);
-
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
-
-        String[] column = {MediaStore.Images.Media.DATA};
-
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{id}, null);
-
-        if (cursor == null) {
-            return null;
-        }
-
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
-        }
-        cursor.close();
-        return filePath;
     }
 
     private void setTextViewFilename(View v, int resourceId, String path) {
