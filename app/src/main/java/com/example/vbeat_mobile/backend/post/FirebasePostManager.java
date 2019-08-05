@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -18,7 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -96,7 +98,9 @@ public class FirebasePostManager implements PostManager<String> {
     @Override
     public VBeatPost getPost(String postId) {
         try {
-            DocumentSnapshot documentSnapshot = Tasks.await(db.collection(postCollectionName).document().get());
+            DocumentSnapshot documentSnapshot = Tasks.await(
+                    db.collection(postCollectionName).document(postId).get()
+            );
             return new FirebasePostAdapter(documentSnapshot);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
@@ -105,9 +109,34 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
+    // id of the last post
     @Override
     public VBeatPostCollection<String> getPosts(String cursor, int limit) {
-        return null;
+        // might not work we'll have to test
+        try {
+            DocumentSnapshot lastPostRendered = Tasks.await(
+                    db.collection(postCollectionName).document(cursor).get()
+            );
+
+            // get n (limit) posts after the current post mentioned in cursor
+            QuerySnapshot nextPostsQuery = Tasks.await(
+                    db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get()
+            );
+
+            LinkedList<VBeatPost> vbeatPostList =  new LinkedList<>();
+
+            for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
+                vbeatPostList.add(new FirebasePostAdapter(snapshot);
+            }
+
+            String lastPostId = vbeatPostList.getLast().getPostId();
+
+            return new VBeatPostCollection<>(vbeatPostList, lastPostId);
+        } catch (ExecutionException | InterruptedException  e) {
+            e.printStackTrace();
+            Log.d(TAG, "getPosts interrupted", e);
+            return null;
+        }
     }
 
     // time to check

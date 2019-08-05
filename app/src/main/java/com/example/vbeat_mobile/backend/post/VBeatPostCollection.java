@@ -7,7 +7,16 @@ public class VBeatPostCollection<T> {
 
     private T cursor;
 
-    public VBeatPostCollection(){
+    public VBeatPostCollection(List<VBeatPost> posts, T cursor){
+        this.posts = posts;
+        this.cursor = cursor;
+    }
 
+    public T getCursor() {
+        return cursor;
+    }
+
+    public List<VBeatPost> getPosts() {
+        return posts;
     }
 }
