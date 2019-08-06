@@ -30,7 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_imageView" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/post_imageView"
         android:layout_width="292dp"
         android:layout_height="205dp"
         android:layout_marginStart="8dp"
@@ -43,13 +43,13 @@
         tools:srcCompat="@tools:sample/backgrounds/scenic[0]" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/musicControl_imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-        app:layout_constraintEnd_toEndOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toTopOf="@+id/imageView2"
+        app:layout_constraintBottom_toBottomOf="@+id/post_imageView"
+        app:layout_constraintEnd_toEndOf="@+id/post_imageView"
+        app:layout_constraintStart_toStartOf="@+id/post_imageView"
+        app:layout_constraintTop_toTopOf="@+id/post_imageView"
         app:srcCompat="@android:drawable/ic_media_play" />
 
     <TextView

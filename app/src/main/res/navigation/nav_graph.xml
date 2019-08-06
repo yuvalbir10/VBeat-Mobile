@@ -29,7 +29,7 @@
         tools:layout="@layout/fragment_sign_up" />
     <fragment
         android:id="@+id/feedFragment"
-        android:name="com.example.vbeat_mobile.feedFragment"
+        android:name="com.example.vbeat_mobile.UI.feedFragment"
         android:label="fragment_feed"
         tools:layout="@layout/fragment_feed" />
 </navigation>
