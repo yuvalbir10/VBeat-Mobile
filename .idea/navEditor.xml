@@ -8,6 +8,17 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="feedFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-790" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="initialFragment">
                     <value>
                       <LayoutPositions>
