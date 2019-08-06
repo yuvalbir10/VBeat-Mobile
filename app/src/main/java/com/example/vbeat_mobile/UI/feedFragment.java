@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,14 @@ public class feedFragment extends Fragment {
 
         feedAdapter = new FeedRecyclerViewAdapter(mData);
         recyclerView.setAdapter(feedAdapter);
+
+        feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int index) {
+                //TODO: complete what we want to happen when post is clicked (for example go to a page that shows this post only)
+                Log.d("TAG", "item click " + index); //TODO: remove this line, this is for checking purposes
+            }
+        });
 
         return v;
     }
