@@ -25,7 +25,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     @NonNull
     @Override
     public PostRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_row, parent);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_row, parent, false);
         PostRowViewHolder postRowViewHolder = new PostRowViewHolder(view);
         return postRowViewHolder;
     }
