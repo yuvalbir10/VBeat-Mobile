@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 
 import com.example.vbeat_mobile.R;
 
+import java.util.Vector;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,6 +22,8 @@ import com.example.vbeat_mobile.R;
 public class feedFragment extends Fragment {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
+    FeedRecyclerViewAdapter feedAdapter;
+    Vector<String> mData = new Vector<String>();
 
     public feedFragment() {
         // Required empty public constructor
@@ -35,6 +39,17 @@ public class feedFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
         recyclerView.setLayoutManager(layoutManager);
+
+
+        //TODO: get the relevant posts list from DB
+
+        for(int i = 0; i < 100; i++){
+            mData.add("st" + i);
+        }
+
+        feedAdapter = new FeedRecyclerViewAdapter(mData);
+        recyclerView.setAdapter(feedAdapter);
+
         return v;
     }
 
