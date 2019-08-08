@@ -38,6 +38,8 @@ public class InitialFragment extends Fragment {
         Button signUpButton = v.findViewById(R.id.sign_up_button);
         signUpButton.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_initialFragment_to_signUpFragment));
 
+        Button uploadPostButton = v.findViewById(R.id.upload_post_button);
+        uploadPostButton.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_initialFragment_to_uploadPostFragment));
 
         return v;
     }

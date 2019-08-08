@@ -29,6 +29,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_initialFragment_to_uploadPostFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
                         </option>
                       </LayoutPositions>
@@ -63,8 +68,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-559" />
-                            <option name="y" value="-151" />
+                            <option name="x" value="-155" />
+                            <option name="y" value="-300" />
                           </Point>
                         </option>
                       </LayoutPositions>

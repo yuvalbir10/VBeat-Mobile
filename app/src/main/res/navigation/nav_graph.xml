@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/uploadPostFragment">
+    app:startDestination="@id/initialFragment">
 
     <fragment
         android:id="@+id/logInFragment"
@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_initialFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_initialFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
