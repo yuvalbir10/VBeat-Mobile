@@ -33,6 +33,7 @@ import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -134,7 +135,12 @@ public class UploadPostFragment extends Fragment {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            String path = URIUtils.getPath(getContext(), imageUri);
+            String path = null;
+            try {
+                path = URIUtils.copyAndGetPath(imageUri, getContext());
+            } catch (IOException e) {
+                Log.e(TAG, "copyAndGetPath failed", e);
+            }
 
             // if we're getting a good path
             // load into image view
@@ -162,7 +168,12 @@ public class UploadPostFragment extends Fragment {
             // content uri
             musicUri = data.getData();
 
-            String musicPath = URIUtils.getPath(getContext(), musicUri);
+            String musicPath = null;
+            try {
+                musicPath = URIUtils.copyAndGetPath(musicUri, getContext());
+            } catch (IOException e) {
+                Log.e(TAG, "copyAndGetPath failed on music copy", e);
+            }
 
             if (musicPath == null) {
                 Log.e(TAG, "musicPath == null");

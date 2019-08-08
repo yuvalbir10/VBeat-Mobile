@@ -3,6 +3,8 @@ package com.example.vbeat_mobile.utility;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -42,7 +44,7 @@ public class URIUtils {
 
             // open temporary output file
             File tmpFile;
-            tmpFile = new File(UUID.randomUUID().toString());
+            tmpFile = new File(getDataDir(context) + "/" + UUID.randomUUID().toString());
             tmpFile.deleteOnExit();
 
             // copying the new file
@@ -69,6 +71,17 @@ public class URIUtils {
             if(os != null){
                 os.close();
             }
+        }
+    }
+
+    private static String getDataDir(Context context){
+        PackageManager pm = context.getPackageManager();
+        String pkgName = context.getPackageName();
+        try {
+            PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+            return pi.applicationInfo.dataDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
         }
     }
 
