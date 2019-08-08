@@ -85,8 +85,7 @@ public class UploadPostFragment extends Fragment {
         });
 
 
-
-        postButton.setOnClickListener(new View.OnClickListener(){
+        postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 uploadPostInBackground();
@@ -96,17 +95,21 @@ public class UploadPostFragment extends Fragment {
         return v;
     }
 
-    private void uploadPostInBackground(){
+    private void uploadPostInBackground() {
         final View v = getView();
 
-        if(v == null) {
+        if (v == null) {
             throw new IllegalStateException("no view available can't upload post in background");
         }
 
         //get description String from UI
         final String description = descriptionEditText.getText().toString();
 
-        // TODO: verify music uri & image uri
+        if (musicUri == null || imageUri == null) {
+            Toast.makeText(getContext(), "Please choose image & music!", Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
 
         // show progress bar & disable post button
         postButton.setEnabled(false);
@@ -128,7 +131,7 @@ public class UploadPostFragment extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
-                } catch(final UploadPostFailedException e) {
+                } catch (final UploadPostFailedException e) {
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
@@ -244,8 +247,8 @@ public class UploadPostFragment extends Fragment {
     }
 
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
+    private void safeRunOnUiThread(Activity a, Runnable r) {
+        if (a != null) {
             a.runOnUiThread(r);
         }
     }
