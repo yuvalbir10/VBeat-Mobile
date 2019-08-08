@@ -1,5 +1,6 @@
 package com.example.vbeat_mobile.utility;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,8 +9,69 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.UUID;
 
 public class URIUtils {
+    private static final String TAG = "URIUtils";
+
+    public static String copyAndGetPath(Uri localPath, Context context)
+            throws IOException
+    {
+        InputStream is = null;
+        OutputStream os = null;
+        BufferedReader reader = null;
+        byte[] tempBuffer = new byte[1024];
+
+        try {
+            // open input stream to target file
+            is = context.getContentResolver().openInputStream(localPath);
+            if(is == null){
+                throw new IOException("unable to open input stream");
+            }
+            reader = new BufferedReader(new InputStreamReader(is));
+
+            // open temporary output file
+            File tmpFile;
+            tmpFile = new File(UUID.randomUUID().toString());
+            tmpFile.deleteOnExit();
+
+            // copying the new file
+            os = new FileOutputStream(tmpFile);
+            int length;
+            while((length = is.read(tempBuffer)) != -1) {
+                os.write(tempBuffer, 0, length);
+            }
+
+            // returning the path we created
+            return tmpFile.getAbsolutePath();
+        } catch(Exception e){
+            Log.e(TAG, "unable to copy file", e);
+            throw e;
+        } finally {
+            // cleaning up on finish
+            if(reader != null) {
+                reader.close();
+            }
+            if(is != null){
+                is.close();
+            }
+
+            if(os != null){
+                os.close();
+            }
+        }
+    }
+
     /**
      * Method for return file path of Gallery image/ Document / Video / Audio
      *
