@@ -1,5 +1,6 @@
 package com.example.vbeat_mobile.backend.post;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 
 import com.example.vbeat_mobile.backend.user.VBeatUser;
@@ -39,7 +40,7 @@ public class FirebasePostAdapter implements VBeatPost {
     }
 
     @Override
-    public Image getImage() {
+    public Bitmap getImage() {
         // download image here? maybe?
         return null;
     }
