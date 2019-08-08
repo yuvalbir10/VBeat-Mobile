@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 
 import com.example.vbeat_mobile.R;
 
-public class PostFragment extends Fragment {
+public class ViewPostFragment extends Fragment {
 
-    public PostFragment() {
+    public ViewPostFragment() {
         // Required empty public constructor
     }
 
