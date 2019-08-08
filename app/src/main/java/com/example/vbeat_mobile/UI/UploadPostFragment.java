@@ -1,10 +1,8 @@
 package com.example.vbeat_mobile.UI;
 
 
-import android.content.ContentResolver;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -13,22 +11,27 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.PostManager;
+import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
+import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.utility.ExifUtil;
+import com.example.vbeat_mobile.utility.URIUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,6 +47,9 @@ public class UploadPostFragment extends Fragment {
     private Button chooseImageButton, chooseMusicButton;
     private Uri imageUri, musicUri;
     private PostManager<String> postManager;
+    private Button postButton;
+    private EditText descriptionEditText;
+    private ProgressBar prBar;
 
     public UploadPostFragment() {
         // Required empty public constructor
@@ -58,6 +64,9 @@ public class UploadPostFragment extends Fragment {
         imageView = v.findViewById(R.id.imageView);
         chooseImageButton = v.findViewById(R.id.choose_image_button);
         chooseMusicButton = v.findViewById(R.id.choose_music_button);
+        postButton = v.findViewById(R.id.post_button);
+        descriptionEditText = v.findViewById(R.id.description_editText);
+        prBar = v.findViewById(R.id.progressBar);
 
         postManager = new FirebasePostManager();
 
@@ -75,26 +84,76 @@ public class UploadPostFragment extends Fragment {
             }
         });
 
-        Button postImageButton = v.findViewById(R.id.post_button);
 
-        postImageButton.setOnClickListener(new View.OnClickListener(){
+
+        postButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                postImage();
+                uploadPostInBackground();
             }
         });
 
         return v;
     }
 
-    private void postImage(){
-        // get description & verify
-        // verify music uri & image uri
-        // run upload post in background while showing
-        // loading animation using a progress bar or something
-        String description = null;
+    private void uploadPostInBackground(){
+        final View v = getView();
 
-        postManager.uploadPost(description, imageUri, musicUri);
+        if(v == null) {
+            throw new IllegalStateException("no view available can't upload post in background");
+        }
+
+        //get description String from UI
+        final String description = descriptionEditText.getText().toString();
+
+        // TODO: verify music uri & image uri
+
+        // show progress bar & disable post button
+        postButton.setEnabled(false);
+        prBar.setVisibility(View.VISIBLE);
+
+        // create post in background so
+        // ui won't be stuck!
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Activity a = UploadPostFragment.this.getActivity();
+                try {
+                    postManager.uploadPost(description, imageUri, musicUri);
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(UploadPostFragment.this.getContext(),
+                                    "Uploaded Post successfully!",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch(final UploadPostFailedException e) {
+                    //error if login failed
+                    final TextView errorTextView = v.findViewById(R.id.error_textView);
+
+
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            errorTextView.setText(e.getMessage());
+                            errorTextView.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                } finally {
+
+                    // hide progress bar & show login button
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            postButton.setEnabled(true);
+                            prBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     private void pickImageFromGallery() {
@@ -130,7 +189,12 @@ public class UploadPostFragment extends Fragment {
             imageUri = data.getData();
             imageView.setVisibility(View.VISIBLE);
 
-            String path = getRealPathFromImageURI(getContext(), imageUri);
+            String path = null;
+            try {
+                path = URIUtils.copyAndGetPath(imageUri, getContext());
+            } catch (IOException e) {
+                Log.e(TAG, "copyAndGetPath failed", e);
+            }
 
             // if we're getting a good path
             // load into image view
@@ -158,7 +222,12 @@ public class UploadPostFragment extends Fragment {
             // content uri
             musicUri = data.getData();
 
-            String musicPath = getRealPathFromAudioURI(getContext(), musicUri);
+            String musicPath = null;
+            try {
+                musicPath = URIUtils.copyAndGetPath(musicUri, getContext());
+            } catch (IOException e) {
+                Log.e(TAG, "copyAndGetPath failed on music copy", e);
+            }
 
             if (musicPath == null) {
                 Log.e(TAG, "musicPath == null");
@@ -170,58 +239,14 @@ public class UploadPostFragment extends Fragment {
         }
     }
 
-    private static String getRealPathFromAudioURI(Context context, Uri musicUri) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String fullPath = null;
-
-        Cursor cursor = contentResolver.query(musicUri, null, null, null, null);
-        if (cursor == null) {
-            Log.e(TAG, "getRealPathFromAudioURI: unable to execute query to resolve music");
-        } else if (!cursor.moveToFirst()) {
-            Log.e(TAG, "getRealPathFromAudioURI: no media on device");
-        } else {
-            fullPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-
-        return fullPath;
-    }
-
-    // min sdk is 19 so we're good
-    private static String getRealPathFromImageURI(Context context, Uri uri) {
-        String filePath = "";
-        String wholeID = DocumentsContract.getDocumentId(uri);
-
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
-
-        String[] column = {MediaStore.Images.Media.DATA};
-
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{id}, null);
-
-        if (cursor == null) {
-            return null;
-        }
-
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
-        }
-        cursor.close();
-        return filePath;
-    }
-
     private void setTextViewFilename(View v, int resourceId, String path) {
         ((TextView) v.findViewById(resourceId)).setText(new File(path).getName());
+    }
+
+
+    private void safeRunOnUiThread(Activity a, Runnable r){
+        if(a != null) {
+            a.runOnUiThread(r);
+        }
     }
 }

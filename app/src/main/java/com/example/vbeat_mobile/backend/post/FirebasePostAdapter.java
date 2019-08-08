@@ -61,6 +61,11 @@ public class FirebasePostAdapter implements VBeatPost {
         return null;
     }
 
+    @Override
+    public byte[] getMusicFile() {
+        return new byte[0];
+    }
+
     public static Map<String, Object> toFirebaseMap(String description,
                                                     String remoteImagePath,
                                                     String remoteMusicPath,
