@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
+import com.example.vbeat_mobile.backend.post.VBeatPost;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
@@ -122,13 +124,15 @@ public class UploadPostFragment extends Fragment {
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
                 try {
-                    postManager.uploadPost(description, imageUri, musicUri);
+                    final VBeatPost uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
                     safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(UploadPostFragment.this.getContext(),
                                     "Uploaded Post successfully!",
                                     Toast.LENGTH_SHORT).show();
+
+                            handleUploadPostFinish(uploadedPost);
                         }
                     });
                 } catch (final UploadPostFailedException e) {
@@ -157,6 +161,20 @@ public class UploadPostFragment extends Fragment {
                 }
             }
         }).start();
+    }
+
+    private void handleUploadPostFinish(VBeatPost uploadedPost) {
+        String postId = uploadedPost.getPostId();
+        UploadPostFragmentDirections.ActionUploadPostFragmentToViewPostFragment action =
+                UploadPostFragmentDirections.actionUploadPostFragmentToViewPostFragment()
+                .setPostId(postId);
+
+        View curView = getView();
+        if(curView == null){
+            throw new IllegalStateException("view == null while handleUploadPostFinish");
+        }
+
+        Navigation.findNavController(curView).navigate(action);
     }
 
     private void pickImageFromGallery() {

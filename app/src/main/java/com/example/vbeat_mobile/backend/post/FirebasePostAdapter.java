@@ -60,7 +60,7 @@ public class FirebasePostAdapter implements VBeatPost {
 
     @Override
     public String getPostId() {
-        return null;
+        return postId;
     }
 
     @Override

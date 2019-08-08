@@ -42,5 +42,27 @@
         android:id="@+id/uploadPostFragment"
         android:name="com.example.vbeat_mobile.UI.UploadPostFragment"
         android:label="fragment_upload_post"
-        tools:layout="@layout/fragment_upload_post" />
+        tools:layout="@layout/fragment_upload_post">
+        <action
+            android:id="@+id/action_uploadPostFragment_to_viewPostFragment"
+            app:destination="@id/viewPostFragment">
+            <argument
+                android:name="post_id"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="null" />
+        </action>
+
+    </fragment>
+    <fragment
+        android:id="@+id/viewPostFragment"
+        android:name="com.example.vbeat_mobile.UI.ViewPostFragment"
+        android:label="fragment_post"
+        tools:layout="@layout/fragment_post">
+        <argument
+            android:name="post_id"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+    </fragment>
 </navigation>
