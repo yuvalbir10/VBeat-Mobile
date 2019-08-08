@@ -11,6 +11,13 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.concurrent.ExecutionException;
 
+/*
+* Cache mechanism:
+* For each new image, the key is the url to download it from firebase
+* Each image will be saved in cache_image folder which will be
+* created if not it does already exist
+* an image filename will be the base64 of the key
+* */
 public class FirebaseImageCache implements Cache<Bitmap, String> {
     private static final String TAG = "FirebaseImageCache";
 
