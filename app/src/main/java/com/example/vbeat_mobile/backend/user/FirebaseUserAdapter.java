@@ -22,4 +22,9 @@ public class FirebaseUserAdapter implements VBeatUser {
     public String getDisplayName() {
         return user.getDisplayName();
     }
+
+    @Override
+    public String getUserId() {
+        return user.getUid();
+    }
 }

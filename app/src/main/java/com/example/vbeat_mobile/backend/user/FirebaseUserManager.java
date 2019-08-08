@@ -10,6 +10,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.concurrent.ExecutionException;
 
+/*
+* This can be a singleton
+* But I don't think it makes much difference if it isn't
+* */
 public class FirebaseUserManager implements UserManager {
     private static final String TAG = "FirebaseUserManager";
 

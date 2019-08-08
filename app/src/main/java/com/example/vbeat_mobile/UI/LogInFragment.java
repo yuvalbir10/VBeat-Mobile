@@ -5,7 +5,10 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,8 @@ import com.example.vbeat_mobile.backend.user.UserManager;
  * A simple {@link Fragment} subclass.
  */
 public class LogInFragment extends Fragment {
+    private static final String TAG  = "LogInFragment";
+
     private Button loginButton = null;
     private ProgressBar prBar = null;
     private UserManager userManager;
@@ -86,6 +91,7 @@ public class LogInFragment extends Fragment {
                             Toast.makeText(LogInFragment.this.getContext(),
                                     "Logged in successfully!",
                                     Toast.LENGTH_SHORT).show();
+                            handleSuccesfulLogin();
                         }
                     });
                 } catch(final UserLoginFailedException e) {
@@ -122,6 +128,19 @@ public class LogInFragment extends Fragment {
         }
     }
 
+    private void handleSuccesfulLogin(){
+        View currentView = getView();
+        if(currentView == null) {
+            Log.e(TAG, "currentView == null");
+            throw new IllegalStateException(TAG + " currentView == null");
+        }
 
+        NavController navController = null;
+        navController = Navigation.findNavController(currentView);
+
+        // cleaning up the stack up to now
+        // so back will exit the app
+        navController.navigate(R.id.action_logInFragment_to_uploadPostFragment);
+    }
 
 }

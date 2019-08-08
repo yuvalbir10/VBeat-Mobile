@@ -9,7 +9,14 @@
         android:id="@+id/logInFragment"
         android:name="com.example.vbeat_mobile.UI.LogInFragment"
         android:label="fragment_log_in"
-        tools:layout="@layout/fragment_log_in" />
+        tools:layout="@layout/fragment_log_in" >
+        <action
+            android:id="@+id/action_logInFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:popUpTo="@+id/nav_graph"
+            app:popUpToInclusive="false" />
+    </fragment>
     <fragment
         android:id="@+id/initialFragment"
         android:name="com.example.vbeat_mobile.UI.InitialFragment"
@@ -21,10 +28,19 @@
         <action
             android:id="@+id/action_initialFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_initialFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment"
+            app:popUpTo="@+id/nav_graph" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.vbeat_mobile.UI.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" />
+    <fragment
+        android:id="@+id/uploadPostFragment"
+        android:name="com.example.vbeat_mobile.UI.UploadPostFragment"
+        android:label="fragment_upload_post"
+        tools:layout="@layout/fragment_upload_post" />
 </navigation>
