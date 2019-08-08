@@ -68,7 +68,7 @@ public class UploadPostFragment extends Fragment {
         descriptionEditText = v.findViewById(R.id.description_editText);
         prBar = v.findViewById(R.id.progressBar);
 
-        postManager = new FirebasePostManager();
+        postManager = FirebasePostManager.getInstance();
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
