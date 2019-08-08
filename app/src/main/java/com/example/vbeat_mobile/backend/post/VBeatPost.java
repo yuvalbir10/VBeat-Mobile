@@ -12,6 +12,6 @@ public interface VBeatPost {
     VBeatUser getUploader();
 
     String getPostId();
-    //TODO : add getMusicFile function
 
+    byte[] getMusicFile();
 }
