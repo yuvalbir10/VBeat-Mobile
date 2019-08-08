@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userManager = new FirebaseUserManager();
+        userManager = FirebaseUserManager.getInstance();
         if(userManager.isUserLoggedIn()) {
             Navigation.findNavController(this, R.id.nav_fragment)
                     .navigate(R.id.action_initialFragment_to_uploadPostFragment);

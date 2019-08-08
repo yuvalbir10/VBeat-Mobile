@@ -35,7 +35,7 @@ public class FirebasePostManager implements PostManager<String> {
     private FirebaseUserManager userManager;
 
     public FirebasePostManager(){
-        userManager = new FirebaseUserManager();
+        userManager = FirebaseUserManager.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 

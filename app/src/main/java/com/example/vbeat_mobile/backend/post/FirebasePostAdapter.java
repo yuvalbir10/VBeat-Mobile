@@ -8,7 +8,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO
 public class FirebasePostAdapter implements VBeatPost {
     private String description;
     private String remoteImagePath;
@@ -47,13 +46,16 @@ public class FirebasePostAdapter implements VBeatPost {
 
     @Override
     public String getDescription() {
-        return null;
+        return description;
     }
 
     @Override
     public VBeatUser getUploader() {
-        // lazy get uploader
-        return null;
+        if(uploader == null){
+            // download uploader
+        }
+
+        return uploader;
     }
 
     @Override
@@ -63,6 +65,8 @@ public class FirebasePostAdapter implements VBeatPost {
 
     @Override
     public byte[] getMusicFile() {
+        // lazy get music file
+
         return new byte[0];
     }
 
@@ -80,5 +84,5 @@ public class FirebasePostAdapter implements VBeatPost {
         return map;
     }
 
-    //TODO : add getMusicFile
+
 }

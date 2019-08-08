@@ -19,7 +19,15 @@ public class FirebaseUserManager implements UserManager {
 
     private FirebaseAuth mAuth;
 
-    public FirebaseUserManager(){
+    private static class FirebaseUserManagerInstanceHolder {
+        private static FirebaseUserManager instance = new FirebaseUserManager();
+    }
+
+    public static FirebaseUserManager getInstance(){
+        return FirebaseUserManagerInstanceHolder.instance;
+    }
+
+    private FirebaseUserManager(){
         mAuth = FirebaseAuth.getInstance();
     }
 

@@ -40,8 +40,7 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         final View v =  inflater.inflate(R.layout.fragment_sign_up, container, false);
 
-        // TODO: change to singleton
-        userManager = new FirebaseUserManager();
+        userManager = FirebaseUserManager.getInstance();
 
         signupButton = v.findViewById(R.id.sign_up_button);
         prBar = v.findViewById(R.id.indeterminateBar);
