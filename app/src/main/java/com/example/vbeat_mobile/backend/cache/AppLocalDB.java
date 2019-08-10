@@ -15,10 +15,14 @@ abstract class AppLocalDbRepository extends RoomDatabase{
 }
 
 public class AppLocalDB {
-    static public AppLocalDbRepository db;
+    public AppLocalDbRepository db;
 
     private static class ApplLocalDbInstanceHolder {
         private static AppLocalDB instance;
+    }
+
+    public static AppLocalDB getInstance(){
+        return ApplLocalDbInstanceHolder.instance;
     }
 
     private AppLocalDB(Context c){
