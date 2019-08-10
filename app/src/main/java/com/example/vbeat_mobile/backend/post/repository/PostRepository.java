@@ -3,7 +3,7 @@ package com.example.vbeat_mobile.backend.post.repository;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.vbeat_mobile.UI.viewmodel.PostViewModel;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 
@@ -52,8 +52,8 @@ public class PostRepository {
         return new PostViewModel(
                 model.getPostId(),
                 model.getDescription(),
-                model.getImage(),
-                model.getMusicFile(),
+                model.getRemoteImagePath(),
+                model.getRemoteMusicPath(),
                 model.getUploader()
         );
     }

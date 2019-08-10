@@ -1,4 +1,4 @@
-package com.example.vbeat_mobile.UI.viewmodel;
+package com.example.vbeat_mobile.viewmodel;
 
 import android.graphics.Bitmap;
 
@@ -9,21 +9,21 @@ import com.example.vbeat_mobile.backend.user.VBeatUser;
 public class PostViewModel extends ViewModel {
     private String postId;
     private String description;
-    private Bitmap postImage;
-    private byte[] musicBytes;
+    private String remoteImagePath;
+    private String remoteMusicPath;
     private VBeatUser uploader;
 
     public PostViewModel(
             String postId,
             String description,
-            Bitmap postImage,
-            byte[] musicBytes,
+            String remoteImagePath,
+            String remoteMusicPath,
             VBeatUser uploader
                          ) {
         this.postId = postId;
         this.description = description;
-        this.postImage = postImage;
-        this.musicBytes = musicBytes;
+        this.remoteImagePath = remoteImagePath;
+        this.remoteMusicPath = remoteMusicPath;
         this.uploader = uploader;
     }
 
@@ -35,12 +35,12 @@ public class PostViewModel extends ViewModel {
         return description;
     }
 
-    public Bitmap getPostImage() {
-        return postImage;
+    public String getRemoteImagePath() {
+        return remoteImagePath;
     }
 
-    public byte[] getMusicBytes() {
-        return musicBytes;
+    public String getRemoteMusicPath() {
+        return remoteMusicPath;
     }
 
     public VBeatUser getUploader() {
