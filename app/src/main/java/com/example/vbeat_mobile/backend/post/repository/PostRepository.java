@@ -54,7 +54,7 @@ public class PostRepository {
                 model.getDescription(),
                 model.getRemoteImagePath(),
                 model.getRemoteMusicPath(),
-                model.getUploader()
+                model.getUploaderId()
         );
     }
 }

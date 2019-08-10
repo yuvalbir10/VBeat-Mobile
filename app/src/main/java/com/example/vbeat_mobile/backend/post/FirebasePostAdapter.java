@@ -14,12 +14,12 @@ public class FirebasePostAdapter extends VBeatPostModel {
             String description,
             String remoteImagePath,
             String remoteMusicPath,
-            VBeatUser uploader) {
+            String uploader) {
         this.postId = postId;
         this.description = description;
         this.remoteImagePath = remoteImagePath;
         this.remoteMusicPath = remoteMusicPath;
-        this.uploader = uploader;
+        this.uploaderId = uploader;
     }
 
     public FirebasePostAdapter(DocumentSnapshot ds){
@@ -27,7 +27,6 @@ public class FirebasePostAdapter extends VBeatPostModel {
         this.description = (String)ds.get("description");
         this.remoteImagePath = (String)ds.get("storage_image_path");
         this.remoteMusicPath = (String)ds.get("storage_music_path");
-        this.uploader = null;
         this.uploaderId = (String)ds.get("uploader_id");
     }
 

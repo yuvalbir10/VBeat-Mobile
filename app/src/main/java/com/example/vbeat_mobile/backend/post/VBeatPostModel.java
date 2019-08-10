@@ -3,15 +3,21 @@ package com.example.vbeat_mobile.backend.post;
 import android.graphics.Bitmap;
 import android.media.Image;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.example.vbeat_mobile.backend.user.VBeatUser;
 
-
+@Entity
 public class VBeatPostModel {
     protected String description;
     protected String remoteImagePath;
     protected String remoteMusicPath;
-    protected VBeatUser uploader;
     protected String uploaderId;
+
+    @PrimaryKey
+    @NonNull
     protected String postId;
 
     public String getDescription() {
@@ -38,14 +44,6 @@ public class VBeatPostModel {
         this.remoteMusicPath = remoteMusicPath;
     }
 
-    public VBeatUser getUploader() {
-        return uploader;
-    }
-
-    public void setUploader(VBeatUser uploader) {
-        this.uploader = uploader;
-    }
-
     public String getUploaderId() {
         return uploaderId;
     }
@@ -61,6 +59,4 @@ public class VBeatPostModel {
     public void setPostId(String postId) {
         this.postId = postId;
     }
-
-
 }

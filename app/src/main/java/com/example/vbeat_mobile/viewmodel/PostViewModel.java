@@ -11,20 +11,20 @@ public class PostViewModel extends ViewModel {
     private String description;
     private String remoteImagePath;
     private String remoteMusicPath;
-    private VBeatUser uploader;
+    private String uploaderId;
 
     public PostViewModel(
             String postId,
             String description,
             String remoteImagePath,
             String remoteMusicPath,
-            VBeatUser uploader
+            String uploader
                          ) {
         this.postId = postId;
         this.description = description;
         this.remoteImagePath = remoteImagePath;
         this.remoteMusicPath = remoteMusicPath;
-        this.uploader = uploader;
+        this.uploaderId = uploader;
     }
 
     public String getPostId() {
@@ -43,7 +43,7 @@ public class PostViewModel extends ViewModel {
         return remoteMusicPath;
     }
 
-    public VBeatUser getUploader() {
-        return uploader;
+    public String getUploader() {
+        return uploaderId;
     }
 }

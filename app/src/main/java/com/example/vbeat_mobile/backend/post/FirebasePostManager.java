@@ -97,7 +97,7 @@ public class FirebasePostManager implements PostManager<String> {
                 description,
                 remoteImagePath,
                 remoteMusicPath,
-                userManager.getCurrentUser()
+                userManager.getCurrentUser().getUserId()
         );
     }
 
