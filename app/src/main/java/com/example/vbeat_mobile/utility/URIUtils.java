@@ -74,7 +74,7 @@ public class URIUtils {
         }
     }
 
-    private static String getDataDir(Context context){
+    public static String getDataDir(Context context){
         PackageManager pm = context.getPackageManager();
         String pkgName = context.getPackageName();
         try {

@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +27,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
-import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 
@@ -68,7 +69,7 @@ public class UploadPostFragment extends Fragment {
         descriptionEditText = v.findViewById(R.id.description_editText);
         prBar = v.findViewById(R.id.progressBar);
 
-        postManager = new FirebasePostManager();
+        postManager = FirebasePostManager.getInstance();
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,8 +86,7 @@ public class UploadPostFragment extends Fragment {
         });
 
 
-
-        postButton.setOnClickListener(new View.OnClickListener(){
+        postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 uploadPostInBackground();
@@ -96,17 +96,21 @@ public class UploadPostFragment extends Fragment {
         return v;
     }
 
-    private void uploadPostInBackground(){
+    private void uploadPostInBackground() {
         final View v = getView();
 
-        if(v == null) {
+        if (v == null) {
             throw new IllegalStateException("no view available can't upload post in background");
         }
 
         //get description String from UI
         final String description = descriptionEditText.getText().toString();
 
-        // TODO: verify music uri & image uri
+        if (musicUri == null || imageUri == null) {
+            Toast.makeText(getContext(), "Please choose image & music!", Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
 
         // show progress bar & disable post button
         postButton.setEnabled(false);
@@ -119,16 +123,18 @@ public class UploadPostFragment extends Fragment {
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
                 try {
-                    postManager.uploadPost(description, imageUri, musicUri);
+                    final VBeatPostModel uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
                     safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(UploadPostFragment.this.getContext(),
                                     "Uploaded Post successfully!",
                                     Toast.LENGTH_SHORT).show();
+
+                            handleUploadPostFinish(uploadedPost);
                         }
                     });
-                } catch(final UploadPostFailedException e) {
+                } catch (final UploadPostFailedException e) {
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
@@ -154,6 +160,20 @@ public class UploadPostFragment extends Fragment {
                 }
             }
         }).start();
+    }
+
+    private void handleUploadPostFinish(VBeatPostModel uploadedPost) {
+        String postId = uploadedPost.getPostId();
+        UploadPostFragmentDirections.ActionUploadPostFragmentToViewPostFragment action =
+                UploadPostFragmentDirections.actionUploadPostFragmentToViewPostFragment()
+                .setPostId(postId);
+
+        View curView = getView();
+        if(curView == null){
+            throw new IllegalStateException("view == null while handleUploadPostFinish");
+        }
+
+        Navigation.findNavController(curView).navigate(action);
     }
 
     private void pickImageFromGallery() {
@@ -244,8 +264,8 @@ public class UploadPostFragment extends Fragment {
     }
 
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
+    private void safeRunOnUiThread(Activity a, Runnable r) {
+        if (a != null) {
             a.runOnUiThread(r);
         }
     }

@@ -34,13 +34,21 @@ public class FirebasePostManager implements PostManager<String> {
     // firebase user manager
     private FirebaseUserManager userManager;
 
-    public FirebasePostManager(){
-        userManager = new FirebaseUserManager();
+    private static class FirebasePostManagerInstanceHolder {
+        private static FirebasePostManager instance = new FirebasePostManager();
+    }
+
+    public static FirebasePostManager getInstance(){
+        return FirebasePostManagerInstanceHolder.instance;
+    }
+
+    private FirebasePostManager(){
+        userManager = FirebaseUserManager.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 
     @Override
-    public VBeatPost uploadPost(String description, Uri imageUri, Uri musicUri) throws UploadPostFailedException {
+    public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri) throws UploadPostFailedException {
         if(!userManager.isUserLoggedIn()) {
             throw new UploadPostFailedException("user not logged in");
         }
@@ -89,12 +97,12 @@ public class FirebasePostManager implements PostManager<String> {
                 description,
                 remoteImagePath,
                 remoteMusicPath,
-                userManager.getCurrentUser()
+                userManager.getCurrentUser().getUserId()
         );
     }
 
     @Override
-    public VBeatPost getPost(String postId) {
+    public VBeatPostModel getPost(String postId) {
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(
                     db.collection(postCollectionName).document(postId).get()
@@ -121,7 +129,7 @@ public class FirebasePostManager implements PostManager<String> {
                     db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get()
             );
 
-            LinkedList<VBeatPost> vbeatPostList =  new LinkedList<>();
+            LinkedList<VBeatPostModel> vbeatPostList =  new LinkedList<>();
 
             for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
                 vbeatPostList.add(new FirebasePostAdapter(snapshot));
