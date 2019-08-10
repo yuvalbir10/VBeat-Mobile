@@ -1,21 +1,16 @@
 package com.example.vbeat_mobile.backend.cache;
 
 import android.app.Application;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.util.Base64;
 import android.util.Log;
 
-import com.example.vbeat_mobile.UI.MainActivity;
 import com.example.vbeat_mobile.utility.URIUtils;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
