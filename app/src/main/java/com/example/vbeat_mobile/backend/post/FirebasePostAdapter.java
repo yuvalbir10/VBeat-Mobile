@@ -1,7 +1,6 @@
 package com.example.vbeat_mobile.backend.post;
 
 import android.graphics.Bitmap;
-import android.media.Image;
 
 import com.example.vbeat_mobile.backend.user.VBeatUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -9,14 +8,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FirebasePostAdapter implements VBeatPost {
-    private String description;
-    private String remoteImagePath;
-    private String remoteMusicPath;
-    private VBeatUser uploader;
-    private String uploaderId;
-    private String postId;
-
+public class FirebasePostAdapter extends VBeatPostModel {
     public FirebasePostAdapter(
             String postId,
             String description,
@@ -39,38 +31,6 @@ public class FirebasePostAdapter implements VBeatPost {
         this.uploaderId = (String)ds.get("uploader_id");
     }
 
-    @Override
-    public Bitmap getImage() {
-        // download image here? maybe?
-        return null;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public VBeatUser getUploader() {
-        if(uploader == null){
-            // download uploader
-        }
-
-        return uploader;
-    }
-
-    @Override
-    public String getPostId() {
-        return postId;
-    }
-
-    @Override
-    public byte[] getMusicFile() {
-        // lazy get music file
-
-        return new byte[0];
-    }
-
     public static Map<String, Object> toFirebaseMap(String description,
                                                     String remoteImagePath,
                                                     String remoteMusicPath,
@@ -84,6 +44,4 @@ public class FirebasePostAdapter implements VBeatPost {
 
         return map;
     }
-
-
 }

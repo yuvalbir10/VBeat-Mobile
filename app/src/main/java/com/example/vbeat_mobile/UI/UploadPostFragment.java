@@ -27,8 +27,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
-import com.example.vbeat_mobile.backend.post.VBeatPost;
-import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 
@@ -124,7 +123,7 @@ public class UploadPostFragment extends Fragment {
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
                 try {
-                    final VBeatPost uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
+                    final VBeatPostModel uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
                     safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
@@ -163,7 +162,7 @@ public class UploadPostFragment extends Fragment {
         }).start();
     }
 
-    private void handleUploadPostFinish(VBeatPost uploadedPost) {
+    private void handleUploadPostFinish(VBeatPostModel uploadedPost) {
         String postId = uploadedPost.getPostId();
         UploadPostFragmentDirections.ActionUploadPostFragmentToViewPostFragment action =
                 UploadPostFragmentDirections.actionUploadPostFragmentToViewPostFragment()

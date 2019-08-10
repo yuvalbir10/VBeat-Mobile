@@ -1,15 +1,15 @@
 package com.example.vbeat_mobile.backend.post.repository;
 
-import com.example.vbeat_mobile.backend.post.VBeatPost;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 
 public class PostCache {
     // cache is empty and not implemented for now
-    public VBeatPost getPost(String postId){
+    public VBeatPostModel getPost(String postId){
         return null;
     }
 
     // cache is currently not implemented
-    public void savePost(VBeatPost post) {
+    public void savePost(VBeatPostModel post) {
         return;
     }
 }

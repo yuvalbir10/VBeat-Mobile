@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.vbeat_mobile.UI.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
-import com.example.vbeat_mobile.backend.post.VBeatPost;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 
 public class PostRepository {
     private PostCache postCache = null;
@@ -24,7 +24,7 @@ public class PostRepository {
 
     public LiveData<PostViewModel> getPost(final String postId) {
         final MutableLiveData<PostViewModel> resPost = new MutableLiveData<>();
-        VBeatPost cachedPost = postCache.getPost(postId);
+        VBeatPostModel cachedPost = postCache.getPost(postId);
         if(cachedPost != null) {
             resPost.setValue(
                     getViewModelFromModel(cachedPost)
@@ -36,7 +36,7 @@ public class PostRepository {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                VBeatPost fetchedPost = FirebasePostManager.getInstance().getPost(postId);
+                VBeatPostModel fetchedPost = FirebasePostManager.getInstance().getPost(postId);
                 postCache.savePost(fetchedPost);
 
                 resPost.setValue(
@@ -48,7 +48,7 @@ public class PostRepository {
         return resPost;
     }
 
-    private PostViewModel getViewModelFromModel(VBeatPost model){
+    private PostViewModel getViewModelFromModel(VBeatPostModel model){
         return new PostViewModel(
                 model.getPostId(),
                 model.getDescription(),
