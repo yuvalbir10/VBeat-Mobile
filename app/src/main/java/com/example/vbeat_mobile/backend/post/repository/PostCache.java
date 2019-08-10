@@ -6,7 +6,7 @@ import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 public class PostCache {
     // cache is empty and not implemented for now
     public VBeatPostModel getPost(String postId){
-        AppLocalDB.db.
+        return null;
     }
 
     // cache is currently not implemented
