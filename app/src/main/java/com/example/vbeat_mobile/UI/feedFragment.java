@@ -121,5 +121,6 @@ public class feedFragment extends Fragment {
         }
         feedAdapter.addAll(mData);
         progressBar.setVisibility(View.INVISIBLE);
+        isLoading = false;
     }
 }
