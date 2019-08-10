@@ -17,8 +17,13 @@ import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -42,6 +47,21 @@ public class FeedFragment extends Fragment {
 
     public FeedFragment() {
         // Required empty public constructor
+    }
+
+    // temporary for testing purposes only
+    // this method blocks so run in a
+    // seperate thread
+    private byte[] downloadMusic(String musicPath) {
+        Task<byte[]> t = FirebaseStorage.getInstance()
+                .getReference().child(musicPath).getBytes(10000000);
+
+        try {
+            return Tasks.await(t);
+        } catch(InterruptedException | ExecutionException e ){
+            Log.e("tmp", "download interrupted", e);
+            return null;
+        }
     }
 
 
