@@ -44,7 +44,7 @@
     <fragment
 
         android:id="@+id/feedFragment"
-        android:name="com.example.vbeat_mobile.UI.feedFragment"
+        android:name="com.example.vbeat_mobile.UI.FeedFragment"
         android:label="fragment_feed"
         tools:layout="@layout/fragment_feed" />
 

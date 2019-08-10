@@ -22,7 +22,7 @@ import java.util.Vector;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class feedFragment extends Fragment {
+public class FeedFragment extends Fragment {
     int tempPostNum = 0;
 
     RecyclerView recyclerView;
@@ -38,7 +38,7 @@ public class feedFragment extends Fragment {
     private static final int TOTAL_PAGES = 100;
     private int currentPage = PAGE_START;
 
-    public feedFragment() {
+    public FeedFragment() {
         // Required empty public constructor
     }
 
