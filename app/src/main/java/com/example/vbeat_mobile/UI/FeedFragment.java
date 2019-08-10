@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,10 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 
-import java.sql.Time;
 import java.util.Vector;
 
 
@@ -80,7 +82,7 @@ public class FeedFragment extends Fragment {
                 isLoading = true;
                 currentPage += 1;
 
-                loadNextPage();
+                loadNextPageInBackground();
             }
 
             @Override
@@ -104,22 +106,50 @@ public class FeedFragment extends Fragment {
         return v;
     }
 
-    private void loadNextPage() {
+    private void loadNextPageInBackground() {
         //TODO: move to another thread
         progressBar.setVisibility(View.VISIBLE);
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Activity a = feedFragment.this.getActivity();
+                try {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-        Vector<String> mData = new Vector<String>();
-        for(int i = 0; i < 4; i++){
-            tempPostNum++;
-            mData.add("st" + tempPostNum);
+                    Vector<String> mData = new Vector<String>();
+                    for(int i = 0; i < 4; i++){
+                        tempPostNum++;
+                        mData.add("st" + tempPostNum);
+                    }
+                    feedAdapter.addAll(mData);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    isLoading = false;
+                }
+                catch(final Exception e) {
+
+                }
+                finally {
+
+                    // hide progress bar & show login button
+                    safeRunOnUiThread(a, new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void safeRunOnUiThread(Activity a, Runnable r){
+        if(a != null) {
+            a.runOnUiThread(r);
         }
-        feedAdapter.addAll(mData);
-        progressBar.setVisibility(View.INVISIBLE);
     }
 }
