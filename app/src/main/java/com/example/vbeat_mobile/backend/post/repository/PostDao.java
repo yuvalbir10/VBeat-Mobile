@@ -16,6 +16,9 @@ public interface PostDao {
     @Query("select * from VBeatPostModel")
     List<VBeatPostModel> getAll();
 
+    @Query("select * from VBeatPostModel where postId == :postId")
+    List<VBeatPostModel> getPost(String postId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(VBeatPostModel ... posts);
 
