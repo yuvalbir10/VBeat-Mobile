@@ -3,11 +3,11 @@ package com.example.vbeat_mobile.backend.post;
 import java.util.List;
 
 public class VBeatPostCollection<T> {
-    private List<VBeatPost> posts;
+    private List<VBeatPostModel> posts;
 
     private T cursor;
 
-    public VBeatPostCollection(List<VBeatPost> posts, T cursor){
+    public VBeatPostCollection(List<VBeatPostModel> posts, T cursor){
         this.posts = posts;
         this.cursor = cursor;
     }
@@ -16,7 +16,7 @@ public class VBeatPostCollection<T> {
         return cursor;
     }
 
-    public List<VBeatPost> getPosts() {
+    public List<VBeatPostModel> getPosts() {
         return posts;
     }
 }

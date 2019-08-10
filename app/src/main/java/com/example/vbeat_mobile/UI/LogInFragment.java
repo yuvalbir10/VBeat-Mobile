@@ -44,7 +44,7 @@ public class LogInFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View v =  inflater.inflate(R.layout.fragment_log_in, container, false);
-        userManager = new FirebaseUserManager();
+        userManager = FirebaseUserManager.getInstance();
 
         loginButton = v.findViewById(R.id.log_in_button);
         prBar = v.findViewById(R.id.indeterminateBar);

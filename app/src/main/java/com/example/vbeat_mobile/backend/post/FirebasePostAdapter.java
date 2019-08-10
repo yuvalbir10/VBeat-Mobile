@@ -1,6 +1,6 @@
 package com.example.vbeat_mobile.backend.post;
 
-import android.media.Image;
+import android.graphics.Bitmap;
 
 import com.example.vbeat_mobile.backend.user.VBeatUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -8,26 +8,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO
-public class FirebasePostAdapter implements VBeatPost {
-    private String description;
-    private String remoteImagePath;
-    private String remoteMusicPath;
-    private VBeatUser uploader;
-    private String uploaderId;
-    private String postId;
-
+public class FirebasePostAdapter extends VBeatPostModel {
     public FirebasePostAdapter(
             String postId,
             String description,
             String remoteImagePath,
             String remoteMusicPath,
-            VBeatUser uploader) {
+            String uploader) {
         this.postId = postId;
         this.description = description;
         this.remoteImagePath = remoteImagePath;
         this.remoteMusicPath = remoteMusicPath;
-        this.uploader = uploader;
+        this.uploaderId = uploader;
     }
 
     public FirebasePostAdapter(DocumentSnapshot ds){
@@ -35,35 +27,7 @@ public class FirebasePostAdapter implements VBeatPost {
         this.description = (String)ds.get("description");
         this.remoteImagePath = (String)ds.get("storage_image_path");
         this.remoteMusicPath = (String)ds.get("storage_music_path");
-        this.uploader = null;
         this.uploaderId = (String)ds.get("uploader_id");
-    }
-
-    @Override
-    public Image getImage() {
-        // download image here? maybe?
-        return null;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public VBeatUser getUploader() {
-        // lazy get uploader
-        return null;
-    }
-
-    @Override
-    public String getPostId() {
-        return null;
-    }
-
-    @Override
-    public byte[] getMusicFile() {
-        return new byte[0];
     }
 
     public static Map<String, Object> toFirebaseMap(String description,
@@ -79,6 +43,4 @@ public class FirebasePostAdapter implements VBeatPost {
 
         return map;
     }
-
-    //TODO : add getMusicFile
 }
