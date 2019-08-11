@@ -1,5 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
+import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Vector;
 
 
@@ -72,6 +79,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             username = itemView.findViewById(R.id.username_textView);
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
 
+
+
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -87,11 +97,23 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
         public void bind(String str){
             username.setText("username: " + str);
+            musicControlButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            byte[] musicBytes = FeedFragment.downloadMusic("music/b5be3cb1-0488-4200-86fb-6710d57961c6/2c7f677b-1c78-4048-bf11-f19fcb28afc9");
+                            playMp3(musicBytes);
+                        }
+                    }).start();
+                }
+            });
         }
     }
 
 
-
+//TODO: delete this class
     protected class LoadingVH extends RecyclerView.ViewHolder {
         private ProgressBar mProgressBar;
 
@@ -145,6 +167,41 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     public String getItem(int position) {
         return mData.get(position);
+    }
+
+
+
+
+
+
+    public static void playMp3(byte[] mp3SoundByteArray) {
+        MediaPlayer mediaPlayer = FeedFragment.mediaPlayer;
+        try {
+            // create temp file that will hold byte array
+            File tempMp3 = File.createTempFile("kurchina", "mp3");
+            tempMp3.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(tempMp3);
+            fos.write(mp3SoundByteArray);
+            fos.close();
+
+            // resetting mediaplayer instance to evade problems
+            mediaPlayer.reset();
+
+            // In case you run into issues with threading consider new instance like:
+            // MediaPlayer mediaPlayer = new MediaPlayer();
+
+            // Tried passing path directly, but kept getting
+            // "Prepare failed.: status=0x1"
+            // so using file descriptor instead
+            FileInputStream fis = new FileInputStream(tempMp3);
+            mediaPlayer.setDataSource(fis.getFD());
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException ex) {
+            String s = ex.toString();
+            ex.printStackTrace();
+        }
     }
 
 }

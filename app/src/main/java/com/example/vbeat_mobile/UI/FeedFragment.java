@@ -2,6 +2,7 @@ package com.example.vbeat_mobile.UI;
 
 
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -37,12 +38,13 @@ public class FeedFragment extends Fragment {
     FeedRecyclerViewAdapter feedAdapter;
     ProgressBar progressBar;
 
+    public static MediaPlayer mediaPlayer = new MediaPlayer();
     private static final int PAGE_START = 1;
 
     private boolean isLoading = false;
     private boolean isLastPage = false;
-    // limiting to 5 for this tutorial, since total pages in actual API is very large. Feel free to modify.
-    private static final int TOTAL_PAGES = 100;
+
+    private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
     private int currentPage = PAGE_START;
 
     public FeedFragment() {
@@ -52,7 +54,7 @@ public class FeedFragment extends Fragment {
     // temporary for testing purposes only
     // this method blocks so run in a
     // seperate thread
-    private byte[] downloadMusic(String musicPath) {
+    public static byte[] downloadMusic(String musicPath) {
         Task<byte[]> t = FirebaseStorage.getInstance()
                 .getReference().child(musicPath).getBytes(10000000);
 
