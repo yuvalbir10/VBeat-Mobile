@@ -133,7 +133,7 @@ public class FeedFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Activity a = feedFragment.this.getActivity();
+                Activity a = FeedFragment.this.getActivity();
                 try {
                     try {
                         Thread.sleep(3000);
