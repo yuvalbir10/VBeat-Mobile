@@ -23,15 +23,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
-    Vector<PostViewModel> mData; //TODO: change all String objects to Post Objects
+    List<PostViewModel> mData; //TODO: change all String objects to Post Objects
     OnItemClickListener clickListener;
     PaginationScrollListener paginationScrollListener;
 
-    public FeedRecyclerViewAdapter(Vector<PostViewModel> data){
+    public FeedRecyclerViewAdapter(List<PostViewModel> data){
         mData = data;
     }
 
@@ -57,7 +59,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull PostRowViewHolder holder, int position) {
-        PostViewModel post = mData.elementAt(position);
+        PostViewModel post = mData.get(position);
         holder.bind(post);
     }
 
@@ -153,7 +155,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         notifyItemInserted(mData.size() - 1);
     }
 
-    public void addAll(Vector<PostViewModel> moveResults) {
+    public void addAll(List<PostViewModel> moveResults) {
         for (PostViewModel result : moveResults) {
             add(result);
         }

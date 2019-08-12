@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +28,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
@@ -86,9 +89,8 @@ public class FeedFragment extends Fragment {
 
 
         //TODO: get the relevant posts list from DB
-        Vector<PostViewModel> mData = new Vector<>();
-        mData = firebasePostManager.getPosts(null, POSTS_PER_PAGE);
-
+        List<PostViewModel> mData;
+        mData = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE).getValue();
         feedAdapter = new FeedRecyclerViewAdapter(mData);
         recyclerView.setAdapter(feedAdapter);
 
@@ -146,11 +148,9 @@ public class FeedFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    Vector<String> mData = new Vector<String>();
-                    for(int i = 0; i < 4; i++){
-                        tempPostNum++;
-                        mData.add("st" + tempPostNum);
-                    }
+                    List<PostViewModel> mData;
+                    mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE).getValue();
+
                     feedAdapter.addAll(mData);
                     progressBar.setVisibility(View.INVISIBLE);
                     isLoading = false;
