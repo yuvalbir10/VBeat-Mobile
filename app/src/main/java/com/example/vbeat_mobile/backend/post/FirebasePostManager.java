@@ -119,10 +119,14 @@ public class FirebasePostManager implements PostManager<String> {
     @Override
     public VBeatPostCollection<String> getPosts(String cursor, int limit) {
         // might not work we'll have to test
+        DocumentSnapshot lastPostRendered;
         try {
-            DocumentSnapshot lastPostRendered = Tasks.await(
-                    db.collection(postCollectionName).document(cursor).get()
-            );
+            if(cursor==null){
+                lastPostRendered = null;
+            }
+            else{
+                lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
+            }
 
             // get n (limit) posts after the current post mentioned in cursor
             QuerySnapshot nextPostsQuery = Tasks.await(
