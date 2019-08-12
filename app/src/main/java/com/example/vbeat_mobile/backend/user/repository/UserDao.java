@@ -5,7 +5,6 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 
 import java.util.List;
