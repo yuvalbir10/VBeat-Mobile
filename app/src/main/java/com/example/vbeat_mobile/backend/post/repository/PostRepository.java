@@ -1,13 +1,21 @@
 package com.example.vbeat_mobile.backend.post.repository;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+
 public class PostRepository {
+    private static final String TAG = "PostRepository";
     private PostCache postCache = null;
 
     private static class PostRepositoryInstanceHolder {
@@ -45,6 +53,39 @@ public class PostRepository {
             }
         }).start();
 
+        return resPost;
+    }
+
+    public LiveData<List<PostViewModel>> getPosts(final String cursor,final int limit) {
+        final MutableLiveData<List<PostViewModel>> resPost = new MutableLiveData<>();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                VBeatPostCollection postCollection = FirebasePostManager
+                        .getInstance().getPosts(cursor, limit);
+
+                // android studio complaining
+                // about not declaring type
+                List postList = postCollection.getPosts();
+                List<PostViewModel> postViewModelList = new LinkedList<>();
+
+                for(Object post : postList) {
+                    if(!(post instanceof VBeatPostModel)) {
+                        Log.wtf(TAG, "post was not of type VBeatPostModel");
+                        throw new RuntimeException("Something really weird happened");
+                    }
+
+                    VBeatPostModel concretePost = (VBeatPostModel)post;
+                    postViewModelList.add(
+                            getViewModelFromModel(concretePost)
+                    );
+                }
+
+                resPost.setValue(postViewModelList);
+            }
+        });
         return resPost;
     }
 
