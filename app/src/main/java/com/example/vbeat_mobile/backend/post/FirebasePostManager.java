@@ -144,7 +144,7 @@ public class FirebasePostManager implements PostManager<String> {
                 vbeatPostList.add(new FirebasePostAdapter(snapshot));
             }
 
-            String lastPostId = vbeatPostList.getLast().getPostId();
+            String lastPostId = vbeatPostList.getLast().getPostId(); //TODO: ishay please handle the case when getLast func returns null(when we reached to the end of the posts list
 
             return new VBeatPostCollection<>(vbeatPostList, lastPostId);
         } catch (ExecutionException | InterruptedException  e) {
