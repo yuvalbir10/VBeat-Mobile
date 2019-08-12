@@ -1,13 +1,8 @@
 package com.example.vbeat_mobile.backend.post;
 
-import android.graphics.Bitmap;
-import android.media.Image;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import com.example.vbeat_mobile.backend.user.VBeatUser;
 
 @Entity
 public class VBeatPostModel {

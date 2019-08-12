@@ -87,7 +87,7 @@ public class FirebaseUserManager implements UserManager {
     }
 
     @Override
-    public VBeatUser getCurrentUser() {
+    public VBeatUserModel getCurrentUser() {
         return new FirebaseUserAdapter(mAuth.getCurrentUser());
     }
 
