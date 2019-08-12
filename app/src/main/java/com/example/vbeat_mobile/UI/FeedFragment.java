@@ -146,44 +146,16 @@ public class FeedFragment extends Fragment {
         //TODO: move to another thread
         progressBar.setVisibility(View.VISIBLE);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Activity a = FeedFragment.this.getActivity();
-                try {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    LiveData<List<PostViewModel>> mData;
-                    mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE);
-                    mData.observeForever(new Observer<List<PostViewModel>>() {
-                        @Override
-                        public void onChanged(List<PostViewModel> postViewModels) {
-                            feedAdapter.addAll(postViewModels);
-                            progressBar.setVisibility(View.INVISIBLE);
-                            isLoading = false;
-                        }
-                    });
+            LiveData<List<PostViewModel>> mData;
+            mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE);
+            mData.observeForever(new Observer<List<PostViewModel>>() {
+                @Override
+                public void onChanged(List<PostViewModel> postViewModels) {
+                    feedAdapter.addAll(postViewModels);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    isLoading = false;
                 }
-                catch(final Exception e) {
-
-                }
-                finally {
-
-                    // hide progress bar & show login button
-                    safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(View.INVISIBLE);
-                        }
-                    });
-                }
-            }
-        }).start();
+            });
     }
 
     private void safeRunOnUiThread(Activity a, Runnable r){
