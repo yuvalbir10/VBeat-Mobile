@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +70,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         ImageView postImage;
         TextView description;
         TextView username;
-        ImageButton musicControlButton;
+        final ImageButton musicControlButton;
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -100,13 +101,20 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new Thread(new Runnable() {
+                    Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            byte[] musicBytes = FeedFragment.downloadMusic("music/b5be3cb1-0488-4200-86fb-6710d57961c6/2c7f677b-1c78-4048-bf11-f19fcb28afc9");
-                            playMp3(musicBytes);
+                            if(FeedFragment.mediaPlayer.isPlaying()){
+                                FeedFragment.mediaPlayer.stop();
+                            }
+                            else{
+                                byte[] musicBytes = FeedFragment.downloadMusic("music/5f915bc3-5aa8-442a-9cee-ee5e900b17ce/e78920a0-7ec7-4ef1-8ce1-b252390e886f");//TODO: change to the specific path of the item
+                                playMp3(musicBytes);
+                            }
                         }
-                    }).start();
+
+                    });
+                    t.start();
                 }
             });
         }
