@@ -1,7 +1,9 @@
 package com.example.vbeat_mobile.UI;
 
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,27 +12,35 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
-    Vector<String> mData; //TODO: change all String objects to Post Objects
+    List<PostViewModel> mData; //TODO: change all String objects to Post Objects
     OnItemClickListener clickListener;
     PaginationScrollListener paginationScrollListener;
 
-    public FeedRecyclerViewAdapter(Vector<String> data){
+    public FeedRecyclerViewAdapter(List<PostViewModel> data){
         mData = data;
+    }
+
+    public FeedRecyclerViewAdapter(){
+        mData = new ArrayList<>();
     }
 
     interface OnItemClickListener{
@@ -55,8 +65,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull PostRowViewHolder holder, int position) {
-        String str = mData.elementAt(position);
-        holder.bind(str);
+        PostViewModel post = mData.get(position);
+        holder.bind(post);
     }
 
     @Override
@@ -69,7 +79,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         ImageView postImage;
         TextView description;
         TextView username;
-        ImageButton musicControlButton;
+        final ImageButton musicControlButton;
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -95,18 +105,33 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
         }
 
-        public void bind(String str){
-            username.setText("username: " + str);
+        public void bind(final PostViewModel post){
+            username.setText("username: " + post.getUploader());
+            description.setText(post.getDescription());
+
+
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new Thread(new Runnable() {
+                    Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            byte[] musicBytes = FeedFragment.downloadMusic("music/b5be3cb1-0488-4200-86fb-6710d57961c6/2c7f677b-1c78-4048-bf11-f19fcb28afc9");
-                            playMp3(musicBytes);
+                            if(FeedFragment.mediaPlayer.isPlaying()){
+                                FeedFragment.mediaPlayer.stop();
+                            }
+                            else{
+                                try{
+                                    byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
+                                    playMp3(musicBytes);
+                                }
+                                catch (Exception e){
+                                    Log.e("FeedFragment", "cant find music path");
+                                }
+                            }
                         }
-                    }).start();
+
+                    });
+                    t.start();
                 }
             });
         }
@@ -136,18 +161,18 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
    _________________________________________________________________________________________________
     */
 
-    public void add(String r) {
+    public void add(PostViewModel r) {
         mData.add(r);
         notifyItemInserted(mData.size() - 1);
     }
 
-    public void addAll(Vector<String> moveResults) {
-        for (String result : moveResults) {
+    public void addAll(List<PostViewModel> moveResults) {
+        for (PostViewModel result : moveResults) {
             add(result);
         }
     }
 
-    public void remove(String r) {
+    public void remove(PostViewModel r) {
         int position = mData.indexOf(r);
         if (position > -1) {
             mData.remove(position);
@@ -165,7 +190,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return getItemCount() == 0;
     }
 
-    public String getItem(int position) {
+    public PostViewModel getItem(int position) {
         return mData.get(position);
     }
 
@@ -178,7 +203,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         MediaPlayer mediaPlayer = FeedFragment.mediaPlayer;
         try {
             // create temp file that will hold byte array
-            File tempMp3 = File.createTempFile("kurchina", "mp3");
+            File tempMp3 = File.createTempFile("temp_music_file", "mp3");
             tempMp3.deleteOnExit();
             FileOutputStream fos = new FileOutputStream(tempMp3);
             fos.write(mp3SoundByteArray);

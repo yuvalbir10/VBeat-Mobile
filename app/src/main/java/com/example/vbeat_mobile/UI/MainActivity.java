@@ -25,8 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         userManager = FirebaseUserManager.getInstance();
         if(userManager.isUserLoggedIn()) {
-            Navigation.findNavController(this, R.id.nav_fragment)
-                    .navigate(R.id.action_initialFragment_to_feedFragment);
+            Navigation.findNavController(this, R.id.nav_fragment).navigate(R.id.action_initialFragment_to_feedFragment);
         }
     }
 

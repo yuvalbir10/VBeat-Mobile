@@ -6,6 +6,8 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,12 +19,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
@@ -32,6 +39,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class FeedFragment extends Fragment {
     int tempPostNum = 0;
+    FirebasePostManager firebasePostManager;
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -46,6 +54,7 @@ public class FeedFragment extends Fragment {
 
     private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
     private int currentPage = PAGE_START;
+    private int POSTS_PER_PAGE = 2;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -70,6 +79,7 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+         firebasePostManager = FirebasePostManager.getInstance();
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
         recyclerView = v.findViewById(R.id.posts_RecyclerView);
@@ -78,16 +88,20 @@ public class FeedFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         progressBar =  v.findViewById(R.id.loadmore_progressBar);
 
+        feedAdapter = new FeedRecyclerViewAdapter();
+        recyclerView.setAdapter(feedAdapter);
 
         //TODO: get the relevant posts list from DB
-        Vector<String> mData = new Vector<>();
-        for(int i = 0; i < 4; i++){
-            tempPostNum++;
-            mData.add("st" + tempPostNum);
-        }
-
-        feedAdapter = new FeedRecyclerViewAdapter(mData);
-        recyclerView.setAdapter(feedAdapter);
+        LiveData<List<PostViewModel>> mData;
+        mData = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
+        mData.observeForever(new Observer<List<PostViewModel>>() {
+            @Override
+            public void onChanged(List<PostViewModel> postViewModels) {
+                feedAdapter.addAll(postViewModels);
+                progressBar.setVisibility(View.INVISIBLE);
+                isLoading = false;
+            }
+        });
 
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -132,46 +146,29 @@ public class FeedFragment extends Fragment {
         //TODO: move to another thread
         progressBar.setVisibility(View.VISIBLE);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Activity a = FeedFragment.this.getActivity();
-                try {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    Vector<String> mData = new Vector<String>();
-                    for(int i = 0; i < 4; i++){
-                        tempPostNum++;
-                        mData.add("st" + tempPostNum);
-                    }
-                    feedAdapter.addAll(mData);
+            LiveData<List<PostViewModel>> mData;
+            mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE);
+            mData.observeForever(new Observer<List<PostViewModel>>() {
+                @Override
+                public void onChanged(List<PostViewModel> postViewModels) {
+                    feedAdapter.addAll(postViewModels);
                     progressBar.setVisibility(View.INVISIBLE);
                     isLoading = false;
                 }
-                catch(final Exception e) {
-
-                }
-                finally {
-
-                    // hide progress bar & show login button
-                    safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(View.INVISIBLE);
-                        }
-                    });
-                }
-            }
-        }).start();
+            });
     }
 
     private void safeRunOnUiThread(Activity a, Runnable r){
         if(a != null) {
             a.runOnUiThread(r);
         }
+    }
+
+    private PostViewModel[] PostBackendToFront(VBeatPostModel[] posts){
+        PostViewModel [] ret = new PostViewModel[posts.length];
+        for(int i =0; i<posts.length;i++){
+            ret[i] = new PostViewModel(posts[i].getPostId(),posts[i].getDescription(),posts[i].getRemoteImagePath(),posts[i].getRemoteMusicPath(),posts[i].getUploaderId());
+        }
+        return ret;
     }
 }
