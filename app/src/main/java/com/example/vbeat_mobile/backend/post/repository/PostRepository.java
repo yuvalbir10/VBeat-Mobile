@@ -97,7 +97,7 @@ public class PostRepository {
 
                 resPost.setValue(postViewModelList);
             }
-        });
+        }).start();
 
         return resPost;
     }

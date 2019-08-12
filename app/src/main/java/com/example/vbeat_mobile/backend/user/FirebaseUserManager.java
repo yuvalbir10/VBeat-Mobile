@@ -117,4 +117,8 @@ public class FirebaseUserManager implements UserManager {
             }
         }
     }
+
+    public VBeatUserModel getUser(String userId){
+        throw new RuntimeException("method not implemented");
+    }
 }
