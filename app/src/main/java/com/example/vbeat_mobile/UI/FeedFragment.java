@@ -17,7 +17,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,6 +35,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class FeedFragment extends Fragment {
     int tempPostNum = 0;
+    FirebasePostManager firebasePostManager;
 
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -46,6 +50,7 @@ public class FeedFragment extends Fragment {
 
     private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
     private int currentPage = PAGE_START;
+    private int POSTS_PER_PAGE = 4;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -70,6 +75,7 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+         firebasePostManager = FirebasePostManager.getInstance();
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
         recyclerView = v.findViewById(R.id.posts_RecyclerView);
@@ -80,11 +86,8 @@ public class FeedFragment extends Fragment {
 
 
         //TODO: get the relevant posts list from DB
-        Vector<String> mData = new Vector<>();
-        for(int i = 0; i < 4; i++){
-            tempPostNum++;
-            mData.add("st" + tempPostNum);
-        }
+        Vector<PostViewModel> mData = new Vector<>();
+        mData = firebasePostManager.getPosts(null, POSTS_PER_PAGE);
 
         feedAdapter = new FeedRecyclerViewAdapter(mData);
         recyclerView.setAdapter(feedAdapter);
@@ -173,5 +176,13 @@ public class FeedFragment extends Fragment {
         if(a != null) {
             a.runOnUiThread(r);
         }
+    }
+
+    private PostViewModel[] PostBackendToFront(VBeatPostModel[] posts){
+        PostViewModel [] ret = new PostViewModel[posts.length];
+        for(int i =0; i<posts.length;i++){
+            ret[i] = new PostViewModel(posts[i].getPostId(),posts[i].getDescription(),posts[i].getRemoteImagePath(),posts[i].getRemoteMusicPath(),posts[i].getUploaderId());
+        }
+        return ret;
     }
 }

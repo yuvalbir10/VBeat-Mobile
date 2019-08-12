@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,11 +27,11 @@ import java.util.Vector;
 
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
-    Vector<String> mData; //TODO: change all String objects to Post Objects
+    Vector<PostViewModel> mData; //TODO: change all String objects to Post Objects
     OnItemClickListener clickListener;
     PaginationScrollListener paginationScrollListener;
 
-    public FeedRecyclerViewAdapter(Vector<String> data){
+    public FeedRecyclerViewAdapter(Vector<PostViewModel> data){
         mData = data;
     }
 
@@ -56,8 +57,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull PostRowViewHolder holder, int position) {
-        String str = mData.elementAt(position);
-        holder.bind(str);
+        PostViewModel post = mData.elementAt(position);
+        holder.bind(post);
     }
 
     @Override
@@ -96,8 +97,11 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
         }
 
-        public void bind(String str){
-            username.setText("username: " + str);
+        public void bind(final PostViewModel post){
+            username.setText("username: " + post.getUploader());
+            description.setText(post.getDescription());
+
+
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -108,7 +112,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                                 FeedFragment.mediaPlayer.stop();
                             }
                             else{
-                                byte[] musicBytes = FeedFragment.downloadMusic("music/5f915bc3-5aa8-442a-9cee-ee5e900b17ce/e78920a0-7ec7-4ef1-8ce1-b252390e886f");//TODO: change to the specific path of the item
+                                byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
                                 playMp3(musicBytes);
                             }
                         }
@@ -144,18 +148,18 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
    _________________________________________________________________________________________________
     */
 
-    public void add(String r) {
+    public void add(PostViewModel r) {
         mData.add(r);
         notifyItemInserted(mData.size() - 1);
     }
 
-    public void addAll(Vector<String> moveResults) {
-        for (String result : moveResults) {
+    public void addAll(Vector<PostViewModel> moveResults) {
+        for (PostViewModel result : moveResults) {
             add(result);
         }
     }
 
-    public void remove(String r) {
+    public void remove(PostViewModel r) {
         int position = mData.indexOf(r);
         if (position > -1) {
             mData.remove(position);
@@ -173,7 +177,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return getItemCount() == 0;
     }
 
-    public String getItem(int position) {
+    public PostViewModel getItem(int position) {
         return mData.get(position);
     }
 
@@ -186,7 +190,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         MediaPlayer mediaPlayer = FeedFragment.mediaPlayer;
         try {
             // create temp file that will hold byte array
-            File tempMp3 = File.createTempFile("kurchina", "mp3");
+            File tempMp3 = File.createTempFile("temp_music_file", "mp3");
             tempMp3.deleteOnExit();
             FileOutputStream fos = new FileOutputStream(tempMp3);
             fos.write(mp3SoundByteArray);
