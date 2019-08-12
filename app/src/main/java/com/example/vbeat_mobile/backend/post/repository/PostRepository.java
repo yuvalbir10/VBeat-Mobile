@@ -31,23 +31,22 @@ public class PostRepository {
 
     public LiveData<PostViewModel> getPost(final String postId) {
         final MutableLiveData<PostViewModel> resPost = new MutableLiveData<>();
-        VBeatPostModel cachedPost = postCache.getPost(postId);
-        if(cachedPost != null) {
-            resPost.setValue(
-                    getViewModelFromModel(cachedPost)
-            );
-            return resPost;
-        }
+
 
         // run in background
         new Thread(new Runnable() {
             @Override
             public void run() {
-                VBeatPostModel fetchedPost = FirebasePostManager.getInstance().getPost(postId);
-                postCache.savePost(fetchedPost);
+
+                VBeatPostModel cachedPost = postCache.getPost(postId);
+                if(cachedPost == null) {
+                    cachedPost = FirebasePostManager.getInstance().getPost(postId);
+                    postCache.savePost(cachedPost);
+                }
+
 
                 resPost.setValue(
-                        getViewModelFromModel(fetchedPost)
+                        getViewModelFromModel(cachedPost)
                 );
             }
         }).start();
