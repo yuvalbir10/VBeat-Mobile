@@ -1,9 +1,17 @@
 package com.example.vbeat_mobile.backend.user;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class VBeatUserModel {
-    protected String email;
-    protected String displayName;
-    protected String userId;
+    private String email;
+    private String displayName;
+
+    @PrimaryKey
+    @NonNull
+    private String userId;
 
     public VBeatUserModel(String email, String displayName, String userId) {
         this.email = email;
