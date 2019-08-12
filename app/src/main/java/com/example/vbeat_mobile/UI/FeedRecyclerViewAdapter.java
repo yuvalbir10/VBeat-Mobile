@@ -3,6 +3,7 @@ package com.example.vbeat_mobile.UI;
 import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -118,8 +120,13 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                                 FeedFragment.mediaPlayer.stop();
                             }
                             else{
-                                byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
-                                playMp3(musicBytes);
+                                try{
+                                    byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
+                                    playMp3(musicBytes);
+                                }
+                                catch (Exception e){
+                                    Log.e("FeedFragment", "cant find music path");
+                                }
                             }
                         }
 
