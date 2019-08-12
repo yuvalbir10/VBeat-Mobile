@@ -83,7 +83,7 @@ public class PostRepository {
                     );
                 }
 
-                resPost.setValue(postViewModelList);
+                resPost.postValue(postViewModelList);
             }
         }).start();
         return resPost;
