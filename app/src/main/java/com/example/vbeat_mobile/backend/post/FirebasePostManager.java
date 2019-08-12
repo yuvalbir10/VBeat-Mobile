@@ -123,7 +123,6 @@ public class FirebasePostManager implements PostManager<String> {
         QuerySnapshot nextPostsQuery;
         try {
             if(cursor==null){
-                lastPostRendered = null;
                 nextPostsQuery = Tasks.await(
                         db.collection(postCollectionName).limit(limit).get());
             }
@@ -134,17 +133,16 @@ public class FirebasePostManager implements PostManager<String> {
             }
 
             // get n (limit) posts after the current post mentioned in cursor
-
-
-
-
             LinkedList<VBeatPostModel> vbeatPostList =  new LinkedList<>();
 
             for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
                 vbeatPostList.add(new FirebasePostAdapter(snapshot));
             }
 
-            String lastPostId = vbeatPostList.getLast().getPostId(); //TODO: ishay please handle the case when getLast func returns null(when we reached to the end of the posts list
+            String lastPostId = null;
+            if(vbeatPostList.size() != 0){
+                lastPostId = vbeatPostList.getLast().getPostId();
+            }
 
             return new VBeatPostCollection<>(vbeatPostList, lastPostId);
         } catch (ExecutionException | InterruptedException  e) {
