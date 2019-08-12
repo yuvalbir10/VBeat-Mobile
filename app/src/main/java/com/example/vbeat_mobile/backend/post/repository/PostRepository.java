@@ -77,8 +77,8 @@ public class PostRepository {
                     // load any posts we have and display them in feed
                     postList = postCache.getAllPostsInCache();
                     // take as much posts as you can but not more than
-                    // limit
-                    postList = postList.subList(0, Math.min(limit, postList.size()));
+                    // limit - 1
+                    postList = postList.subList(0, Math.min(limit - 1, postList.size()));
                 }
 
                 List<PostViewModel> postViewModelList = new LinkedList<>();
