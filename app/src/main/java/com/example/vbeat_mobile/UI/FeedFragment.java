@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,7 +54,7 @@ public class FeedFragment extends Fragment {
 
     private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
     private int currentPage = PAGE_START;
-    private int POSTS_PER_PAGE = 4;
+    private int POSTS_PER_PAGE = 2;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -87,12 +88,20 @@ public class FeedFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         progressBar =  v.findViewById(R.id.loadmore_progressBar);
 
+        feedAdapter = new FeedRecyclerViewAdapter();
+        recyclerView.setAdapter(feedAdapter);
 
         //TODO: get the relevant posts list from DB
-        List<PostViewModel> mData;
-        mData = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE).getValue();
-        feedAdapter = new FeedRecyclerViewAdapter(mData);
-        recyclerView.setAdapter(feedAdapter);
+        LiveData<List<PostViewModel>> mData;
+        mData = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
+        mData.observeForever(new Observer<List<PostViewModel>>() {
+            @Override
+            public void onChanged(List<PostViewModel> postViewModels) {
+                feedAdapter.addAll(postViewModels);
+                progressBar.setVisibility(View.INVISIBLE);
+                isLoading = false;
+            }
+        });
 
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -148,12 +157,17 @@ public class FeedFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    List<PostViewModel> mData;
-                    mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE).getValue();
 
-                    feedAdapter.addAll(mData);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    isLoading = false;
+                    LiveData<List<PostViewModel>> mData;
+                    mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE);
+                    mData.observeForever(new Observer<List<PostViewModel>>() {
+                        @Override
+                        public void onChanged(List<PostViewModel> postViewModels) {
+                            feedAdapter.addAll(postViewModels);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            isLoading = false;
+                        }
+                    });
                 }
                 catch(final Exception e) {
 

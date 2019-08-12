@@ -37,6 +37,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         mData = data;
     }
 
+    public FeedRecyclerViewAdapter(){
+        mData = new ArrayList<>();
+    }
+
     interface OnItemClickListener{
         void onClick(int index);
     }
