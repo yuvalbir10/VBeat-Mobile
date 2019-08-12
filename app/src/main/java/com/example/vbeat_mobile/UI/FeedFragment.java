@@ -33,10 +33,10 @@ import java.util.concurrent.ExecutionException;
 public class FeedFragment extends Fragment {
     int tempPostNum = 0;
 
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    FeedRecyclerViewAdapter feedAdapter;
-    ProgressBar progressBar;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private FeedRecyclerViewAdapter feedAdapter;
+    private ProgressBar progressBar;
 
     public static MediaPlayer mediaPlayer = new MediaPlayer();
     private static final int PAGE_START = 1;
