@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,36 +32,38 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.ExecutionException;
 
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
-    List<PostViewModel> mData; //TODO: change all String objects to Post Objects
-    OnItemClickListener clickListener;
-    PaginationScrollListener paginationScrollListener;
-    Activity fromActivity;
+    private static final String TAG = "FeedRecyclerVA";
 
-    public FeedRecyclerViewAdapter(List<PostViewModel> data){
+    List<PostViewModel> mData; //TODO: change all String objects to Post Objects
+    private OnItemClickListener clickListener;
+    private PaginationScrollListener paginationScrollListener;
+    private Activity fromActivity;
+
+    public FeedRecyclerViewAdapter(List<PostViewModel> data) {
         mData = data;
     }
 
-    public FeedRecyclerViewAdapter(){
+    public FeedRecyclerViewAdapter() {
         mData = new ArrayList<>();
     }
 
-    public void setActivity(Activity a){
+    public void setActivity(Activity a) {
         fromActivity = a;
     }
 
-    interface OnItemClickListener{
+    interface OnItemClickListener {
         void onClick(int index);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener){
+    public void setOnItemClickListener(OnItemClickListener listener) {
         clickListener = listener;
     }
 
-    public void setPaginationScrollListener(PaginationScrollListener listener){
+    public void setPaginationScrollListener(PaginationScrollListener listener) {
         paginationScrollListener = listener;
     }
 
@@ -66,8 +71,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     @Override
     public PostRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_row, parent, false);
-        PostRowViewHolder postRowViewHolder = new PostRowViewHolder(view, clickListener);
-        return postRowViewHolder;
+        return new PostRowViewHolder(view, clickListener);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return mData.size();
     }
 
-    class PostRowViewHolder extends RecyclerView.ViewHolder{
+    class PostRowViewHolder extends RecyclerView.ViewHolder {
         ImageView profilePhoto;
         ImageView postImage;
         TextView description;
@@ -97,13 +101,12 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
 
 
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int index = getAdapterPosition();
-                    if(clickListener!= null) {
-                        if(index != RecyclerView.NO_POSITION){
+                    if (clickListener != null) {
+                        if (index != RecyclerView.NO_POSITION) {
                             clickListener.onClick(index);
                         }
                     }
@@ -111,13 +114,33 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
         }
 
-        public void bind(final PostViewModel post){
+        public void bind(final PostViewModel post) {
             username.setText("username: " + post.getUploader());
             description.setText(post.getDescription());
-            ImageViewUtil.getInstance().displayAndCache(
-                    postImage,
-                    post.getRemoteImagePath()
-            );
+
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Uri remoteImageDownloadUri = null;
+                            try {
+                                remoteImageDownloadUri = Tasks.await(
+                                        FirebaseStorage.getInstance()
+                                                .getReference().child(post.getRemoteImagePath()).getDownloadUrl()
+                                );
+
+                                ImageViewUtil.getInstance().displayAndCache(
+                                        FeedRecyclerViewAdapter.this.fromActivity,
+                                        postImage,
+                                        remoteImageDownloadUri
+                                );
+                            } catch (ExecutionException | InterruptedException e) {
+                                Log.e(TAG, "can't display image", e);
+                            }
+                        }
+                    }
+            ).start();
+
 
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -125,15 +148,13 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if(FeedFragment.mediaPlayer.isPlaying()){
+                            if (FeedFragment.mediaPlayer.isPlaying()) {
                                 FeedFragment.mediaPlayer.stop();
-                            }
-                            else{
-                                try{
+                            } else {
+                                try {
                                     byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
                                     playMp3(musicBytes);
-                                }
-                                catch (Exception e){
+                                } catch (Exception e) {
                                     Log.e("FeedFragment", "cant find music path");
                                 }
                             }
@@ -147,7 +168,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     }
 
 
-//TODO: delete this class
+    //TODO: delete this class
     protected class LoadingVH extends RecyclerView.ViewHolder {
         private ProgressBar mProgressBar;
 
@@ -202,10 +223,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     public PostViewModel getItem(int position) {
         return mData.get(position);
     }
-
-
-
-
 
 
     public static void playMp3(byte[] mp3SoundByteArray) {

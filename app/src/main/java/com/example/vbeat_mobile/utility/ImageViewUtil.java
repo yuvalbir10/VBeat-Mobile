@@ -33,17 +33,27 @@ public class ImageViewUtil {
         Picasso.setSingletonInstance(p);
     }
 
-    public void displayAndCache(ImageView imageView, String url){
-        Picasso.get()
-                .load(url)
+    public void displayAndCache(Activity a, final ImageView imageView, final String url){
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Picasso.get()
+                        .load(url)
 //                .placeholder(R.drawable.progress_animation)
-                .into(imageView);
+                        .into(imageView);
+            }
+        });
     }
 
-    public void displayAndCache(ImageView imageView, Uri uri) {
-        Picasso.get()
-                .load(uri)
+    public void displayAndCache(Activity a , final ImageView imageView,final Uri uri) {
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Picasso.get()
+                        .load(uri)
 //                .placeholder(R.drawable.progress_animation)
-                .into(imageView);
+                        .into(imageView);
+            }
+        });
     }
 }

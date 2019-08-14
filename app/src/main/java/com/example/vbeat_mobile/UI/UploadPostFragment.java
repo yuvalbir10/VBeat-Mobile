@@ -236,6 +236,7 @@ public class UploadPostFragment extends Fragment {
 //
 //                imageView.setImageBitmap(fixed);
                 ImageViewUtil.getInstance().displayAndCache(
+                        getActivity(),
                         imageView,
                         imageUri
                 );
