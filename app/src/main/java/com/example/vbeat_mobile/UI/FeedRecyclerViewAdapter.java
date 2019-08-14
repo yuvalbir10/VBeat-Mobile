@@ -86,7 +86,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     }
 
     class PostRowViewHolder extends RecyclerView.ViewHolder {
-        ImageView profilePhoto;
         ImageView postImage;
         TextView description;
         TextView username;
@@ -94,7 +93,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
-            profilePhoto = itemView.findViewById(R.id.profile_imageView);
             postImage = itemView.findViewById(R.id.post_imageView);
             description = itemView.findViewById(R.id.description_textView);
             username = itemView.findViewById(R.id.username_textView);
@@ -115,7 +113,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         }
 
         public void bind(final PostViewModel post) {
-            username.setText("username: " + post.getUploader());
+            username.setText(post.getUploader());
             description.setText(post.getDescription());
 
             new Thread(
