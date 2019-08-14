@@ -33,17 +33,17 @@ public class ImageViewUtil {
         Picasso.setSingletonInstance(p);
     }
 
-    public void displayAndCache(Activity a, ImageView imageView, String url){
+    public void displayAndCache(ImageView imageView, String url){
         Picasso.get()
                 .load(url)
-                .placeholder(R.drawable.progress_animation)
+//                .placeholder(R.drawable.progress_animation)
                 .into(imageView);
     }
 
-    public void displayAndCache(Activity a, ImageView imageView, Uri uri) {
+    public void displayAndCache(ImageView imageView, Uri uri) {
         Picasso.get()
                 .load(uri)
-                .placeholder(R.drawable.progress_animation)
+//                .placeholder(R.drawable.progress_animation)
                 .into(imageView);
     }
 }

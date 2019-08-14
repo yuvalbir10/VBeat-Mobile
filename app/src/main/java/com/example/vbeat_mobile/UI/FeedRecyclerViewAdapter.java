@@ -115,7 +115,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             username.setText("username: " + post.getUploader());
             description.setText(post.getDescription());
             ImageViewUtil.getInstance().displayAndCache(
-                    FeedRecyclerViewAdapter.this.fromActivity,
                     postImage,
                     post.getRemoteImagePath()
             );
