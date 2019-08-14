@@ -98,7 +98,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
 
 
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -115,7 +114,11 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         public void bind(final PostViewModel post){
             username.setText("username: " + post.getUploader());
             description.setText(post.getDescription());
-
+            ImageViewUtil.getInstance().displayAndCache(
+                    FeedRecyclerViewAdapter.this.fromActivity,
+                    postImage,
+                    post.getRemoteImagePath()
+            );
 
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -135,20 +138,12 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                                     Log.e("FeedFragment", "cant find music path");
                                 }
                             }
-
-                            ImageViewUtil.getInstance().displayAndCache(
-                                    FeedRecyclerViewAdapter.this.fromActivity,
-                                    postImage,
-                                    post.getRemoteImagePath()
-                            );
                         }
 
                     });
                     t.start();
                 }
             });
-
-
         }
     }
 
