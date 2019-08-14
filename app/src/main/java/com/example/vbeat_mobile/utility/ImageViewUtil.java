@@ -3,6 +3,7 @@ package com.example.vbeat_mobile.utility;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.net.Uri;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
@@ -35,6 +36,13 @@ public class ImageViewUtil {
     public void displayAndCache(Activity a, ImageView imageView, String url){
         Picasso.get()
                 .load(url)
+                .placeholder(R.drawable.progress_animation)
+                .into(imageView);
+    }
+
+    public void displayAndCache(Activity a, ImageView imageView, Uri uri) {
+        Picasso.get()
+                .load(uri)
                 .placeholder(R.drawable.progress_animation)
                 .into(imageView);
     }
