@@ -1,5 +1,6 @@
 package com.example.vbeat_mobile.UI;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
@@ -18,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.io.File;
@@ -34,6 +36,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     List<PostViewModel> mData; //TODO: change all String objects to Post Objects
     OnItemClickListener clickListener;
     PaginationScrollListener paginationScrollListener;
+    Activity fromActivity;
 
     public FeedRecyclerViewAdapter(List<PostViewModel> data){
         mData = data;
@@ -41,6 +44,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     public FeedRecyclerViewAdapter(){
         mData = new ArrayList<>();
+    }
+
+    public void setActivity(Activity a){
+        fromActivity = a;
     }
 
     interface OnItemClickListener{
@@ -74,7 +81,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return mData.size();
     }
 
-    static class PostRowViewHolder extends RecyclerView.ViewHolder{
+    class PostRowViewHolder extends RecyclerView.ViewHolder{
         ImageView profilePhoto;
         ImageView postImage;
         TextView description;
@@ -128,12 +135,20 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                                     Log.e("FeedFragment", "cant find music path");
                                 }
                             }
+
+                            ImageViewUtil.getInstance().displayAndCache(
+                                    FeedRecyclerViewAdapter.this.fromActivity,
+                                    postImage,
+                                    post.getRemoteImagePath()
+                            );
                         }
 
                     });
                     t.start();
                 }
             });
+
+
         }
     }
 

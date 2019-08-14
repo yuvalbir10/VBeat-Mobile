@@ -89,6 +89,7 @@ public class FeedFragment extends Fragment {
         progressBar =  v.findViewById(R.id.loadmore_progressBar);
 
         feedAdapter = new FeedRecyclerViewAdapter();
+        feedAdapter.setActivity(getActivity());
         recyclerView.setAdapter(feedAdapter);
 
         //TODO: get the relevant posts list from DB
