@@ -87,7 +87,7 @@ public class FirebaseUserManager implements UserManager {
     }
 
     @Override
-    public VBeatUser getCurrentUser() {
+    public VBeatUserModel getCurrentUser() {
         return new FirebaseUserAdapter(mAuth.getCurrentUser());
     }
 
@@ -116,5 +116,9 @@ public class FirebaseUserManager implements UserManager {
                 throw new UserLoginFailedException("unknown reason");
             }
         }
+    }
+
+    public VBeatUserModel getUser(String userId){
+        throw new RuntimeException("method not implemented");
     }
 }

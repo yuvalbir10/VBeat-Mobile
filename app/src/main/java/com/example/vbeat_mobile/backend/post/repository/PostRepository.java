@@ -5,14 +5,13 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
-import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class PostRepository {
     private static final String TAG = "PostRepository";
@@ -32,23 +31,22 @@ public class PostRepository {
 
     public LiveData<PostViewModel> getPost(final String postId) {
         final MutableLiveData<PostViewModel> resPost = new MutableLiveData<>();
-        VBeatPostModel cachedPost = postCache.getPost(postId);
-        if(cachedPost != null) {
-            resPost.setValue(
-                    getViewModelFromModel(cachedPost)
-            );
-            return resPost;
-        }
+
 
         // run in background
         new Thread(new Runnable() {
             @Override
             public void run() {
-                VBeatPostModel fetchedPost = FirebasePostManager.getInstance().getPost(postId);
-                postCache.savePost(fetchedPost);
+
+                VBeatPostModel cachedPost = postCache.getPost(postId);
+                if(cachedPost == null) {
+                    cachedPost = FirebasePostManager.getInstance().getPost(postId);
+                    postCache.savePost(cachedPost);
+                }
+
 
                 resPost.setValue(
-                        getViewModelFromModel(fetchedPost)
+                        getViewModelFromModel(cachedPost)
                 );
             }
         }).start();
@@ -56,9 +54,8 @@ public class PostRepository {
         return resPost;
     }
 
-    public LiveData<List<PostViewModel>> getPosts(final String cursor,final int limit) {
+    public LiveData<List<PostViewModel>> getPosts(final String cursor, final int limit) {
         final MutableLiveData<List<PostViewModel>> resPost = new MutableLiveData<>();
-
 
         new Thread(new Runnable() {
             @Override
@@ -66,9 +63,23 @@ public class PostRepository {
                 VBeatPostCollection postCollection = FirebasePostManager
                         .getInstance().getPosts(cursor, limit);
 
+
+
                 // android studio complaining
                 // about not declaring type
-                List postList = postCollection.getPosts();
+                List postList = null;
+
+                if(postCollection != null) {
+                    // load from remote source if we can
+                    postList = postCollection.getPosts();
+                } else {
+                    // load any posts we have and display them in feed
+                    postList = postCache.getAllPostsInCache();
+                    // take as much posts as you can but not more than
+                    // limit - 1
+                    postList = postList.subList(0, Math.min(limit - 1, postList.size()));
+                }
+
                 List<PostViewModel> postViewModelList = new LinkedList<>();
 
                 for(Object post : postList) {
@@ -86,6 +97,7 @@ public class PostRepository {
                 resPost.postValue(postViewModelList);
             }
         }).start();
+
         return resPost;
     }
 
