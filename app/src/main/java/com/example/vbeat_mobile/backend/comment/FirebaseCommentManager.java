@@ -6,9 +6,13 @@ import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -26,6 +30,27 @@ public class FirebaseCommentManager {
 
     private FirebaseCommentManager() {
         Log.d(TAG, "FirebaseCommentManager instance created");
+    }
+
+    public List<CommentModel> getComments(String postId) throws CommentException {
+        List<CommentModel> commentModelLinkedList = new LinkedList<>();
+        FirebaseFirestore instance = FirebaseFirestore.getInstance();
+
+        QuerySnapshot qs = null;
+        try {
+            qs = Tasks.await(
+                    instance.collection(COMMENT_COLLECTION).whereEqualTo("postId", postId).get()
+            );
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "unable to fetch comments for post", e);
+            throw new CommentException(e.getMessage());
+        }
+
+        for(DocumentSnapshot ds : qs.getDocuments()) {
+            commentModelLinkedList.add(documentToCommentModel(ds));
+        }
+
+        return commentModelLinkedList;
     }
 
     public CommentModel comment(String commentText, String postId) throws CommentException {
@@ -91,5 +116,14 @@ public class FirebaseCommentManager {
         obj.put("postId", postId);
         obj.put("userId", userId);
         return obj;
+    }
+
+    private CommentModel documentToCommentModel(DocumentSnapshot ds) {
+        return new CommentModel(
+                ds.getId(),
+                (String)ds.get("userId"),
+                (String)ds.get("commentText"),
+                (String)ds.get("postId")
+        );
     }
 }
