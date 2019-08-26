@@ -1,4 +1,4 @@
-package com.example.vbeat_mobile.backend;
+package com.example.vbeat_mobile.backend.comment;
 
 public class CommentModel {
     private String userId;
