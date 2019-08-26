@@ -14,4 +14,16 @@ public class CommentModel {
         this.commentText = commentText;
         this.postId = postId;
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getCommentText() {
+        return commentText;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
 }
