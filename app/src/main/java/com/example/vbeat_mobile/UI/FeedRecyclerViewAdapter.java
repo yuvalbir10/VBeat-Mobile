@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.comment.CommentException;
+import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Tasks;
@@ -90,6 +94,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         TextView description;
         TextView username;
         final ImageButton musicControlButton;
+        Button commentButton;
+        EditText commentEditText;
+        String postId;
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -97,7 +104,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             description = itemView.findViewById(R.id.description_textView);
             username = itemView.findViewById(R.id.username_textView);
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
-
+            commentButton = itemView.findViewById(R.id.post_comment_button);
+            commentEditText = itemView.findViewById(R.id.comment_editText);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -110,11 +118,70 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     }
                 }
             });
+
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
+                    final String commentStr = commentEditText.getText().toString();
+
+                    if(commentStr.contentEquals("")){
+                        safeRunOnUiThread(fromActivity, new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(fromActivity.getBaseContext(),
+                                        "Can't post empty comment...",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        return;
+                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                commentManager.comment(commentStr, postId);
+                                safeRunOnUiThread(fromActivity, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(fromActivity.getBaseContext(),
+                                                "Commented Successfully!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                commentEditText.setText("");
+
+                            } catch (final CommentException e) {
+                                safeRunOnUiThread(fromActivity, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(fromActivity.getBaseContext(),
+                                                "Error Commenting : " + e.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+
+                }
+            });
         }
+
+
+        private void safeRunOnUiThread(Activity a, Runnable r){
+            if(a != null) {
+                a.runOnUiThread(r);
+            }
+        }
+
+
 
         public void bind(final PostViewModel post) {
             username.setText(post.getUploader());
             description.setText(post.getDescription());
+            postId = post.getPostId();
 
             new Thread(
                     new Runnable() {
