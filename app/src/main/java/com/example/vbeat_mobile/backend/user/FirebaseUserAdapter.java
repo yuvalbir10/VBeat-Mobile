@@ -2,29 +2,9 @@ package com.example.vbeat_mobile.backend.user;
 
 import com.google.firebase.auth.FirebaseUser;
 
-public class FirebaseUserAdapter implements VBeatUser {
-    private FirebaseUser user;
+public class FirebaseUserAdapter extends VBeatUserModel {
 
     public FirebaseUserAdapter(FirebaseUser user) {
-        if(user == null) {
-            throw new NullPointerException("can't have null user adapter");
-        }
-
-        this.user = user;
-    }
-
-    @Override
-    public String getEmail() {
-        return user.getEmail();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return user.getDisplayName();
-    }
-
-    @Override
-    public String getUserId() {
-        return user.getUid();
+        super(user.getEmail(), user.getDisplayName(), user.getUid());
     }
 }

@@ -22,4 +22,8 @@ public class PostCache {
     public void savePost(VBeatPostModel post) {
         AppLocalDB.getInstance().db.postDao().insertAll(post);
     }
+
+    public List<VBeatPostModel> getAllPostsInCache(){
+        return AppLocalDB.getInstance().db.postDao().getAll();
+    }
 }
