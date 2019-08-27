@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -116,6 +117,10 @@ public class FirebaseUserManager implements UserManager {
                 throw new UserLoginFailedException("unknown reason");
             }
         }
+    }
+
+    public List<VBeatUserModel> getUsers(List<String> userIds) {
+        throw new RuntimeException("not implemented");
     }
 
     public VBeatUserModel getUser(String userId){
