@@ -1,10 +1,6 @@
 package com.example.vbeat_mobile.viewmodel;
 
-import android.graphics.Bitmap;
-
 import androidx.lifecycle.ViewModel;
-
-import com.example.vbeat_mobile.backend.user.VBeatUser;
 
 public class PostViewModel extends ViewModel {
     private String postId;

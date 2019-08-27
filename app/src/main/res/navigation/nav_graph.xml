@@ -11,11 +11,10 @@
         android:label="fragment_log_in"
         tools:layout="@layout/fragment_log_in" >
         <action
-            android:id="@+id/action_logInFragment_to_uploadPostFragment"
-            app:destination="@id/uploadPostFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
+            android:id="@+id/action_logInFragment_to_feedFragment"
+            app:destination="@id/feedFragment"
             app:popUpTo="@+id/nav_graph"
-            app:popUpToInclusive="false" />
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/initialFragment"
@@ -29,15 +28,23 @@
             android:id="@+id/action_initialFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
         <action
-            android:id="@+id/action_initialFragment_to_uploadPostFragment"
-            app:destination="@id/uploadPostFragment"
-            app:popUpTo="@+id/nav_graph" />
+            android:id="@+id/action_initialFragment_to_feedFragment"
+            app:destination="@id/feedFragment"
+            app:popUpTo="@+id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.vbeat_mobile.UI.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" />
+    <fragment
+
+        android:id="@+id/feedFragment"
+        android:name="com.example.vbeat_mobile.UI.FeedFragment"
+        android:label="fragment_feed"
+        tools:layout="@layout/fragment_feed" />
+
     <fragment
         android:id="@+id/uploadPostFragment"
         android:name="com.example.vbeat_mobile.UI.UploadPostFragment"

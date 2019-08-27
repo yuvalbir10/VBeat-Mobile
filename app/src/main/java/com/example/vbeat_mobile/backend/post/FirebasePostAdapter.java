@@ -1,8 +1,6 @@
 package com.example.vbeat_mobile.backend.post;
 
-import android.graphics.Bitmap;
-
-import com.example.vbeat_mobile.backend.user.VBeatUser;
+import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.HashMap;
@@ -33,7 +31,7 @@ public class FirebasePostAdapter extends VBeatPostModel {
     public static Map<String, Object> toFirebaseMap(String description,
                                                     String remoteImagePath,
                                                     String remoteMusicPath,
-                                                    VBeatUser uploader) {
+                                                    VBeatUserModel uploader) {
         Map<String, Object> map = new HashMap<>();
 
         map.put("description", description);

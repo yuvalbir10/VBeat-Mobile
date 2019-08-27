@@ -119,23 +119,30 @@ public class FirebasePostManager implements PostManager<String> {
     @Override
     public VBeatPostCollection<String> getPosts(String cursor, int limit) {
         // might not work we'll have to test
+        DocumentSnapshot lastPostRendered;
+        QuerySnapshot nextPostsQuery;
         try {
-            DocumentSnapshot lastPostRendered = Tasks.await(
-                    db.collection(postCollectionName).document(cursor).get()
-            );
+            if(cursor==null){
+                nextPostsQuery = Tasks.await(
+                        db.collection(postCollectionName).limit(limit).get());
+            }
+            else{
+                lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
+                nextPostsQuery = Tasks.await(
+                        db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get());
+            }
 
             // get n (limit) posts after the current post mentioned in cursor
-            QuerySnapshot nextPostsQuery = Tasks.await(
-                    db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get()
-            );
-
             LinkedList<VBeatPostModel> vbeatPostList =  new LinkedList<>();
 
             for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
                 vbeatPostList.add(new FirebasePostAdapter(snapshot));
             }
 
-            String lastPostId = vbeatPostList.getLast().getPostId();
+            String lastPostId = null;
+            if(vbeatPostList.size() != 0){
+                lastPostId = vbeatPostList.getLast().getPostId();
+            }
 
             return new VBeatPostCollection<>(vbeatPostList, lastPostId);
         } catch (ExecutionException | InterruptedException  e) {

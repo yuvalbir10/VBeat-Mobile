@@ -8,6 +8,18 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="feedFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="160" />
+                            <option name="y" value="165" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="initialFragment">
                     <value>
                       <LayoutPositions>
@@ -19,17 +31,17 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_initialFragment_to_feedFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_initialFragment_to_logInFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
                             <entry key="action_initialFragment_to_signUpFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_initialFragment_to_uploadPostFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -50,7 +62,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_logInFragment_to_uploadPostFragment">
+                            <entry key="action_logInFragment_to_feedFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -77,8 +89,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="180" />
-                            <option name="y" value="166" />
+                            <option name="x" value="34" />
+                            <option name="y" value="-330" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -98,8 +110,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="476" />
-                            <option name="y" value="162" />
+                            <option name="x" value="290" />
+                            <option name="y" value="-352" />
                           </Point>
                         </option>
                       </LayoutPositions>

@@ -91,7 +91,7 @@ public class LogInFragment extends Fragment {
                             Toast.makeText(LogInFragment.this.getContext(),
                                     "Logged in successfully!",
                                     Toast.LENGTH_SHORT).show();
-                            handleSuccesfulLogin();
+                            handleSuccessfulLogin();
                         }
                     });
                 } catch(final UserLoginFailedException e) {
@@ -128,7 +128,7 @@ public class LogInFragment extends Fragment {
         }
     }
 
-    private void handleSuccesfulLogin(){
+    private void handleSuccessfulLogin(){
         View currentView = getView();
         if(currentView == null) {
             Log.e(TAG, "currentView == null");
@@ -140,7 +140,7 @@ public class LogInFragment extends Fragment {
 
         // cleaning up the stack up to now
         // so back will exit the app
-        navController.navigate(R.id.action_logInFragment_to_uploadPostFragment);
+        navController.navigate(R.id.action_logInFragment_to_feedFragment);
     }
 
 }

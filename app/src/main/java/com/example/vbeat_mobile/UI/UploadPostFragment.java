@@ -29,6 +29,7 @@ import com.example.vbeat_mobile.backend.post.PostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.utility.ExifUtil;
+import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 
 import java.io.File;
@@ -219,21 +220,26 @@ public class UploadPostFragment extends Fragment {
             // if we're getting a good path
             // load into image view
             if (path != null) {
-                Bitmap bitmap = BitmapFactory.decodeFile(path);
                 imageUri = Uri.fromFile(new File(path));
+                ImageView imageView = v.findViewById(R.id.imageView);
 
-                // prevent memory issues
-                Bitmap scaled = Bitmap.createScaledBitmap(
-                        bitmap,
-                        512,
-                        512,
-                        true);
-
-                Bitmap fixed = ExifUtil.rotateBitmap(path, scaled);
-
-                ImageView image = v.findViewById(R.id.imageView);
-
-                image.setImageBitmap(fixed);
+//                // prevent memory issues
+//                Bitmap bitmap = BitmapFactory.decodeFile(path);
+//                Bitmap scaled = Bitmap.createScaledBitmap(
+//                        bitmap,
+//                        512,
+//                        512,
+//                        true);
+//
+//                Bitmap fixed = ExifUtil.rotateBitmap(path, scaled);
+//
+//
+//                imageView.setImageBitmap(fixed);
+                ImageViewUtil.getInstance().displayAndCache(
+                        getActivity(),
+                        imageView,
+                        imageUri
+                );
                 setTextViewFilename(v, R.id.imagePathTextView, path);
             }
         }
