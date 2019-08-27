@@ -19,4 +19,14 @@ public class CommentViewModel {
     public String getUsername() {
         return username;
     }
+
+    public String getUserId(){
+        //TODO: ishay to implement
+        return null;
+    }
+
+    public String getCommentId(){
+        //TODO: ishay to implement
+        return null;
+    }
 }

@@ -44,6 +44,7 @@ public class showCommentsFragment extends Fragment {
         commentsRecyclerView.setLayoutManager(layoutManager);
 
         final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
+        adapter.setActivity(getActivity());
 
         LiveData<List<CommentViewModel>> mData;
         mData = CommentRepository.getInstance().getComments("fsjYLSud01LPCjG0R3jq"); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
