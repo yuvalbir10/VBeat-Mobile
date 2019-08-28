@@ -36,7 +36,10 @@ public class ImageViewUtil {
         Picasso.Builder builder = new Picasso.Builder(c);
         Picasso p = builder.memoryCache(new LruCache(CACHE_SIZE)).build();
         p.setLoggingEnabled(true);
-        Picasso.setSingletonInstance(p);
+
+        if(Picasso.get() == null) {
+            Picasso.setSingletonInstance(p);
+        }
     }
 
     public void displayAndCache(Activity a, final ImageView imageView, final String url){
