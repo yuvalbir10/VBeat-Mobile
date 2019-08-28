@@ -10,4 +10,7 @@
     <string name="my_profile">My Profile</string>
     <string name="home">Home</string>
     <string name="upload_menu">Upload</string>
+    <string name="post_image">post image</string>
+    <string name="username_text_label">username</string>
+    <string name="add_a_comment_hint">Add a comment...</string>
 </resources>

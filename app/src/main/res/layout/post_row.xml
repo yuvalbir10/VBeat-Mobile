@@ -22,15 +22,13 @@
 
     <ImageView
         android:id="@+id/post_imageView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="205dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="63dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description_textView"
-        tools:srcCompat="@tools:sample/backgrounds/scenic[0]" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic[0]"
+        android:contentDescription="@string/post_image" />
 
     <ImageButton
         android:id="@+id/musicControl_imageButton"
@@ -48,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="username"
+        android:text="@string/username_text_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -61,7 +59,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
-        android:hint="Add a comment..."
+        android:hint="@string/add_a_comment_hint"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toStartOf="@+id/post_comment_button"
         app:layout_constraintHorizontal_bias="0.655"

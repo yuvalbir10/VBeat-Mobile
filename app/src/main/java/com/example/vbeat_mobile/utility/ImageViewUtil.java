@@ -58,7 +58,7 @@ public class ImageViewUtil {
             public void run() {
                 Picasso.get()
                         .load(uri)
-                        .resize(200, 0)
+                        .fit()
                         .centerCrop()
                         .into(imageView);
             }
