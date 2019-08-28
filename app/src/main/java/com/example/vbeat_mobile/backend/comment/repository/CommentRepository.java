@@ -9,6 +9,7 @@ import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.CommentModel;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,7 +54,7 @@ public class CommentRepository {
         return liveData;
     }
 
-    private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels) {
+    private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels)  throws CommentException {
         List<String> userIds = new LinkedList<>();
         List<CommentViewModel> commentViewModels = new LinkedList<>();
 
@@ -62,7 +63,12 @@ public class CommentRepository {
         }
 
         FirebaseUserManager userManager = FirebaseUserManager.getInstance();
-        List<VBeatUserModel> userModels = userManager.getUsers(userIds);
+        List<VBeatUserModel> userModels = null;
+        try {
+            userModels = userManager.getUsers(userIds);
+        } catch (UserBackendException e) {
+            throw new CommentException("unable to grab users for comments");
+        }
 
         // match usernames to user ids
         for(CommentModel commentModel : commentModels) {

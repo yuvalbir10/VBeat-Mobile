@@ -180,7 +180,7 @@ public class FirebaseUserManager implements UserManager {
             Log.e(TAG, "getUser failed with exception", e);
             throw new UserBackendException(e.getMessage());
         }
-        
+
         DocumentSnapshot ds = t.getResult();
         if(ds == null) {
             throw new UserBackendException("unable to find user");
