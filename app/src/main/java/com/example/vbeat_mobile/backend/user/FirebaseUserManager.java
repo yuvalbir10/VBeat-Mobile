@@ -7,8 +7,11 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -17,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 * */
 public class FirebaseUserManager implements UserManager {
     private static final String TAG = "FirebaseUserManager";
+    private static final String USERS_COLLECTION = "vbeat_users";
 
     private FirebaseAuth mAuth;
 
@@ -45,13 +49,29 @@ public class FirebaseUserManager implements UserManager {
         }
 
         Task<AuthResult> t = mAuth.createUserWithEmailAndPassword(email, password);
+        FirebaseFirestore instance = FirebaseFirestore.getInstance();
+
 
         // wait for result
         try {
+            // register user with firebase authentication
             Tasks.await(t);
+
+            if(t.getResult() == null) {
+                Log.wtf(TAG, "await failed (?)");
+                throw new ExecutionException(new RuntimeException("Tasks.await failed"));
+            }
+
+            VBeatUserModel userToBeRegistered = new VBeatUserModel(
+                    email, getDisplayNameFromEmail(email),
+                    t.getResult().getUser().getUid()
+            );
+            // write user details into users collection
+            instance.collection(USERS_COLLECTION).document(userToBeRegistered.getUserId())
+                    .update(createFirebaseFromModel(userToBeRegistered));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
-            Log.d(TAG, "Tasks.await was interrupted", e);
+            Log.d(TAG, "register user has failed with exception", e);
         }
         // get exception if there was one
         Exception e = t.getException();
@@ -100,6 +120,7 @@ public class FirebaseUserManager implements UserManager {
 
         Task<AuthResult> t = mAuth.signInWithEmailAndPassword(email, password);
 
+
         // wait for task to complete
         try {
             Tasks.await(t);
@@ -125,5 +146,17 @@ public class FirebaseUserManager implements UserManager {
 
     public VBeatUserModel getUser(String userId){
         throw new RuntimeException("method not implemented");
+    }
+
+    private static Map<String, Object> createFirebaseFromModel(VBeatUserModel vBeatUserModel){
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("display_name", vBeatUserModel.getDisplayName());
+        obj.put("email", vBeatUserModel.getEmail());
+
+        return obj;
+    }
+
+    private static String getDisplayNameFromEmail(String email) {
+        return email.substring(0, email.indexOf('@'));
     }
 }
