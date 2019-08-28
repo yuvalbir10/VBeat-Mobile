@@ -150,8 +150,8 @@ public class FirebaseUserManager implements UserManager {
         Task<QuerySnapshot> t = instance.collection(USERS_COLLECTION).get();
 
         try {
-            verifyResult(t);
             Tasks.await(t);
+            verifyResult(t);
         } catch (ExecutionException | InterruptedException e) {
             Log.e(TAG, "getUsers failed with exception", e);
             throw new UserBackendException(e.getMessage());

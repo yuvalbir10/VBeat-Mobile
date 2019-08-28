@@ -7,4 +7,7 @@
     <string name="choose_music">Choose Music</string>
     <string name="post">Post</string>
     <string name="no_file_chosen">No File Chosen</string>
+    <string name="my_profile">My Profile</string>
+    <string name="home">Home</string>
+    <string name="upload_menu">Upload</string>
 </resources>
