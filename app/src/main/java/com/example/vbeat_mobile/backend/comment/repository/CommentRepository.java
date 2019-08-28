@@ -77,7 +77,7 @@ public class CommentRepository {
                 if (user.getUserId().equals(commentModel.getUserId())) {
                     commentViewModels.add(new CommentViewModel(
                             user.getUserId(),
-                            commentModel.getPostId(),
+                            commentModel.getCommentId(),
                             user.getDisplayName(),
                             commentModel.getCommentText()
                     ));
