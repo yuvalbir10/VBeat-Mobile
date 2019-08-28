@@ -24,11 +24,11 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class showCommentsFragment extends Fragment {
+public class ShowCommentsFragment extends Fragment {
 
-    RecyclerView commentsRecyclerView;
-    LinearLayoutManager layoutManager;
-    public showCommentsFragment() {
+    private RecyclerView commentsRecyclerView;
+    private LinearLayoutManager layoutManager;
+    public ShowCommentsFragment() {
         // Required empty public constructor
     }
 
