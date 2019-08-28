@@ -60,7 +60,6 @@ public class FirebaseUserManager implements UserManager {
         try {
             // register user with firebase authentication
             Tasks.await(t);
-
             verifyResult(t);
 
             VBeatUserModel userToBeRegistered = new VBeatUserModel(
@@ -70,11 +69,12 @@ public class FirebaseUserManager implements UserManager {
             // write user details into users collection
             Tasks.await(
                     instance.collection(USERS_COLLECTION).document(userToBeRegistered.getUserId())
-                            .update(createFirebaseFromModel(userToBeRegistered))
+                            .set(createFirebaseFromModel(userToBeRegistered))
             );
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.d(TAG, "register user has failed with exception", e);
+            throw new UserRegistrationFailedException(e.getMessage());
         }
         // get exception if there was one
         Exception e = t.getException();
