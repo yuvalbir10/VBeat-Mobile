@@ -121,14 +121,11 @@ public class FeedFragment extends Fragment {
 
                 NavController navController = null;
                 navController = Navigation.findNavController(currentView);
-
-                // cleaning up the stack up to now
-                // so back will exit the app
-                FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment(); //here ishay
+                
+                FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment();
                 action.setPostId(post.getPostId());
                 navController.navigate(action);
 
-                //Navigation.createNavigateOnClickListener(FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment(post.getPostId()));
             }
         });
 
