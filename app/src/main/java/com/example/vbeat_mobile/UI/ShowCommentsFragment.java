@@ -26,8 +26,6 @@ import java.util.List;
  */
 public class ShowCommentsFragment extends Fragment {
 
-    private RecyclerView commentsRecyclerView;
-    private LinearLayoutManager layoutManager;
     public ShowCommentsFragment() {
         // Required empty public constructor
     }
@@ -42,20 +40,20 @@ public class ShowCommentsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
 
-        commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
+        RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
         commentsRecyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this.getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         commentsRecyclerView.setLayoutManager(layoutManager);
 
         final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
         adapter.setActivity(getActivity());
 
         LiveData<List<CommentViewModel>> mData;
-        mData = CommentRepository.getInstance().getComments(postID); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
+        mData = CommentRepository.getInstance().getComments(postID);
         mData.observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
-                adapter.addAll(commentViewModels); //TODO: change to comments adapter
+                adapter.addAll(commentViewModels);
             }
         });
 
