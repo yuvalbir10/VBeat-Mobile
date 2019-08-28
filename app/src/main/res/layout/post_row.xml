@@ -22,13 +22,13 @@
 
     <ImageView
         android:id="@+id/post_imageView"
-        android:layout_width="match_parent"
-        android:layout_height="205dp"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:contentDescription="@string/post_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description_textView"
-        tools:srcCompat="@tools:sample/backgrounds/scenic[0]"
-        android:contentDescription="@string/post_image" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic[0]" />
 
     <ImageButton
         android:id="@+id/musicControl_imageButton"
@@ -54,10 +54,9 @@
 
     <EditText
         android:id="@+id/comment_editText"
-        android:layout_width="198dp"
-        android:layout_height="37dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="@string/add_a_comment_hint"
@@ -71,10 +70,11 @@
         android:id="@+id/post_comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/post"
+        app:layout_constraintBottom_toBottomOf="@+id/comment_editText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_imageView" />
+        app:layout_constraintTop_toTopOf="@+id/comment_editText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
