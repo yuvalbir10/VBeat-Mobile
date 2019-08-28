@@ -13,4 +13,5 @@
     <string name="post_image">post image</string>
     <string name="username_text_label">username</string>
     <string name="add_a_comment_hint">Add a comment...</string>
+    <string name="media_button">Media Button</string>
 </resources>
