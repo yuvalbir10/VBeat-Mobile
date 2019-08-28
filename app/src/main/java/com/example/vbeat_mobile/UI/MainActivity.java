@@ -8,6 +8,7 @@ import androidx.navigation.ui.NavigationUI;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
@@ -21,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private NavController navController;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUserManager userManager = FirebaseUserManager.getInstance();
         if(userManager.isUserLoggedIn()) {
             navController.navigate(R.id.action_initialFragment_to_feedFragment);
+            BottomNavigationViewManager.enable(this, true);
+        } else {
+            BottomNavigationViewManager.enable(this, false);
         }
     }
 
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeBottomNavigationBar(){
         // as shown in presentation
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
+        bottomNavigationView = findViewById(R.id.bottom_nav_bar);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
 
