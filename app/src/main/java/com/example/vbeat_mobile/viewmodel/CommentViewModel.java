@@ -3,8 +3,12 @@ package com.example.vbeat_mobile.viewmodel;
 public class CommentViewModel {
     private String username;
     private String commentText;
+    private String userId;
+    private String commentId;
 
     public CommentViewModel(
+            String userId,
+            String postId,
             String username,
             String commentText
     ){
@@ -21,12 +25,10 @@ public class CommentViewModel {
     }
 
     public String getUserId(){
-        //TODO: ishay to implement
-        return null;
+        return userId;
     }
 
     public String getCommentId(){
-        //TODO: ishay to implement
-        return null;
+        return commentId;
     }
 }

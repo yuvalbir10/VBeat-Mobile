@@ -19,15 +19,16 @@ import java.util.List;
 
 public class CommentRepository {
     private static final String TAG = "CommentRepo";
+
     private static class CommentRepositoryInstanceHolder {
         private static CommentRepository instance = new CommentRepository();
     }
 
-    public static CommentRepository getInstance(){
+    public static CommentRepository getInstance() {
         return CommentRepositoryInstanceHolder.instance;
     }
 
-    private CommentRepository(){
+    private CommentRepository() {
 
     }
 
@@ -54,11 +55,11 @@ public class CommentRepository {
         return liveData;
     }
 
-    private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels)  throws CommentException {
+    private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels) throws CommentException {
         List<String> userIds = new LinkedList<>();
         List<CommentViewModel> commentViewModels = new LinkedList<>();
 
-        for(CommentModel cm: commentModels){
+        for (CommentModel cm : commentModels) {
             userIds.add(cm.getUserId());
         }
 
@@ -71,12 +72,14 @@ public class CommentRepository {
         }
 
         // match usernames to user ids
-        for(CommentModel commentModel : commentModels) {
-            for(VBeatUserModel user : userModels) {
-                if(user.getUserId().equals(commentModel.getUserId())) {
+        for (CommentModel commentModel : commentModels) {
+            for (VBeatUserModel user : userModels) {
+                if (user.getUserId().equals(commentModel.getUserId())) {
                     commentViewModels.add(new CommentViewModel(
-                       user.getDisplayName(),
-                       commentModel.getCommentText()
+                            user.getUserId(),
+                            commentModel.getPostId(),
+                            user.getDisplayName(),
+                            commentModel.getCommentText()
                     ));
                 }
             }
