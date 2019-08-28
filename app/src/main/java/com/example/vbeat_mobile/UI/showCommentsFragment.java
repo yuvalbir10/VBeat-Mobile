@@ -47,13 +47,15 @@ public class showCommentsFragment extends Fragment {
         adapter.setActivity(getActivity());
 
         LiveData<List<CommentViewModel>> mData;
-        mData = CommentRepository.getInstance().getComments("fsjYLSud01LPCjG0R3jq"); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
+        mData = CommentRepository.getInstance().getComments("YBE46GWPsT9DlCZjHyB1"); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
         mData.observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
                 adapter.addAll(commentViewModels); //TODO: change to comments adapter
             }
         });
+
+        commentsRecyclerView.setAdapter(adapter);
 
         return view;
     }

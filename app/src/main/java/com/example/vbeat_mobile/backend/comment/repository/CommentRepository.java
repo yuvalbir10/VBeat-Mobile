@@ -43,10 +43,10 @@ public class CommentRepository {
                     FirebaseCommentManager instance = FirebaseCommentManager.getInstance();
                     List<CommentModel> commentModel = instance.getComments(postId);
                     List<CommentViewModel> commentViewModels = convertCommentModelsToViewModels(commentModel);
-                    liveData.setValue(commentViewModels);
+                    liveData.postValue(commentViewModels);
                 } catch (CommentException e) {
                     Log.e(TAG, "unable to grab comments", e);
-                    liveData.setValue(null);
+                    liveData.postValue(null);
                 }
             }
         }).start();
