@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.List;
 
@@ -36,6 +37,9 @@ public class showCommentsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        ViewPostFragmentArgs args = ViewPostFragmentArgs.fromBundle(getArguments());//here ishay
+        String postID = args.getPostId();
+
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
 
         commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
@@ -47,7 +51,7 @@ public class showCommentsFragment extends Fragment {
         adapter.setActivity(getActivity());
 
         LiveData<List<CommentViewModel>> mData;
-        mData = CommentRepository.getInstance().getComments("8pveQPb6Ml98rajrsOQj"); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
+        mData = CommentRepository.getInstance().getComments(postID); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
         mData.observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {

@@ -60,7 +60,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     }
 
     interface OnItemClickListener {
-        void onClick(int index);
+        void onClick(int index, PostViewModel post);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -113,7 +113,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     int index = getAdapterPosition();
                     if (clickListener != null) {
                         if (index != RecyclerView.NO_POSITION) {
-                            clickListener.onClick(index);
+                            clickListener.onClick(index, getItem(index));
                         }
                     }
                 }

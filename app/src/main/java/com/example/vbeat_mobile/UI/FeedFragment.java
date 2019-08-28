@@ -8,6 +8,8 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +40,8 @@ import java.util.concurrent.ExecutionException;
  * A simple {@link Fragment} subclass.
  */
 public class FeedFragment extends Fragment {
+    private static final String TAG  = "FeedFragment";
+
     int tempPostNum = 0;
     FirebasePostManager firebasePostManager;
 
@@ -106,9 +110,25 @@ public class FeedFragment extends Fragment {
 
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onClick(int index) {
+            public void onClick(int index, PostViewModel post) {
                 //TODO: complete what we want to happen when post is clicked (for example go to a page that shows this post only)
                 Log.d("TAG", "item click " + index); //TODO: remove this line, this is for checking purposes
+                View currentView = getView();
+                if(currentView == null) {
+                    Log.e(TAG, "currentView == null");
+                    throw new IllegalStateException(TAG + " currentView == null");
+                }
+
+                NavController navController = null;
+                navController = Navigation.findNavController(currentView);
+
+                // cleaning up the stack up to now
+                // so back will exit the app
+                FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment(); //here ishay
+                action.setPostId(post.getPostId());
+                navController.navigate(action);
+
+                //Navigation.createNavigateOnClickListener(FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment(post.getPostId()));
             }
         });
 
