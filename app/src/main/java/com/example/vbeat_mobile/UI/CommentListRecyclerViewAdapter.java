@@ -15,6 +15,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 
 import java.util.LinkedList;
@@ -80,23 +81,9 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                             public void run() {
                                 try {
                                     FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
-                                    safeRunOnUiThread(fromActivity, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(fromActivity.getBaseContext(),
-                                                    "Deleted comment successfully!",
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    UiUtils.showMessage(fromActivity, "Deleted comment successfully!");
                                 } catch (final CommentException e) {
-                                    safeRunOnUiThread(fromActivity, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(fromActivity.getBaseContext(),
-                                                    "Error on deleting comment..." + e.getMessage(),
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    UiUtils.showMessage(fromActivity, "Error on deleting comment..." + e.getMessage());
                                 }
                             }
                         }).start();
@@ -116,11 +103,5 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
     public void add(CommentViewModel r) {
         mData.add(r);
         notifyItemInserted(mData.size() - 1);
-    }
-
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
-            a.runOnUiThread(r);
-        }
     }
 }

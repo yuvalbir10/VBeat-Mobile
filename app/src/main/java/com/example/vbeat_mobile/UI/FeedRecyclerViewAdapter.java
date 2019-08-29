@@ -25,6 +25,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
+import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
@@ -126,14 +127,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     final String commentStr = commentEditText.getText().toString();
 
                     if(commentStr.contentEquals("")){
-                        safeRunOnUiThread(fromActivity, new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(fromActivity.getBaseContext(),
-                                        "Can't post empty comment...",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        UiUtils.showMessage(fromActivity, "Can't post empty comment...");
                         return;
                     }
 
@@ -142,38 +136,17 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         public void run() {
                             try {
                                 commentManager.comment(commentStr, postId);
-                                safeRunOnUiThread(fromActivity, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(fromActivity.getBaseContext(),
-                                                "Commented Successfully!",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                UiUtils.showMessage(fromActivity, "Commented Successfully!");
                                 commentEditText.setText("");
 
                             } catch (final CommentException e) {
-                                safeRunOnUiThread(fromActivity, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(fromActivity.getBaseContext(),
-                                                "Error Commenting : " + e.getMessage(),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
                             }
                         }
                     }).start();
 
                 }
             });
-        }
-
-
-        private void safeRunOnUiThread(Activity a, Runnable r){
-            if(a != null) {
-                a.runOnUiThread(r);
-            }
         }
 
 
