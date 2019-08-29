@@ -114,56 +114,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             deleteButton = itemView.findViewById(R.id.delete_imageButton);
 
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int index = getAdapterPosition();
-                    if (clickListener != null) {
-                        if (index != RecyclerView.NO_POSITION) {
-                            clickListener.onClick(index, getItem(index));
-                        }
-                    }
-                }
-            });
 
-            commentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
-                    final String commentStr = commentEditText.getText().toString();
-
-                    if(commentStr.contentEquals("")){
-                        UiUtils.showMessage(fromActivity, "Can't post empty comment...");
-                        return;
-                    }
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                commentManager.comment(commentStr, postId);
-                                UiUtils.showMessage(fromActivity, "Commented Successfully!");
-                                commentEditText.setText("");
-
-                            } catch (final CommentException e) {
-                                UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
-                            }
-                        }
-                    }).start();
-
-                }
-            });
-
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        FirebasePostManager.getInstance().deletePost(postId);
-                    } catch (DeletePostException e) {
-                        UiUtils.showMessage(fromActivity, "error on deleting post...");
-                    }
-                }
-            });
         }
 
 
@@ -221,6 +172,59 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
                     });
                     t.start();
+                }
+            });
+
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        FirebasePostManager.getInstance().deletePost(postId);
+                        UiUtils.showMessage(fromActivity, "Post deleted successfully!");
+                    } catch (DeletePostException e) {
+                        UiUtils.showMessage(fromActivity, "error on deleting post...");
+                    }
+                }
+            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int index = getAdapterPosition();
+                    if (clickListener != null) {
+                        if (index != RecyclerView.NO_POSITION) {
+                            clickListener.onClick(index, getItem(index));
+                        }
+                    }
+                }
+            });
+
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
+                    final String commentStr = commentEditText.getText().toString();
+
+                    if(commentStr.contentEquals("")){
+                        UiUtils.showMessage(fromActivity, "Can't post empty comment...");
+                        return;
+                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                commentManager.comment(commentStr, postId);
+                                UiUtils.showMessage(fromActivity, "Commented Successfully!");
+                                commentEditText.setText("");
+
+                            } catch (final CommentException e) {
+                                UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
+                            }
+                        }
+                    }).start();
+
                 }
             });
         }
