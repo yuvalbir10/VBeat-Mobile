@@ -179,12 +179,17 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    try {
-                        FirebasePostManager.getInstance().deletePost(postId);
-                        UiUtils.showMessage(fromActivity, "Post deleted successfully!");
-                    } catch (DeletePostException e) {
-                        UiUtils.showMessage(fromActivity, "error on deleting post...");
-                    }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                FirebasePostManager.getInstance().deletePost(postId);
+                                UiUtils.showMessage(fromActivity, "Post deleted successfully!");
+                            } catch (DeletePostException | CommentException e) {
+                                UiUtils.showMessage(fromActivity, "Error on deleting post...");
+                            }
+                        }
+                    }).start();
                 }
             });
 

@@ -5,6 +5,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.vbeat_mobile.backend.comment.CommentException;
+import com.example.vbeat_mobile.backend.comment.CommentModel;
+import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
+import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -155,8 +160,31 @@ public class FirebasePostManager implements PostManager<String> {
 
     //ishay please implement this method
     @Override
-    public void deletePost(String postId) throws DeletePostException {
+    public void deletePost(String postId) throws DeletePostException, CommentException {
+        List<CommentModel> comments = null;
+        try {
+            comments = FirebaseCommentManager.getInstance().getComments(postId);
+        } catch (CommentException e) {
+            e.printStackTrace();
+        }
+        
+        for(CommentModel comment:comments){
+            try {
+                FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
+            } catch (CommentException e) {
+                Log.e(TAG, "unable to delete comment of the post", e);
+                throw new CommentException(e.getMessage());
+            }
+        }
 
+        try {
+            Void v = Tasks.await(
+                    db.collection(postCollectionName).document(postId).delete()
+            );
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "unable to delete post", e);
+            throw new DeletePostException(e.getMessage());
+        }
     }
 
     // time to check
