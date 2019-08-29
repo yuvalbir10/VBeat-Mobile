@@ -78,4 +78,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_imageView" />
 
+    <ImageButton
+        android:id="@+id/delete_imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        tools:layout_editor_absoluteX="338dp"
+        tools:layout_editor_absoluteY="10dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

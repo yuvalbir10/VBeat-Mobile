@@ -24,6 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
+import com.example.vbeat_mobile.backend.post.DeletePostException;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
@@ -98,6 +101,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         Button commentButton;
         EditText commentEditText;
         String postId;
+        ImageButton deleteButton;
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -107,6 +111,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
+            deleteButton = itemView.findViewById(R.id.delete_imageButton);
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -147,6 +153,17 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
                 }
             });
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        FirebasePostManager.getInstance().deletePost(postId);
+                    } catch (DeletePostException e) {
+                        UiUtils.showMessage(fromActivity, "error on deleting post...");
+                    }
+                }
+            });
         }
 
 
@@ -155,6 +172,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             username.setText(post.getUploader());
             description.setText(post.getDescription());
             postId = post.getPostId();
+
+            if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
+                deleteButton.setVisibility(View.VISIBLE);
+            }
 
             new Thread(
                     new Runnable() {

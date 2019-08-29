@@ -152,6 +152,13 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
+
+    //ishay please implement this method
+    @Override
+    public void deletePost(String postId) throws DeletePostException {
+
+    }
+
     // time to check
     // time to use
     // still a useful sanity check
