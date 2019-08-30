@@ -34,10 +34,11 @@ public class ShowCommentsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         ShowCommentsFragmentArgs args = ShowCommentsFragmentArgs.fromBundle(getArguments());
         String postID = args.getPostId();
 
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
 
         RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
