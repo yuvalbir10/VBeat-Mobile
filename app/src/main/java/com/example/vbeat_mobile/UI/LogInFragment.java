@@ -22,6 +22,9 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.UserManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Objects;
 import com.example.vbeat_mobile.utility.UiUtils;
 
 
@@ -125,6 +128,8 @@ public class LogInFragment extends Fragment {
 
         NavController navController = null;
         navController = Navigation.findNavController(currentView);
+
+        BottomNavigationViewManager.enable(Objects.requireNonNull(getActivity()), true);
 
         // cleaning up the stack up to now
         // so back will exit the app

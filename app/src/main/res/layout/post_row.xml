@@ -22,11 +22,9 @@
 
     <ImageView
         android:id="@+id/post_imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="205dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="63dp"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:contentDescription="@string/post_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description_textView"
@@ -40,7 +38,8 @@
         app:layout_constraintEnd_toEndOf="@+id/post_imageView"
         app:layout_constraintStart_toStartOf="@+id/post_imageView"
         app:layout_constraintTop_toTopOf="@+id/post_imageView"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@android:drawable/ic_media_play"
+        android:contentDescription="@string/media_button" />
 
     <TextView
         android:id="@+id/username_textView"
@@ -48,20 +47,19 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="username"
+        android:text="@string/username_text_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/comment_editText"
-        android:layout_width="198dp"
-        android:layout_height="37dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
-        android:hint="Add a comment..."
+        android:hint="@string/add_a_comment_hint"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toStartOf="@+id/post_comment_button"
         app:layout_constraintHorizontal_bias="0.655"
@@ -72,11 +70,12 @@
         android:id="@+id/post_comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/post"
+        app:layout_constraintBottom_toBottomOf="@+id/comment_editText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_imageView" />
+        app:layout_constraintTop_toTopOf="@+id/comment_editText" />
 
     <ImageButton
         android:id="@+id/delete_imageButton"
