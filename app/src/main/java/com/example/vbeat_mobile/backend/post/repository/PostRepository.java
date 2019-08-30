@@ -10,6 +10,7 @@ import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +38,6 @@ public class PostRepository {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 VBeatPostModel cachedPost = postCache.getPost(postId);
                 if(cachedPost == null) {
                     cachedPost = FirebasePostManager.getInstance().getPost(postId);
@@ -56,6 +56,7 @@ public class PostRepository {
 
     public LiveData<List<PostViewModel>> getPosts(final String cursor, final int limit) {
         final MutableLiveData<List<PostViewModel>> resPost = new MutableLiveData<>();
+        resPost.setValue(new ArrayList<PostViewModel>());
 
         new Thread(new Runnable() {
             @Override
