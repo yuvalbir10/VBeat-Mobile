@@ -31,6 +31,7 @@ import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
+import com.example.vbeat_mobile.utility.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,7 +126,7 @@ public class UploadPostFragment extends Fragment {
                 Activity a = UploadPostFragment.this.getActivity();
                 try {
                     final VBeatPostModel uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(UploadPostFragment.this.getContext(),
@@ -140,7 +141,7 @@ public class UploadPostFragment extends Fragment {
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
 
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             errorTextView.setText(e.getMessage());
@@ -151,7 +152,7 @@ public class UploadPostFragment extends Fragment {
                 } finally {
 
                     // hide progress bar & show login button
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             postButton.setEnabled(true);
@@ -269,10 +270,4 @@ public class UploadPostFragment extends Fragment {
         ((TextView) v.findViewById(resourceId)).setText(new File(path).getName());
     }
 
-
-    private void safeRunOnUiThread(Activity a, Runnable r) {
-        if (a != null) {
-            a.runOnUiThread(r);
-        }
-    }
 }

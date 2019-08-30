@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.List;
 
@@ -23,11 +24,9 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class showCommentsFragment extends Fragment {
+public class ShowCommentsFragment extends Fragment {
 
-    RecyclerView commentsRecyclerView;
-    LinearLayoutManager layoutManager;
-    public showCommentsFragment() {
+    public ShowCommentsFragment() {
         // Required empty public constructor
     }
 
@@ -36,24 +35,29 @@ public class showCommentsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        ShowCommentsFragmentArgs args = ShowCommentsFragmentArgs.fromBundle(getArguments());
+        String postID = args.getPostId();
+
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
 
-        commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
+        RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
         commentsRecyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this.getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         commentsRecyclerView.setLayoutManager(layoutManager);
 
         final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
         adapter.setActivity(getActivity());
 
         LiveData<List<CommentViewModel>> mData;
-        mData = CommentRepository.getInstance().getComments("fsjYLSud01LPCjG0R3jq"); //TODO: replace the hardcoded postID with the passed postID from the prev Fragment
+        mData = CommentRepository.getInstance().getComments(postID);
         mData.observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
-                adapter.addAll(commentViewModels); //TODO: change to comments adapter
+                adapter.addAll(commentViewModels);
             }
         });
+
+        commentsRecyclerView.setAdapter(adapter);
 
         return view;
     }

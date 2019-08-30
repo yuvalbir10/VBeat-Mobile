@@ -78,7 +78,12 @@
     </fragment>
     <fragment
         android:id="@+id/showCommentsFragment"
-        android:name="com.example.vbeat_mobile.UI.showCommentsFragment"
+        android:name="com.example.vbeat_mobile.UI.ShowCommentsFragment"
         android:label="fragment_show_comments"
-        tools:layout="@layout/fragment_show_comments" />
+        tools:layout="@layout/fragment_show_comments" >
+        <argument
+            android:name="postId"
+            app:argType="string"
+            android:defaultValue="default" />
+    </fragment>
 </navigation>

@@ -8,12 +8,14 @@ public class CommentViewModel {
 
     public CommentViewModel(
             String userId,
-            String postId,
+            String commentId,
             String username,
             String commentText
     ){
         this.username = username;
         this.commentText = commentText;
+        this.userId = userId;
+        this.commentId = commentId;
     }
 
     public String getCommentText() {
