@@ -8,6 +8,9 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +28,7 @@ import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -43,14 +47,11 @@ public class FeedFragment extends Fragment {
     private static final String TAG  = "FeedFragment";
 
     int tempPostNum = 0;
-    FirebasePostManager firebasePostManager;
 
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private FeedRecyclerViewAdapter feedAdapter;
     private ProgressBar progressBar;
 
-    public static MediaPlayer mediaPlayer = new MediaPlayer();
+    static MediaPlayer mediaPlayer = new MediaPlayer();
     private static final int PAGE_START = 1;
 
     private boolean isLoading = false;
@@ -60,6 +61,8 @@ public class FeedFragment extends Fragment {
     private int currentPage = PAGE_START;
     private int POSTS_PER_PAGE = 2;
 
+    private PostListViewModel postListViewModel;
+
     public FeedFragment() {
         // Required empty public constructor
     }
@@ -67,7 +70,7 @@ public class FeedFragment extends Fragment {
     // temporary for testing purposes only
     // this method blocks so run in a
     // seperate thread
-    public static byte[] downloadMusic(String musicPath) {
+    static byte[] downloadMusic(String musicPath) {
         Task<byte[]> t = FirebaseStorage.getInstance()
                 .getReference().child(musicPath).getBytes(10000000);
 
@@ -83,23 +86,24 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         firebasePostManager = FirebasePostManager.getInstance();
+        FirebasePostManager firebasePostManager = FirebasePostManager.getInstance();
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
-        recyclerView = v.findViewById(R.id.posts_RecyclerView);
+        RecyclerView recyclerView = v.findViewById(R.id.posts_RecyclerView);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
         recyclerView.setLayoutManager(layoutManager);
         progressBar =  v.findViewById(R.id.loadmore_progressBar);
+        postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
 
-        feedAdapter = new FeedRecyclerViewAdapter();
+        feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
         feedAdapter.setActivity(getActivity());
+
         recyclerView.setAdapter(feedAdapter);
 
-        //TODO: get the relevant posts list from DB
-        LiveData<List<PostViewModel>> mData;
-        mData = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
-        mData.observeForever(new Observer<List<PostViewModel>>() {
+        LiveData<List<PostViewModel>> data;
+        data = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
+        data.observeForever(new Observer<List<PostViewModel>>() {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
                 feedAdapter.addAll(postViewModels);
@@ -165,7 +169,7 @@ public class FeedFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
             LiveData<List<PostViewModel>> mData;
-            mData = PostRepository.getInstance().getPosts(feedAdapter.mData.get(feedAdapter.mData.size()-1).getPostId(), POSTS_PER_PAGE);
+            mData = PostRepository.getInstance().getPosts(feedAdapter.getDataList().get(feedAdapter.getDataList().size()-1).getPostId(), POSTS_PER_PAGE);
             mData.observeForever(new Observer<List<PostViewModel>>() {
                 @Override
                 public void onChanged(List<PostViewModel> postViewModels) {

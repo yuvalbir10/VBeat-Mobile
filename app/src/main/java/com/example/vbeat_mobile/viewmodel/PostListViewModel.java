@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 public class PostListViewModel extends ViewModel {
-    private LiveData<List<PostViewModel>> postListViewModel;
+    private List<PostViewModel> postList;
 
-    public LiveData<List<PostViewModel>> getPostListViewModel() {
-        return postListViewModel;
+    public List<PostViewModel> getPostList() {
+        return postList;
     }
 
-    public void setPostListViewModel(LiveData<List<PostViewModel>> postListViewModel) {
-        this.postListViewModel = postListViewModel;
+    public void setPostList(List<PostViewModel> postList) {
+        this.postList = postList;
     }
 }

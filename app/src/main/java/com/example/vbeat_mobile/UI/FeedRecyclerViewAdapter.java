@@ -48,12 +48,13 @@ import java.util.concurrent.ExecutionException;
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
     private static final String TAG = "FeedRecyclerVA";
 
-    PostListViewModel mData;
+    private PostListViewModel mData;
     private OnItemClickListener clickListener;
     private Activity fromActivity;
 
     public FeedRecyclerViewAdapter(PostListViewModel data) {
         mData = data;
+        mData.setPostList(new ArrayList<PostViewModel>());
     }
 
     public void setActivity(Activity a) {
@@ -269,8 +270,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return getDataList().get(position);
     }
 
-    private List<PostViewModel> getDataList(){
-        return Objects.requireNonNull(mData.getPostListViewModel().getValue());
+    public List<PostViewModel> getDataList(){
+        return Objects.requireNonNull(mData.getPostList());
     }
 
     private static void playMp3(byte[] mp3SoundByteArray) {
