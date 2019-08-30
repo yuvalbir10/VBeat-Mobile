@@ -105,7 +105,7 @@ public class UploadPostFragment extends Fragment {
             throw new IllegalStateException("no view available can't upload post in background");
         }
 
-        //get description String from UI
+        //get descriptionTextView String from UI
         final String description = descriptionEditText.getText().toString();
 
         if (musicUri == null || imageUri == null) {
