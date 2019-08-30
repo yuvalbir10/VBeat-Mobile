@@ -81,8 +81,15 @@ public class UserRepository {
 
     private boolean fetchRemainingUserIdsFromFirebase(List<VBeatUserModel> fetchedList, List<String> remainingUserIds, MutableLiveData<List<VBeatUserModel>> userModelList) {
         try {
+            List<VBeatUserModel> fromFirebase = FirebaseUserManager.getInstance().getUsers(remainingUserIds);
+
+            // add new users to cache
+            for(VBeatUserModel model : fromFirebase) {
+                userCache.save(model);
+            }
+            
             fetchedList.addAll(
-                    FirebaseUserManager.getInstance().getUsers(remainingUserIds)
+                fromFirebase
             );
         } catch (UserBackendException e) {
             Log.e(TAG, "getUsers failed with exception", e);
