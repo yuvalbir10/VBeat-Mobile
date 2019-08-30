@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,10 +16,12 @@ import android.view.ViewGroup;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
+import com.example.vbeat_mobile.viewmodel.CommentListViewModel;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -35,11 +38,19 @@ public class ShowCommentsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        ShowCommentsFragmentArgs args = ShowCommentsFragmentArgs.fromBundle(getArguments());
+        // parse arguments for this fragment
+        // arguments cannot be null because there are no comments
+        // to show if arguments are null
+        ShowCommentsFragmentArgs args = ShowCommentsFragmentArgs
+                .fromBundle(Objects.requireNonNull(getArguments()));
         String postID = args.getPostId();
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
+
+        // Get view model for this fragment
+        CommentListViewModel commentListViewModel = ViewModelProviders.of(this)
+                .get(CommentListViewModel.class);
 
         RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
         commentsRecyclerView.setHasFixedSize(true);
