@@ -92,7 +92,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         final ImageButton musicControlButton;
         Button commentButton;
         EditText commentEditText;
-        String postIdTextView;
+        String postId;
         ImageButton deleteButton;
 
         PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
@@ -119,7 +119,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     });
 
             descriptionTextView.setText(post.getDescription());
-            postIdTextView = post.getPostId();
+            postId = post.getPostId();
 
             if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
                 deleteButton.setVisibility(View.VISIBLE);
@@ -177,7 +177,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         @Override
                         public void run() {
                             try {
-                                commentManager.comment(commentStr, postIdTextView);
+                                commentManager.comment(commentStr, postId);
                                 UiUtils.showMessage(fromActivity, "Commented Successfully!");
 
                                 UiUtils.safeRunOnUiThread(fromActivity, new Runnable() {
@@ -205,7 +205,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         @Override
                         public void run() {
                             try {
-                                FirebasePostManager.getInstance().deletePost(postIdTextView);
+                                FirebasePostManager.getInstance().deletePost(postId);
+                                
+                                remove(postId);
                                 UiUtils.showMessage(fromActivity, "Post deleted successfully!");
                             } catch (DeletePostException | CommentException e) {
                                 UiUtils.showMessage(fromActivity, "Error on deleting post...");
@@ -289,12 +291,27 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         }
     }
 
-    public void remove(PostViewModel r) {
-        int position = getDataList().indexOf(r);
+    public void remove(String postId) {
+        int position = findPositionById(postId);
         if (position > -1) {
             getDataList().remove(position);
             notifyItemRemoved(position);
         }
+    }
+
+
+    private int findPositionById(String postId){
+        for (int i = 0; i < getDataList().size(); i++){
+            if(getDataList().get(i).getPostId().contentEquals(postId))
+                return i;
+        }
+        return -1;
+    }
+
+    public void clear() {
+            while (getItemCount() > 0) {
+                remove(getItem(0).getPostId());
+            }
     }
 
     private PostViewModel getItem(int position) {

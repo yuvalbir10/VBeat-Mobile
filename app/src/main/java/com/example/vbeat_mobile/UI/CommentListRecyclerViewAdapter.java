@@ -80,6 +80,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                             public void run() {
                                 try {
                                     FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
+                                    remove(comment.getCommentId());
                                     UiUtils.showMessage(fromActivity, "Deleted comment successfully!");
                                 } catch (final CommentException e) {
                                     UiUtils.showMessage(fromActivity, "Error on deleting comment..." + e.getMessage());
@@ -102,5 +103,21 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
     public void add(CommentViewModel r) {
         mData.add(r);
         notifyItemInserted(mData.size() - 1);
+    }
+
+    public void remove(String commentId) {
+        int position = findPositionById(commentId);
+        if (position > -1) {
+            mData.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    private int findPositionById(String commentId){
+        for (int i = 0; i < mData.size(); i++){
+            if(mData.get(i).getCommentId().contentEquals(commentId))
+                return i;
+        }
+        return -1;
     }
 }
