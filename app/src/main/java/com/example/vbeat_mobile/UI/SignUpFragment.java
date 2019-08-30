@@ -19,6 +19,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
+import com.example.vbeat_mobile.utility.UiUtils;
 
 
 /**
@@ -68,9 +69,7 @@ public class SignUpFragment extends Fragment {
         final String username = usernameTB.getText().toString();
         final String password = passwordTB.getText().toString();
 
-        // show progress bar & disable sign up button
-        signupButton.setEnabled(false);
-        prBar.setVisibility(View.VISIBLE);
+        disableLoginUi(false, View.VISIBLE);
 
         // create account in background so
         // ui won't be stuck!
@@ -80,7 +79,7 @@ public class SignUpFragment extends Fragment {
                 Activity a = SignUpFragment.this.getActivity();
                 try {
                     userManager.createAccount(username, password);
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(SignUpFragment.this.getContext(),
@@ -89,37 +88,42 @@ public class SignUpFragment extends Fragment {
                         }
                     });
                 } catch(final UserRegistrationFailedException e) {
-                    //error if sign up failed
-                    final TextView errorTextView = v.findViewById(R.id.error_textView);
-
-
-                    safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            errorTextView.setText(e.getMessage());
-                            errorTextView.setVisibility(View.VISIBLE);
-                        }
-                    });
-
+                    showRegistrationErrorMessage(a, e, v);
                 } finally {
-
-                    // hide progress bar & show sign up button
-                    safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            signupButton.setEnabled(true);
-                            prBar.setVisibility(View.INVISIBLE);
-                        }
-                    });
+                    enableLoginUi(a);
                 }
             }
         }).start();
     }
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
-            a.runOnUiThread(r);
-        }
+    private void disableLoginUi(boolean b, int visible) {
+        // show progress bar & disable sign up button
+        signupButton.setEnabled(b);
+        prBar.setVisibility(visible);
+    }
+
+    private void enableLoginUi(Activity a) {
+        // hide progress bar & show sign up button
+        UiUtils.safeRunOnUiThread(a, new Runnable() {
+            @Override
+            public void run() {
+                disableLoginUi(true, View.INVISIBLE);
+            }
+        });
+    }
+
+    private void showRegistrationErrorMessage(Activity a, final UserRegistrationFailedException e, View v) {
+        //error if sign up failed
+        final TextView errorTextView = v.findViewById(R.id.error_textView);
+
+
+        UiUtils.safeRunOnUiThread(a, new Runnable() {
+            @Override
+            public void run() {
+                errorTextView.setText(e.getMessage());
+                errorTextView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
 }

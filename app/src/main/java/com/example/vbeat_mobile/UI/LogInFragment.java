@@ -22,6 +22,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.UserManager;
+import com.example.vbeat_mobile.utility.UiUtils;
 
 
 /**
@@ -85,21 +86,13 @@ public class LogInFragment extends Fragment {
                 Activity a = LogInFragment.this.getActivity();
                 try {
                     userManager.login(username, password);
-                    safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(LogInFragment.this.getContext(),
-                                    "Logged in successfully!",
-                                    Toast.LENGTH_SHORT).show();
-                            handleSuccessfulLogin();
-                        }
-                    });
+                    UiUtils.showMessage(a, "Logged in successfully!");
                 } catch(final UserLoginFailedException e) {
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
 
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             errorTextView.setText(e.getMessage());
@@ -110,7 +103,7 @@ public class LogInFragment extends Fragment {
                 } finally {
 
                     // hide progress bar & show login button
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             loginButton.setEnabled(true);
@@ -122,11 +115,6 @@ public class LogInFragment extends Fragment {
         }).start();
     }
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
-            a.runOnUiThread(r);
-        }
-    }
 
     private void handleSuccessfulLogin(){
         View currentView = getView();

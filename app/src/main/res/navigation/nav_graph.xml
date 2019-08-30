@@ -43,7 +43,11 @@
         android:id="@+id/feedFragment"
         android:name="com.example.vbeat_mobile.UI.FeedFragment"
         android:label="fragment_feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed" >
+        <action
+            android:id="@+id/action_feedFragment_to_showCommentsFragment"
+            app:destination="@id/showCommentsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/uploadPostFragment"
@@ -71,5 +75,15 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="null" />
+    </fragment>
+    <fragment
+        android:id="@+id/showCommentsFragment"
+        android:name="com.example.vbeat_mobile.UI.ShowCommentsFragment"
+        android:label="fragment_show_comments"
+        tools:layout="@layout/fragment_show_comments" >
+        <argument
+            android:name="postId"
+            app:argType="string"
+            android:defaultValue="default" />
     </fragment>
 </navigation>

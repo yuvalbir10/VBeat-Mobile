@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
 
@@ -26,7 +27,11 @@ public class UserRepository {
             public void run() {
                 VBeatUserModel userModel = userCache.get(userId);
                 if(userModel == null) {
-                    userModel = FirebaseUserManager.getInstance().getUser(userId);
+                    try {
+                        userModel = FirebaseUserManager.getInstance().getUser(userId);
+                    } catch (UserBackendException e) {
+                        userViewModel.setValue(null);
+                    }
                     userCache.save(userModel);
                 }
                 userViewModel.setValue(getViewModelFromModel(userModel));

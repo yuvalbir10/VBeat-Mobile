@@ -24,7 +24,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
+import com.example.vbeat_mobile.backend.post.DeletePostException;
+import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
+import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
@@ -60,7 +64,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     }
 
     interface OnItemClickListener {
-        void onClick(int index);
+        void onClick(int index, PostViewModel post);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -97,6 +101,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         Button commentButton;
         EditText commentEditText;
         String postId;
+        ImageButton deleteButton;
 
         public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -106,74 +111,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int index = getAdapterPosition();
-                    if (clickListener != null) {
-                        if (index != RecyclerView.NO_POSITION) {
-                            clickListener.onClick(index);
-                        }
-                    }
-                }
-            });
-
-            commentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
-                    final String commentStr = commentEditText.getText().toString();
-
-                    if(commentStr.contentEquals("")){
-                        safeRunOnUiThread(fromActivity, new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(fromActivity.getBaseContext(),
-                                        "Can't post empty comment...",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return;
-                    }
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                commentManager.comment(commentStr, postId);
-                                safeRunOnUiThread(fromActivity, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(fromActivity.getBaseContext(),
-                                                "Commented Successfully!",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                commentEditText.setText("");
-
-                            } catch (final CommentException e) {
-                                safeRunOnUiThread(fromActivity, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(fromActivity.getBaseContext(),
-                                                "Error Commenting : " + e.getMessage(),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-                    }).start();
-
-                }
-            });
-        }
+            deleteButton = itemView.findViewById(R.id.delete_imageButton);
 
 
-        private void safeRunOnUiThread(Activity a, Runnable r){
-            if(a != null) {
-                a.runOnUiThread(r);
-            }
+
         }
 
 
@@ -182,6 +123,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             username.setText(post.getUploader());
             description.setText(post.getDescription());
             postId = post.getPostId();
+
+            if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
+                deleteButton.setVisibility(View.VISIBLE);
+            }
 
             new Thread(
                     new Runnable() {
@@ -227,6 +172,64 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
                     });
                     t.start();
+                }
+            });
+
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                FirebasePostManager.getInstance().deletePost(postId);
+                                UiUtils.showMessage(fromActivity, "Post deleted successfully!");
+                            } catch (DeletePostException | CommentException e) {
+                                UiUtils.showMessage(fromActivity, "Error on deleting post...");
+                            }
+                        }
+                    }).start();
+                }
+            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int index = getAdapterPosition();
+                    if (clickListener != null) {
+                        if (index != RecyclerView.NO_POSITION) {
+                            clickListener.onClick(index, getItem(index));
+                        }
+                    }
+                }
+            });
+
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
+                    final String commentStr = commentEditText.getText().toString();
+
+                    if(commentStr.contentEquals("")){
+                        UiUtils.showMessage(fromActivity, "Can't post empty comment...");
+                        return;
+                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                commentManager.comment(commentStr, postId);
+                                UiUtils.showMessage(fromActivity, "Commented Successfully!");
+                                commentEditText.setText("");
+
+                            } catch (final CommentException e) {
+                                UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
+                            }
+                        }
+                    }).start();
+
                 }
             });
         }
