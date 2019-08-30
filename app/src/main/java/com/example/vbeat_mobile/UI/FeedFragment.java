@@ -44,7 +44,7 @@ import java.util.concurrent.ExecutionException;
  * A simple {@link Fragment} subclass.
  */
 public class FeedFragment extends Fragment {
-    private static final String TAG  = "FeedFragment";
+    private static final String TAG = "FeedFragment";
 
     int tempPostNum = 0;
 
@@ -74,7 +74,7 @@ public class FeedFragment extends Fragment {
 
         try {
             return Tasks.await(t);
-        } catch(InterruptedException | ExecutionException e ){
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("tmp", "download interrupted", e);
             return null;
         }
@@ -91,7 +91,7 @@ public class FeedFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
         recyclerView.setLayoutManager(layoutManager);
-        progressBar =  v.findViewById(R.id.loadmore_progressBar);
+        progressBar = v.findViewById(R.id.loadmore_progressBar);
 
         // setting post list view model to hold the data
         // to survive configuration changes
@@ -118,14 +118,14 @@ public class FeedFragment extends Fragment {
             public void onClick(int index, PostViewModel post) {
                 Log.d("TAG", "item click " + index);
                 View currentView = getView();
-                if(currentView == null) {
+                if (currentView == null) {
                     Log.e(TAG, "currentView == null");
                     throw new IllegalStateException(TAG + " currentView == null");
                 }
 
                 NavController navController = null;
                 navController = Navigation.findNavController(currentView);
-                
+
                 FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment();
                 action.setPostId(post.getPostId());
                 navController.navigate(action);
@@ -159,7 +159,6 @@ public class FeedFragment extends Fragment {
         });
 
 
-
         return v;
     }
 
@@ -167,15 +166,15 @@ public class FeedFragment extends Fragment {
         //TODO: move to another thread
         progressBar.setVisibility(View.VISIBLE);
 
-            LiveData<List<PostViewModel>> mData;
-            mData = PostRepository.getInstance().getPosts(feedAdapter.getDataList().get(feedAdapter.getDataList().size()-1).getPostId(), POSTS_PER_PAGE);
-            mData.observeForever(new Observer<List<PostViewModel>>() {
-                @Override
-                public void onChanged(List<PostViewModel> postViewModels) {
-                    feedAdapter.addAll(postViewModels);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    isLoading = false;
-                }
-            });
+        LiveData<List<PostViewModel>> mData;
+        mData = PostRepository.getInstance().getPosts(feedAdapter.getDataList().get(feedAdapter.getDataList().size() - 1).getPostId(), POSTS_PER_PAGE);
+        mData.observeForever(new Observer<List<PostViewModel>>() {
+            @Override
+            public void onChanged(List<PostViewModel> postViewModels) {
+                feedAdapter.addAll(postViewModels);
+                progressBar.setVisibility(View.INVISIBLE);
+                isLoading = false;
+            }
+        });
     }
 }
