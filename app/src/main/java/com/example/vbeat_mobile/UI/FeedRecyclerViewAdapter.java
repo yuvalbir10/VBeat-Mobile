@@ -1,8 +1,6 @@
 package com.example.vbeat_mobile.UI;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -13,12 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
@@ -27,16 +24,17 @@ import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.post.DeletePostException;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
+import com.example.vbeat_mobile.viewmodel.UserViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,19 +87,19 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     class PostRowViewHolder extends RecyclerView.ViewHolder {
         ImageView postImage;
-        TextView description;
-        TextView username;
+        TextView descriptionTextView;
+        TextView usernameTextView;
         final ImageButton musicControlButton;
         Button commentButton;
         EditText commentEditText;
-        String postId;
+        String postIdTextView;
         ImageButton deleteButton;
 
         PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
             postImage = itemView.findViewById(R.id.post_imageView);
-            description = itemView.findViewById(R.id.description_textView);
-            username = itemView.findViewById(R.id.username_textView);
+            descriptionTextView = itemView.findViewById(R.id.description_textView);
+            usernameTextView = itemView.findViewById(R.id.username_textView);
             musicControlButton = itemView.findViewById(R.id.musicControl_imageButton);
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
@@ -109,9 +107,19 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         }
 
         void bind(final PostViewModel post) {
-            username.setText(post.getUploader());
-            description.setText(post.getDescription());
-            postId = post.getPostId();
+
+            final LiveData<UserViewModel> liveUser = UserRepository.getInstance()
+                    .getUser(post.getUploader());
+            liveUser.observeForever(new Observer<UserViewModel>() {
+                        @Override
+                        public void onChanged(UserViewModel userViewModel) {
+                            usernameTextView.setText(userViewModel.getDisplayName());
+                            liveUser.removeObserver(this);
+                        }
+                    });
+
+            descriptionTextView.setText(post.getDescription());
+            postIdTextView = post.getPostId();
 
             if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
                 deleteButton.setVisibility(View.VISIBLE);
@@ -169,7 +177,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         @Override
                         public void run() {
                             try {
-                                commentManager.comment(commentStr, postId);
+                                commentManager.comment(commentStr, postIdTextView);
                                 UiUtils.showMessage(fromActivity, "Commented Successfully!");
 
                                 UiUtils.safeRunOnUiThread(fromActivity, new Runnable() {
@@ -197,7 +205,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         @Override
                         public void run() {
                             try {
-                                FirebasePostManager.getInstance().deletePost(postId);
+                                FirebasePostManager.getInstance().deletePost(postIdTextView);
                                 UiUtils.showMessage(fromActivity, "Post deleted successfully!");
                             } catch (DeletePostException | CommentException e) {
                                 UiUtils.showMessage(fromActivity, "Error on deleting post...");

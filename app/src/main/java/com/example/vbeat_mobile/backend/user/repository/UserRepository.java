@@ -40,11 +40,11 @@ public class UserRepository {
                     try {
                         userModel = FirebaseUserManager.getInstance().getUser(userId);
                     } catch (UserBackendException e) {
-                        userViewModel.setValue(null);
+                        userViewModel.postValue(null);
                     }
                     userCache.save(userModel);
                 }
-                userViewModel.setValue(getViewModelFromModel(userModel));
+                userViewModel.postValue(getViewModelFromModel(userModel));
             }
         }).start();
 
