@@ -22,6 +22,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.UserManager;
+import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Objects;
@@ -89,7 +90,12 @@ public class LogInFragment extends Fragment {
                 Activity a = LogInFragment.this.getActivity();
                 try {
                     userManager.login(username, password);
-                    UiUtils.showMessage(a, "Logged in successfully!");
+                    UiUtils.safeRunOnUiThread(a,new Runnable() {
+                        @Override
+                        public void run() {
+                            handleSuccessfulLogin();
+                        }
+                    });
                 } catch(final UserLoginFailedException e) {
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
@@ -121,19 +127,10 @@ public class LogInFragment extends Fragment {
 
     private void handleSuccessfulLogin(){
         View currentView = getView();
-        if(currentView == null) {
-            Log.e(TAG, "currentView == null");
-            throw new IllegalStateException(TAG + " currentView == null");
-        }
-
-        NavController navController = null;
-        navController = Navigation.findNavController(currentView);
-
-        BottomNavigationViewManager.enable(Objects.requireNonNull(getActivity()), true);
-
-        // cleaning up the stack up to now
-        // so back will exit the app
-        navController.navigate(R.id.action_logInFragment_to_feedFragment);
+        RedirectionUtils.redirectAndEnableNavBar(
+                getActivity(),
+                currentView,
+                R.id.action_logInFragment_to_feedFragment);
     }
 
 }

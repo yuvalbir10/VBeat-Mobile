@@ -29,6 +29,7 @@ import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.UiUtils;
+import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,23 +41,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.PostRowViewHolder> {
     private static final String TAG = "FeedRecyclerVA";
 
-    List<PostViewModel> mData; //TODO: change all String objects to Post Objects
+    private PostListViewModel mData;
     private OnItemClickListener clickListener;
-    private PaginationScrollListener paginationScrollListener;
     private Activity fromActivity;
 
-    public FeedRecyclerViewAdapter(List<PostViewModel> data) {
+    public FeedRecyclerViewAdapter(PostListViewModel data) {
         mData = data;
-    }
-
-    public FeedRecyclerViewAdapter() {
-        mData = new ArrayList<>();
+        mData.setPostList(new ArrayList<PostViewModel>());
     }
 
     public void setActivity(Activity a) {
@@ -71,10 +69,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         clickListener = listener;
     }
 
-    public void setPaginationScrollListener(PaginationScrollListener listener) {
-        paginationScrollListener = listener;
-    }
-
     @NonNull
     @Override
     public PostRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -84,13 +78,13 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull PostRowViewHolder holder, int position) {
-        PostViewModel post = mData.get(position);
+        PostViewModel post = getDataList().get(position);
         holder.bind(post);
     }
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        return getDataList().size();
     }
 
     class PostRowViewHolder extends RecyclerView.ViewHolder {
@@ -103,7 +97,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         String postId;
         ImageButton deleteButton;
 
-        public PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
+        PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
             postImage = itemView.findViewById(R.id.post_imageView);
             description = itemView.findViewById(R.id.description_textView);
@@ -112,14 +106,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
             deleteButton = itemView.findViewById(R.id.delete_imageButton);
-
-
-
         }
 
-
-
-        public void bind(final PostViewModel post) {
+        void bind(final PostViewModel post) {
             username.setText(post.getUploader());
             description.setText(post.getDescription());
             postId = post.getPostId();
@@ -128,71 +117,11 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 deleteButton.setVisibility(View.VISIBLE);
             }
 
-            new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            Uri remoteImageDownloadUri = null;
-                            try {
-                                remoteImageDownloadUri = Tasks.await(
-                                        FirebaseStorage.getInstance()
-                                                .getReference().child(post.getRemoteImagePath()).getDownloadUrl()
-                                );
+            downloadAndDisplayImageInBackground(post);
 
-                                ImageViewUtil.getInstance().displayAndCache(
-                                        FeedRecyclerViewAdapter.this.fromActivity,
-                                        postImage,
-                                        remoteImageDownloadUri
-                                );
-                            } catch (ExecutionException | InterruptedException e) {
-                                Log.e(TAG, "can't display image", e);
-                            }
-                        }
-                    }
-            ).start();
-
-
-            musicControlButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (FeedFragment.mediaPlayer.isPlaying()) {
-                                FeedFragment.mediaPlayer.stop();
-                            } else {
-                                try {
-                                    byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());//TODO: change to the specific path of the item
-                                    playMp3(musicBytes);
-                                } catch (Exception e) {
-                                    Log.e("FeedFragment", "cant find music path");
-                                }
-                            }
-                        }
-
-                    });
-                    t.start();
-                }
-            });
-
-
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                FirebasePostManager.getInstance().deletePost(postId);
-                                remove(postId);
-                                UiUtils.showMessage(fromActivity, "Post deleted successfully!");
-                            } catch (DeletePostException | CommentException e) {
-                                UiUtils.showMessage(fromActivity, "Error on deleting post...");
-                            }
-                        }
-                    }).start();
-                }
-            });
+            setupMusicButton(post);
+            setupDeleteButton();
+            setupCommentButton();
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -206,6 +135,25 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 }
             });
 
+
+        }
+
+        private void downloadAndDisplayImageInBackground(final PostViewModel post) {
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                getAndDownloadImage(post);
+                            } catch (ExecutionException | InterruptedException e) {
+                                Log.e(TAG, "can't display image", e);
+                            }
+                        }
+                    }
+            ).start();
+        }
+
+        private void setupCommentButton() {
             commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -223,7 +171,13 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                             try {
                                 commentManager.comment(commentStr, postId);
                                 UiUtils.showMessage(fromActivity, "Commented Successfully!");
-                                commentEditText.setText("");
+
+                                UiUtils.safeRunOnUiThread(fromActivity, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        commentEditText.setText("");
+                                    }
+                                });
 
                             } catch (final CommentException e) {
                                 UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
@@ -234,35 +188,92 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 }
             });
         }
-    }
 
-
-    //TODO: delete this class
-    protected class LoadingVH extends RecyclerView.ViewHolder {
-        private ProgressBar mProgressBar;
-
-
-        public LoadingVH(View itemView) {
-            super(itemView);
-
-            mProgressBar = itemView.findViewById(R.id.loadmore_progressBar);
-
-
+        private void setupDeleteButton() {
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                FirebasePostManager.getInstance().deletePost(postId);
+                                remove(postId);
+                                UiUtils.showMessage(fromActivity, "Post deleted successfully!");
+                            } catch (DeletePostException | CommentException e) {
+                                UiUtils.showMessage(fromActivity, "Error on deleting post...");
+                            }
+                        }
+                    }).start();
+                }
+            });
         }
 
+        private void setupMusicButton(final PostViewModel post) {
+            musicControlButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (FeedFragment.mediaPlayer.isPlaying()) {
+                                FeedFragment.mediaPlayer.stop();
+                            } else {
+                                try {
+                                    byte[] musicBytes = FeedFragment.downloadMusic(post.getRemoteMusicPath());
+                                    playMp3(musicBytes);
+                                } catch (Exception e) {
+                                    Log.e("FeedFragment", "cant find music path");
+                                }
+                            }
+                        }
+
+                    });
+                    t.start();
+                }
+            });
+        }
+
+        private void getAndDownloadImage(PostViewModel post) throws ExecutionException, InterruptedException {
+            Uri remoteImageDownloadUri;
+            remoteImageDownloadUri = Tasks.await(
+                    FirebaseStorage.getInstance()
+                            .getReference().child(post.getRemoteImagePath()).getDownloadUrl()
+            );
+
+            ImageViewUtil.getInstance().displayAndCache(
+                    FeedRecyclerViewAdapter.this.fromActivity,
+                    postImage,
+                    remoteImageDownloadUri
+            );
+        }
     }
-
-
-
 
     /*
         Helpers - Pagination
    _________________________________________________________________________________________________
     */
 
+    private boolean isPostInList(String postId) {
+        for(PostViewModel postViewModel : getDataList() ){
+            if (postId.equals(postViewModel.getPostId())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void add(PostViewModel r) {
-        mData.add(r);
-        notifyItemInserted(mData.size() - 1);
+        // this is a sanity check
+        // the real check should happen when
+        // you ask the PostRepository for more posts
+        // and get less than you expected
+        // you should stop asking for more posts
+        if(!isPostInList(r.getPostId())) {
+            getDataList().add(r);
+        }
+
+        notifyItemInserted(getDataList().size() - 1);
     }
 
     public void addAll(List<PostViewModel> moveResults) {
@@ -274,35 +285,35 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     public void remove(String postId) {
         int position = findPositionById(postId);
         if (position > -1) {
-            mData.remove(position);
+            getDataList().remove(position);
             notifyItemRemoved(position);
         }
     }
 
+
     private int findPositionById(String postId){
-        for (int i = 0; i < mData.size(); i++){
-            if(mData.get(i).getPostId().contentEquals(postId))
+        for (int i = 0; i < getDataList().size(); i++){
+            if(getDataList().get(i).getPostId().contentEquals(postId))
                 return i;
         }
         return -1;
     }
 
     public void clear() {
-        while (getItemCount() > 0) {
-            remove(getItem(0).getPostId());
-        }
+            while (getItemCount() > 0) {
+                remove(getItem(0).getPostId());
+            }
     }
 
-    public boolean isEmpty() {
-        return getItemCount() == 0;
+    private PostViewModel getItem(int position) {
+        return getDataList().get(position);
     }
 
-    public PostViewModel getItem(int position) {
-        return mData.get(position);
+    public List<PostViewModel> getDataList(){
+        return Objects.requireNonNull(mData.getPostList());
     }
 
-
-    public static void playMp3(byte[] mp3SoundByteArray) {
+    private static void playMp3(byte[] mp3SoundByteArray) {
         MediaPlayer mediaPlayer = FeedFragment.mediaPlayer;
         try {
             // create temp file that will hold byte array
@@ -327,8 +338,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (IOException ex) {
-            String s = ex.toString();
-            ex.printStackTrace();
+            Log.e(TAG, "exception while trying to play music", ex);
         }
     }
 
