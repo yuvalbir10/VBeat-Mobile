@@ -115,8 +115,8 @@ public class FeedFragment extends Fragment {
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int index, PostViewModel post) {
-                //TODO: complete what we want to happen when post is clicked (for example go to a page that shows this post only)
-                Log.d("TAG", "item click " + index); //TODO: remove this line, this is for checking purposes
+
+                Log.d("TAG", "item click " + index);
                 View currentView = getView();
                 if(currentView == null) {
                     Log.e(TAG, "currentView == null");
