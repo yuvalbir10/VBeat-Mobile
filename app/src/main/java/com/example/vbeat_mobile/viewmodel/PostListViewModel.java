@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 public class PostListViewModel extends ViewModel {
+    // not live data because post list does not update automatically
     private List<PostViewModel> postList;
 
     public List<PostViewModel> getPostList() {
