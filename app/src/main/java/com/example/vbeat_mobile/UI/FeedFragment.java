@@ -46,20 +46,16 @@ import java.util.concurrent.ExecutionException;
 public class FeedFragment extends Fragment {
     private static final String TAG = "FeedFragment";
 
-    int tempPostNum = 0;
-
     private FeedRecyclerViewAdapter feedAdapter;
     private ProgressBar progressBar;
 
     static MediaPlayer mediaPlayer = new MediaPlayer();
-    private static final int PAGE_START = 1;
 
     private boolean isLoading = false;
     private boolean isLastPage = false;
 
     private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
-    private int currentPage = PAGE_START;
-    private int POSTS_PER_PAGE = 2;
+    private int POSTS_PER_PAGE = 5;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -137,7 +133,6 @@ public class FeedFragment extends Fragment {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
-                currentPage += 1;
 
                 loadNextPageInBackground();
             }
