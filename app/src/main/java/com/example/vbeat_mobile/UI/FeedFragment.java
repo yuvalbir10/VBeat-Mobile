@@ -178,12 +178,4 @@ public class FeedFragment extends Fragment {
                 }
             });
     }
-
-    private PostViewModel[] PostBackendToFront(VBeatPostModel[] posts){
-        PostViewModel [] ret = new PostViewModel[posts.length];
-        for(int i =0; i<posts.length;i++){
-            ret[i] = new PostViewModel(posts[i].getPostId(),posts[i].getDescription(),posts[i].getRemoteImagePath(),posts[i].getRemoteMusicPath(),posts[i].getUploaderId());
-        }
-        return ret;
-    }
 }
