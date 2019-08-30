@@ -171,7 +171,13 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                             try {
                                 commentManager.comment(commentStr, postId);
                                 UiUtils.showMessage(fromActivity, "Commented Successfully!");
-                                commentEditText.setText("");
+
+                                UiUtils.safeRunOnUiThread(fromActivity, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        commentEditText.setText("");
+                                    }
+                                });
 
                             } catch (final CommentException e) {
                                 UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
