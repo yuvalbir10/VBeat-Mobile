@@ -61,8 +61,6 @@ public class FeedFragment extends Fragment {
     private int currentPage = PAGE_START;
     private int POSTS_PER_PAGE = 2;
 
-    private PostListViewModel postListViewModel;
-
     public FeedFragment() {
         // Required empty public constructor
     }
@@ -94,7 +92,10 @@ public class FeedFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
         recyclerView.setLayoutManager(layoutManager);
         progressBar =  v.findViewById(R.id.loadmore_progressBar);
-        postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
+
+        // setting post list view model to hold the data
+        // to survive configuration changes
+        PostListViewModel postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
 
         feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
         feedAdapter.setActivity(getActivity());
@@ -115,7 +116,6 @@ public class FeedFragment extends Fragment {
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onClick(int index, PostViewModel post) {
-
                 Log.d("TAG", "item click " + index);
                 View currentView = getView();
                 if(currentView == null) {
@@ -129,7 +129,6 @@ public class FeedFragment extends Fragment {
                 FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment();
                 action.setPostId(post.getPostId());
                 navController.navigate(action);
-
             }
         });
 
