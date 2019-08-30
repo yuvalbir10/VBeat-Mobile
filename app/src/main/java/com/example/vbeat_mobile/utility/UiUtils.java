@@ -13,7 +13,7 @@ public class UiUtils {
         });
     }
 
-    private static void safeRunOnUiThread(Activity a, Runnable r){
+    public static void safeRunOnUiThread(Activity a, Runnable r){
         if(a != null) {
             a.runOnUiThread(r);
         }

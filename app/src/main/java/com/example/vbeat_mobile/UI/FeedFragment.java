@@ -176,12 +176,6 @@ public class FeedFragment extends Fragment {
             });
     }
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
-            a.runOnUiThread(r);
-        }
-    }
-
     private PostViewModel[] PostBackendToFront(VBeatPostModel[] posts){
         PostViewModel [] ret = new PostViewModel[posts.length];
         for(int i =0; i<posts.length;i++){

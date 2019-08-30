@@ -92,7 +92,7 @@ public class LogInFragment extends Fragment {
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
 
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             errorTextView.setText(e.getMessage());
@@ -103,7 +103,7 @@ public class LogInFragment extends Fragment {
                 } finally {
 
                     // hide progress bar & show login button
-                    safeRunOnUiThread(a, new Runnable() {
+                    UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
                             loginButton.setEnabled(true);
@@ -115,11 +115,6 @@ public class LogInFragment extends Fragment {
         }).start();
     }
 
-    private void safeRunOnUiThread(Activity a, Runnable r){
-        if(a != null) {
-            a.runOnUiThread(r);
-        }
-    }
 
     private void handleSuccessfulLogin(){
         View currentView = getView();
