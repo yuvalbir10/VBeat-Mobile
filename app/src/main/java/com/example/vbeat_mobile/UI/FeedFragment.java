@@ -159,6 +159,7 @@ public class FeedFragment extends Fragment {
 
     private void loadNextPageInBackground() {
         //TODO: move to another thread
+        Log.d(TAG, "loadNextPageInBackground is called");
         progressBar.setVisibility(View.VISIBLE);
 
         LiveData<List<PostViewModel>> mData;
@@ -166,6 +167,8 @@ public class FeedFragment extends Fragment {
         mData.observeForever(new Observer<List<PostViewModel>>() {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
+                Log.d(TAG, String.format("onChanged called %d", postViewModels.size()));
+
                 feedAdapter.addAll(postViewModels);
                 progressBar.setVisibility(View.INVISIBLE);
                 isLoading = false;

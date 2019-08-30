@@ -247,8 +247,25 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
    _________________________________________________________________________________________________
     */
 
+    private boolean isPostInList(String postId) {
+        for(PostViewModel postViewModel : getDataList() ){
+            if (postId.equals(postViewModel.getPostId())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void add(PostViewModel r) {
-        getDataList().add(r);
+        // this is a sanity check
+        // the real check should happen when
+        // you ask the PostRepository for more posts
+        // and get less than you expected
+        // you should stop asking for more posts
+        if(!isPostInList(r.getPostId())) {
+            getDataList().add(r);
+        }
+
         notifyItemInserted(getDataList().size() - 1);
     }
 
