@@ -54,7 +54,11 @@ public class ShowCommentsFragment extends Fragment {
                 .get(CommentListViewModel.class);
 
         RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
+        // size of recycler view does not change because
+        // of each comment
         commentsRecyclerView.setHasFixedSize(true);
+
+        // set layout manager for comment list
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         commentsRecyclerView.setLayoutManager(layoutManager);
 
