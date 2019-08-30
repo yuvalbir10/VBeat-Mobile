@@ -87,7 +87,7 @@ public class UserRepository {
             for(VBeatUserModel model : fromFirebase) {
                 userCache.save(model);
             }
-            
+
             fetchedList.addAll(
                 fromFirebase
             );
@@ -95,7 +95,10 @@ public class UserRepository {
             Log.e(TAG, "getUsers failed with exception", e);
             // set null unless we were able to get all users
             userModelList.postValue(null);
+            return false;
         }
+
+        return true;
     }
 
     private List<String> removeFetchedIds(List<VBeatUserModel> fetchedList, List<String> userIds) {
