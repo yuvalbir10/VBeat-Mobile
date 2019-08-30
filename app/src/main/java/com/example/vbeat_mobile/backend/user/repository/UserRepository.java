@@ -79,14 +79,18 @@ public class UserRepository {
         return userModelList;
     }
 
+    public void saveUsers(List<VBeatUserModel> userModels) {
+        for(VBeatUserModel model : userModels) {
+            userCache.save(model);
+        }
+    }
+
     private boolean fetchRemainingUserIdsFromFirebase(List<VBeatUserModel> fetchedList, List<String> remainingUserIds, MutableLiveData<List<VBeatUserModel>> userModelList) {
         try {
             List<VBeatUserModel> fromFirebase = FirebaseUserManager.getInstance().getUsers(remainingUserIds);
 
             // add new users to cache
-            for(VBeatUserModel model : fromFirebase) {
-                userCache.save(model);
-            }
+            saveUsers(fromFirebase);
 
             fetchedList.addAll(
                 fromFirebase

@@ -11,6 +11,7 @@ import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -64,9 +65,14 @@ public class CommentRepository {
         }
 
         FirebaseUserManager userManager = FirebaseUserManager.getInstance();
+        UserRepository userRepository = UserRepository.getInstance();
         List<VBeatUserModel> userModels = null;
         try {
             userModels = userManager.getUsers(userIds);
+            // the reason for using the method from UserRepository
+            // is because we don't want to do this operation async
+            // we want to wait for it to be over
+            userRepository.saveUsers(userModels);
         } catch (UserBackendException e) {
             throw new CommentException("unable to grab users for comments");
         }
