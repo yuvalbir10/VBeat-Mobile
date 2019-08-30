@@ -28,6 +28,7 @@ import java.util.Objects;
  * A simple {@link Fragment} subclass.
  */
 public class ShowCommentsFragment extends Fragment {
+    private CommentListViewModel commentListViewModel;
 
     public ShowCommentsFragment() {
         // Required empty public constructor
@@ -49,7 +50,7 @@ public class ShowCommentsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_show_comments, container, false);
 
         // Get view model for this fragment
-        CommentListViewModel commentListViewModel = ViewModelProviders.of(this)
+        commentListViewModel = ViewModelProviders.of(this)
                 .get(CommentListViewModel.class);
 
         RecyclerView commentsRecyclerView = view.findViewById(R.id.comments_RecyclerView);
@@ -60,9 +61,13 @@ public class ShowCommentsFragment extends Fragment {
         final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
         adapter.setActivity(getActivity());
 
-        LiveData<List<CommentViewModel>> mData;
-        mData = CommentRepository.getInstance().getComments(postID);
-        mData.observeForever(new Observer<List<CommentViewModel>>() {
+        LiveData<List<CommentViewModel>> data;
+        // get comments for current post
+        data = CommentRepository.getInstance().getComments(postID);
+
+        // set ViewModel live data list
+        commentListViewModel.setCommentViewModelLiveData(data);
+        commentListViewModel.getComments().observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
                 adapter.addAll(commentViewModels);
