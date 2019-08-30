@@ -89,7 +89,12 @@ public class LogInFragment extends Fragment {
                 Activity a = LogInFragment.this.getActivity();
                 try {
                     userManager.login(username, password);
-                    UiUtils.showMessage(a, "Logged in successfully!");
+                    UiUtils.safeRunOnUiThread(a,new Runnable() {
+                        @Override
+                        public void run() {
+                            handleSuccessfulLogin();
+                        }
+                    });
                 } catch(final UserLoginFailedException e) {
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
