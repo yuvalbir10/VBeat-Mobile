@@ -120,7 +120,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                             usernameTextView.setText(userViewModel.getDisplayName());
                             liveUser.removeObserver(this);
                         }
-                    });
+            });
 
             descriptionTextView.setText(post.getDescription());
             postId = post.getPostId();

@@ -257,6 +257,8 @@ public class FirebasePostManager implements PostManager<String> {
                             documentSnapshot == null ? "null" : documentSnapshot.toString()), e);
                     return;
                 }
+                Log.d(TAG, String.format("snapshotListener called docSnapshot=%s", documentSnapshot));
+
                 if(!documentSnapshot.exists()) {
                     postChangesListener.onPostChanged(postId, null, true);
                 } else {
