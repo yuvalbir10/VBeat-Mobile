@@ -23,6 +23,8 @@ import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.post.DeletePostException;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
@@ -145,6 +147,16 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 }
             });
 
+
+            PostRepository.getInstance().listenToPostChange(postId).observeForever(new Observer<PostChangeData>() {
+                @Override
+                public void onChanged(PostChangeData postChangeData) {
+                    edit(postId,postChangeData.getNewDescription());
+                    if(postChangeData.getIsDeleted()){
+                        remove(postId);
+                    }
+                }
+            });
 
         }
 
@@ -314,6 +326,14 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         if (position > -1) {
             getDataList().remove(position);
             notifyItemRemoved(position);
+        }
+    }
+
+    public void edit(String postId, String newDesc){
+        int position = findPositionById(postId);
+        if (position > -1) {
+            getDataList().get(position).setDescription(newDesc);
+            notifyItemChanged(position);
         }
     }
 
