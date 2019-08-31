@@ -16,8 +16,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
@@ -25,8 +23,6 @@ import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.post.DeletePostException;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
-import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
-import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
@@ -43,7 +39,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -315,16 +310,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     }
 
     private List<PostViewModel> sortByDate(List<PostViewModel> postViewModels){
-        Collections.sort(postViewModels, new Comparator<PostViewModel>() {
-            @Override
-            public int compare(PostViewModel postViewModel, PostViewModel t1) {
-                if(postViewModel.getUploadDate().before(t1.getUploadDate())) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }
-        });
+        Collections.sort(postViewModels, new PostViewModelDateComparator());
 
         return postViewModels;
     }

@@ -275,7 +275,7 @@ public class FirebasePostManager implements PostManager<String> {
         return listenerRegistration;
     }
 
-    public ListenerRegistration listenToNewPost(final NewPostListener postListener,final String lastPostId) {
+    public ListenerRegistration listenToNewPost(final NewPostListener postListener,final String firstPostId) {
         return db.collection(POST_COLLECTION_NAME)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(1)
@@ -292,7 +292,7 @@ public class FirebasePostManager implements PostManager<String> {
                             return;
                         }
 
-                        if(!queryDocumentSnapshots.getDocuments().get(0).getId().equals(lastPostId)) {
+                        if(!queryDocumentSnapshots.getDocuments().get(0).getId().equals(firstPostId)) {
                             postListener.onNewPost();
                         }
                     }

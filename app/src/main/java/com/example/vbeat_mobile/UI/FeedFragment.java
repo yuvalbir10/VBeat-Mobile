@@ -3,6 +3,7 @@ package com.example.vbeat_mobile.UI;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
+import android.net.sip.SipSession;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
@@ -32,8 +35,10 @@ import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -55,6 +60,11 @@ public class FeedFragment extends Fragment {
 
     private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
     private int POSTS_PER_PAGE = 5;
+
+    // in order to signal firebase
+    // when to unsubscribe from a certain
+    // new post listener
+    private ListenerRegistration newPostListenerRegistration = null;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -110,6 +120,9 @@ public class FeedFragment extends Fragment {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
                 feedAdapter.addAll(postViewModels);
+
+                // show toast whenever new post is made
+                showToastOnNewPost(getFirstPostId(postViewModels));
 
                 // set listener to update posts in live mode
                 listenOnPosts(postViewModels);
@@ -194,6 +207,30 @@ public class FeedFragment extends Fragment {
                 }
             });
         }
+    }
+
+    // side effect is sorting the list
+    private String getFirstPostId(List<PostViewModel> postViewModels) {
+        // same comparator as in the FeedRecyclerViewAdapter
+        // should not matter
+        Collections.sort(postViewModels, new PostViewModelDateComparator());
+        return postViewModels.get(0).getPostId();
+    }
+
+    private void showToastOnNewPost(String firstPostId){
+        // remove if we're already subscribed
+        if(newPostListenerRegistration != null) {
+            newPostListenerRegistration.remove();
+            // good practice
+            newPostListenerRegistration = null;
+        }
+
+        newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(FeedFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+            }
+        }, firstPostId);
     }
 
     private void loadNextPageInBackground() {
