@@ -163,14 +163,20 @@ public class FirebasePostManager implements PostManager<String> {
         try {
             if (cursor == null) {
                 nextPostsQuery = Tasks.await(
-                        db.collection(POST_COLLECTION_NAME).limit(limit).get());
+                        db.collection(POST_COLLECTION_NAME)
+                                .orderBy("timestamp", Query.Direction.DESCENDING)
+                                .limit(limit)
+                                .get()
+                );
             } else {
                 lastPostRendered = Tasks.await(db.collection(POST_COLLECTION_NAME).document(cursor).get());
                 nextPostsQuery = Tasks.await(
                         db.collection(POST_COLLECTION_NAME)
                                 .orderBy("timestamp", Query.Direction.DESCENDING)
                                 .startAfter(lastPostRendered)
-                                .limit(limit).get());
+                                .limit(limit)
+                                .get()
+                );
             }
 
             // get n (limit) posts after the current post mentioned in cursor
