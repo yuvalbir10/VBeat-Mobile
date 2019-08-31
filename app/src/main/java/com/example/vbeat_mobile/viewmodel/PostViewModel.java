@@ -2,25 +2,30 @@ package com.example.vbeat_mobile.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
+import java.util.Date;
+
 public class PostViewModel extends ViewModel {
     private String postId;
     private String description;
     private String remoteImagePath;
     private String remoteMusicPath;
     private String uploaderId;
+    private Date uploadDate;
 
     public PostViewModel(
             String postId,
             String description,
             String remoteImagePath,
             String remoteMusicPath,
-            String uploader
+            String uploader,
+            Date uploadDate
                          ) {
         this.postId = postId;
         this.description = description;
         this.remoteImagePath = remoteImagePath;
         this.remoteMusicPath = remoteMusicPath;
         this.uploaderId = uploader;
+        this.uploadDate = uploadDate;
     }
 
     public String getPostId() {
@@ -41,5 +46,9 @@ public class PostViewModel extends ViewModel {
 
     public String getUploader() {
         return uploaderId;
+    }
+
+    public Date getUploadDate() {
+        return uploadDate;
     }
 }
