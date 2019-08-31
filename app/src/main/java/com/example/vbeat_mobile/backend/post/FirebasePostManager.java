@@ -94,11 +94,7 @@ public class FirebasePostManager implements PostManager<String> {
 
         DocumentReference docRef = null;
         try {
-<<<<<<< HEAD
              docRef = Tasks.await(db.collection(POST_COLLECTION_NAME).add(firebaseMap));
-=======
-            docRef = Tasks.await(db.collection(postCollectionName).add(firebaseMap));
->>>>>>> 128fa97b7c59936e98b8a2f629b156f906d1e6f5
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "upload post interrupted", e);
@@ -138,7 +134,7 @@ public class FirebasePostManager implements PostManager<String> {
     }
 
     public List<VBeatPostModel> getUserPosts(String userId) {
-        Task<QuerySnapshot> querySnapshotTask = db.collection(postCollectionName)
+        Task<QuerySnapshot> querySnapshotTask = db.collection(POST_COLLECTION_NAME)
                 .whereEqualTo("uploader_id", userId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get();
@@ -225,8 +221,7 @@ public class FirebasePostManager implements PostManager<String> {
             throw new DeletePostException(e.getMessage());
         }
     }
-
-<<<<<<< HEAD
+    
     public void editPost(String postId, String description) throws UploadPostFailedException {
         try {
             Tasks.await(
@@ -237,8 +232,7 @@ public class FirebasePostManager implements PostManager<String> {
             throw new UploadPostFailedException(e.getMessage());
         }
     }
-=======
->>>>>>> 128fa97b7c59936e98b8a2f629b156f906d1e6f5
+
 
     // time to check
     // time to use
