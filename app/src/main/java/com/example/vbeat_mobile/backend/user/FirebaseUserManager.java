@@ -52,6 +52,10 @@ public class FirebaseUserManager implements UserManager {
             throw new IllegalStateException("can't create account while user is logged in");
         }
 
+        if(!email.endsWith("@gmail.com")){
+            throw new UserRegistrationFailedException("we do not support email providers other than gmail!");
+        }
+
         Task<AuthResult> t = mAuth.createUserWithEmailAndPassword(email, password);
         FirebaseFirestore instance = FirebaseFirestore.getInstance();
 
@@ -62,8 +66,11 @@ public class FirebaseUserManager implements UserManager {
             Tasks.await(t);
             verifyResult(t);
 
+            String displayName = getDisplayNameFromEmail(email);
+            FirebaseUserManager.getInstance().getCurrentUser().setDisplayName(displayName);
+
             VBeatUserModel userToBeRegistered = new VBeatUserModel(
-                    email, getDisplayNameFromEmail(email),
+                    email, displayName,
                     Objects.requireNonNull(t.getResult()).getUser().getUid()
             );
             // write user details into users collection
