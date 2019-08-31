@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -68,6 +69,11 @@ public class FirebaseUserManager implements UserManager {
 
             String displayName = getDisplayNameFromEmail(email);
             FirebaseUserManager.getInstance().getCurrentUser().setDisplayName(displayName);
+
+            // change user display name
+            UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName).build();
+            mAuth.getCurrentUser().updateProfile(userProfileChangeRequest);
 
             VBeatUserModel userToBeRegistered = new VBeatUserModel(
                     email, displayName,
