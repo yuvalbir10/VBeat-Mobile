@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/MyProfileFragment"
+        android:id="@+id/myProfileFragment"
         android:title="@string/my_profile" />
     <item
         android:id="@+id/feedFragment"
