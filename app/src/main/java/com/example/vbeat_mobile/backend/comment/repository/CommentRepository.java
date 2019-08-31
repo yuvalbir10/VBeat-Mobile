@@ -14,6 +14,7 @@ import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,28 @@ public class CommentRepository {
 
 
         return liveData;
+    }
+
+    public LiveData<List<CommentViewModel>> listenOnLiveCommentChanges(String postId) {
+        final MutableLiveData<List<CommentViewModel>> commentListMutableLiveData = new MutableLiveData<>();
+
+
+        ListenerRegistration listenerRegistration = FirebaseCommentManager.getInstance().listenOnCommentPageChanges(postId,
+                new FirebaseCommentManager.CommentPageChangesListener() {
+                    @Override
+                    public void onCommentListChanged(List<CommentModel> newCommentList) {
+
+                        try {
+                            List<CommentViewModel> commentViewModelList =
+                                    convertCommentModelsToViewModels(newCommentList);
+                            commentListMutableLiveData.postValue(commentViewModelList);
+                        } catch (CommentException e) {
+                            Log.e(TAG, "Comment update failed", e);
+                        }
+                    }
+                });
+
+        return commentListMutableLiveData;
     }
 
     private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels) throws CommentException {
