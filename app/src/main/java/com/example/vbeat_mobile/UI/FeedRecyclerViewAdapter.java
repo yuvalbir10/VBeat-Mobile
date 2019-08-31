@@ -293,7 +293,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 if(postViewModel.getUploadDate().before(t1.getUploadDate())) {
                     return 1;
                 } else {
-                    return 0;
+                    return -1;
                 }
             }
         });

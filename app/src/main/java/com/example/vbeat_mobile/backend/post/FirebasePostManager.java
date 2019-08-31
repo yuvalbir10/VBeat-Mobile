@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -99,13 +100,21 @@ public class FirebasePostManager implements PostManager<String> {
             throw new UploadPostFailedException(e.getMessage());
         }
 
+        Timestamp currentTimestamp = null;
+        try {
+            currentTimestamp = Tasks.await(docRef.get()).getTimestamp("timestamp");
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "unable to get timestamp from server", e);
+            throw new UploadPostFailedException("upload post failed");
+        }
+
         return new FirebasePostAdapter(
                 docRef.getId(),
                 description,
                 remoteImagePath,
                 remoteMusicPath,
                 userManager.getCurrentUser().getUserId(),
-                (Timestamp)firebaseMap.get("timestamp")
+                currentTimestamp
         );
     }
 
