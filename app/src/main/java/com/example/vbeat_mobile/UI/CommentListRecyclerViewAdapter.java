@@ -41,7 +41,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
     @Override
     public CommentRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_row, parent, false);
-        return new CommentRowViewHolder(view);
+        return new CommentRowViewHolder(view, this);
     }
 
     @Override
@@ -55,16 +55,19 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
         return mData.size();
     }
 
-    class CommentRowViewHolder extends RecyclerView.ViewHolder{
+    static class CommentRowViewHolder extends RecyclerView.ViewHolder{
         TextView usernameTextView;
         TextView commentTextView;
         ImageButton deleteImageButton;
+        private CommentListRecyclerViewAdapter commentListRecyclerViewAdapter;
 
-        CommentRowViewHolder(@NonNull View itemView) {
+        CommentRowViewHolder(@NonNull View itemView, CommentListRecyclerViewAdapter commentListRecyclerViewAdapter) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.username_textView);
             commentTextView= itemView.findViewById(R.id.comment_textView);
             deleteImageButton = itemView.findViewById(R.id.delete_imageButton);
+
+            this.commentListRecyclerViewAdapter = commentListRecyclerViewAdapter;
         }
 
         void bind(final CommentViewModel comment){
@@ -80,10 +83,10 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                             public void run() {
                                 try {
                                     FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
-                                    remove(comment.getCommentId());
-                                    UiUtils.showMessage(fromActivity, "Deleted comment successfully!");
+                                    commentListRecyclerViewAdapter.remove(comment.getCommentId());
+                                    UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Deleted comment successfully!");
                                 } catch (final CommentException e) {
-                                    UiUtils.showMessage(fromActivity, "Error on deleting comment..." + e.getMessage());
+                                    UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Error on deleting comment..." + e.getMessage());
                                 }
                             }
                         }).start();
