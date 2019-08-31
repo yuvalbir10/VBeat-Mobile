@@ -63,24 +63,11 @@ public class ImageViewUtil {
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final RequestCreator r = Picasso.get()
+                Picasso.get()
                         .load(uri)
                         .fit()
-                        .centerCrop();
-
-                r.networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(imageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                r.into(imageView);
-                            }
-                        });
-
+                        .centerCrop()
+                        .into(imageView);
             }
         });
     }

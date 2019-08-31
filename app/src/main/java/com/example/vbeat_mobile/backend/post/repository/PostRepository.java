@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
+import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
@@ -53,6 +54,17 @@ public class PostRepository {
         }).start();
 
         return resPost;
+    }
+
+    public boolean editPost(String postId, String description) {
+        try {
+            FirebasePostManager.getInstance().editPost(postId, description);
+            return true;
+        } catch (UploadPostFailedException e) {
+            Log.e(TAG, "unable to edit post", e);
+            return false;
+        }
+
     }
 
     public LiveData<List<PostViewModel>> getPosts(final String cursor, final int limit) {
