@@ -53,6 +53,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     private PostListViewModel mData;
     private OnItemClickListener clickListener;
     private Activity fromActivity;
+    private OnItemClickListener editClickListener;
 
     public FeedRecyclerViewAdapter(PostListViewModel data) {
         mData = data;
@@ -69,6 +70,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         clickListener = listener;
+    }
+
+    public void setEditOnClickListener(OnItemClickListener listener){
+        editClickListener = listener;
     }
 
     @NonNull
@@ -230,7 +235,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //TODO::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                    editClickListener.onClick(getAdapterPosition(), getItem(getAdapterPosition()));
                 }
             });
         }
