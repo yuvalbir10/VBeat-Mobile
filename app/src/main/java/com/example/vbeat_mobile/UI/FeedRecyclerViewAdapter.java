@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
+import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.post.DeletePostException;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
@@ -139,10 +140,17 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             descriptionTextView.setText(post.getDescription());
             postId = post.getPostId();
 
-            if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
-                deleteButton.setVisibility(View.VISIBLE);
-                editButton.setVisibility(View.VISIBLE);
-            }
+            UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+                @Override
+                public void onChanged(UserViewModel userViewModel) {
+                    if(post.getUploader().contentEquals(userViewModel.getUserId())){
+                        deleteButton.setVisibility(View.VISIBLE);
+                        editButton.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+
 
             downloadAndDisplayImageInBackground(post);
 
@@ -183,7 +191,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final FirebaseCommentManager commentManager = FirebaseCommentManager.getInstance();
                     final String commentStr = commentEditText.getText().toString();
 
                     if(commentStr.contentEquals("")){
@@ -194,19 +201,18 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                commentManager.comment(commentStr, postId);
+                            boolean success = CommentRepository.getInstance().comment(postId, commentStr);
+                            if(success){
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Commented Successfully!");
-
                                 UiUtils.safeRunOnUiThread(feedRecyclerViewAdapter.fromActivity, new Runnable() {
                                     @Override
                                     public void run() {
                                         commentEditText.setText("");
                                     }
                                 });
-
-                            } catch (final CommentException e) {
-                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error Commenting : " + e.getMessage());
+                            }
+                            else{
+                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error Commenting : ");
                             }
                         }
                     }).start();
@@ -222,11 +228,12 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                FirebasePostManager.getInstance().deletePost(postId);
+                            boolean success = PostRepository.getInstance().deletePost(postId);
+                            if(success){
                                 feedRecyclerViewAdapter.remove(postId);
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Post deleted successfully!");
-                            } catch (DeletePostException | CommentException e) {
+                            }
+                            else{
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error on deleting post...");
                             }
                         }

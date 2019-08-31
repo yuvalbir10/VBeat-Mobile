@@ -9,7 +9,6 @@ import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
-import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -152,6 +151,11 @@ public class PostRepository {
         }).start();
 
         return postsLiveData;
+    }
+
+    public boolean deletePost(String postId){
+        //TODO!!!!!!!!!!!!!!!!!!
+        return true;
     }
 
 
