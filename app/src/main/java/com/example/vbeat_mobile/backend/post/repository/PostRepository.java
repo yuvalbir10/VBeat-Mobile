@@ -11,6 +11,7 @@ import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -24,11 +25,11 @@ public class PostRepository {
         private static PostRepository instance = new PostRepository();
     }
 
-    public static PostRepository getInstance(){
+    public static PostRepository getInstance() {
         return PostRepositoryInstanceHolder.instance;
     }
 
-    private PostRepository(){
+    private PostRepository() {
         postCache = new PostCache();
     }
 
@@ -41,7 +42,7 @@ public class PostRepository {
             @Override
             public void run() {
                 VBeatPostModel cachedPost = postCache.getPost(postId);
-                if(cachedPost == null) {
+                if (cachedPost == null) {
                     cachedPost = FirebasePostManager.getInstance().getPost(postId);
                     postCache.savePost(cachedPost);
                 }
@@ -78,12 +79,11 @@ public class PostRepository {
                         .getInstance().getPosts(cursor, limit);
 
 
-
                 // android studio complaining
                 // about not declaring type
                 List postList = null;
 
-                if(postCollection != null) {
+                if (postCollection != null) {
                     // load from remote source if we can
                     postList = postCollection.getPosts();
                 } else {
@@ -105,7 +105,29 @@ public class PostRepository {
     }
 
 
+    public LiveData<PostChangeData> listenToPostChange(String postId) {
+        final MutableLiveData<PostChangeData> postViewModelMutableLiveData = new MutableLiveData<>();
 
+        ListenerRegistration firebaseListener =
+                FirebasePostManager.getInstance().listenToPostChanges(postId,
+                        new FirebasePostManager.PostChangesListener() {
+                            @Override
+                            public void onPostChanged(String postId,
+                                                      String newDescription,
+                                                      boolean isDeleted) {
+                                postViewModelMutableLiveData.postValue(
+                                        new PostChangeData(
+                                                postId,
+                                                newDescription,
+                                                isDeleted
+                                        )
+                                );
+                            }
+                        });
+
+
+        return postViewModelMutableLiveData;
+    }
 
     public LiveData<List<PostViewModel>> getPostsByUser(final String userId) {
         final MutableLiveData<List<PostViewModel>> postsLiveData = new MutableLiveData<>();
@@ -128,7 +150,7 @@ public class PostRepository {
     }
 
 
-    private PostViewModel getViewModelFromModel(VBeatPostModel model){
+    private PostViewModel getViewModelFromModel(VBeatPostModel model) {
         return new PostViewModel(
                 model.getPostId(),
                 model.getDescription(),
@@ -140,18 +162,18 @@ public class PostRepository {
     }
 
     private void modelListToViewModelList(List postList, List<PostViewModel> postViewModelList) {
-        if(postList == null) {
+        if (postList == null) {
             Log.e(TAG, "modeListToViewModelList: postList == null");
             return;
         }
 
-        for(Object post : postList) {
-            if(!(post instanceof VBeatPostModel)) {
+        for (Object post : postList) {
+            if (!(post instanceof VBeatPostModel)) {
                 Log.wtf(TAG, "post was not of type VBeatPostModel");
                 throw new RuntimeException("Something really weird happened");
             }
 
-            VBeatPostModel concretePost = (VBeatPostModel)post;
+            VBeatPostModel concretePost = (VBeatPostModel) post;
             postViewModelList.add(
                     getViewModelFromModel(concretePost)
             );

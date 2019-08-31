@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -243,8 +244,9 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
-    public void listenToPostChanges(final String postId, final PostChangesListener postChangesListener) {
-        db.collection(POST_COLLECTION_NAME)
+    public ListenerRegistration listenToPostChanges(final String postId, final PostChangesListener postChangesListener) {
+        //noinspection UnnecessaryLocalVariable
+        ListenerRegistration listenerRegistration = db.collection(POST_COLLECTION_NAME)
                 .document(postId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
@@ -267,6 +269,8 @@ public class FirebasePostManager implements PostManager<String> {
                 }
             }
         });
+
+        return listenerRegistration;
     }
 
 
