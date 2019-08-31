@@ -20,6 +20,7 @@ import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 import com.example.vbeat_mobile.utility.UiUtils;
+import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
 
 
 /**
@@ -79,14 +80,7 @@ public class SignUpFragment extends Fragment {
                 Activity a = SignUpFragment.this.getActivity();
                 try {
                     userManager.createAccount(username, password);
-                    UiUtils.safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(SignUpFragment.this.getContext(),
-                                    "Sign up successful!",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    handleSuccessfulSignUp(a);
                 } catch(final UserRegistrationFailedException e) {
                     showRegistrationErrorMessage(a, e, v);
                 } finally {
@@ -94,6 +88,19 @@ public class SignUpFragment extends Fragment {
                 }
             }
         }).start();
+    }
+
+    private void handleSuccessfulSignUp(Activity a) {
+        UiUtils.safeRunOnUiThread(a, new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(SignUpFragment.this.getContext(),
+                        "Sign up successful!",
+                        Toast.LENGTH_SHORT).show();
+
+                redirectToFeed();
+            }
+        });
     }
 
     private void disableLoginUi(boolean b, int visible) {
@@ -116,7 +123,6 @@ public class SignUpFragment extends Fragment {
         //error if sign up failed
         final TextView errorTextView = v.findViewById(R.id.error_textView);
 
-
         UiUtils.safeRunOnUiThread(a, new Runnable() {
             @Override
             public void run() {
@@ -124,6 +130,13 @@ public class SignUpFragment extends Fragment {
                 errorTextView.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    private void redirectToFeed(){
+        RedirectionUtils.redirectAndEnableNavBar(
+                getActivity(),
+                getView(),
+                R.id.action_signUpFragment_to_feedFragment);
     }
 
 }

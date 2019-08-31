@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<CommentListRecyclerViewAdapter.CommentRowViewHolder> {
-    List<CommentViewModel> mData;
+    private List<CommentViewModel> mData;
     private Activity fromActivity;
 
     public void setActivity(Activity a) {
@@ -41,8 +41,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
     @Override
     public CommentRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_row, parent, false);
-        CommentRowViewHolder commentRowViewHolder = new CommentRowViewHolder(view);
-        return commentRowViewHolder;
+        return new CommentRowViewHolder(view);
     }
 
     @Override
@@ -61,14 +60,14 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
         TextView commentTextView;
         ImageButton deleteImageButton;
 
-        public CommentRowViewHolder(@NonNull View itemView) {
+        CommentRowViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.username_textView);
             commentTextView= itemView.findViewById(R.id.comment_textView);
             deleteImageButton = itemView.findViewById(R.id.delete_imageButton);
         }
 
-        public void bind(final CommentViewModel comment){
+        void bind(final CommentViewModel comment){
             usernameTextView.setText(comment.getUsername());
             commentTextView.setText(comment.getCommentText());
             if(comment.getUserId().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
@@ -81,6 +80,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                             public void run() {
                                 try {
                                     FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
+                                    remove(comment.getCommentId());
                                     UiUtils.showMessage(fromActivity, "Deleted comment successfully!");
                                 } catch (final CommentException e) {
                                     UiUtils.showMessage(fromActivity, "Error on deleting comment..." + e.getMessage());
@@ -94,7 +94,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
 
     }
 
-    public void addAll(List<CommentViewModel> moveResults) {
+    void addAll(List<CommentViewModel> moveResults) {
         for (CommentViewModel result : moveResults) {
             add(result);
         }
@@ -103,5 +103,21 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
     public void add(CommentViewModel r) {
         mData.add(r);
         notifyItemInserted(mData.size() - 1);
+    }
+
+    public void remove(String commentId) {
+        int position = findPositionById(commentId);
+        if (position > -1) {
+            mData.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    private int findPositionById(String commentId){
+        for (int i = 0; i < mData.size(); i++){
+            if(mData.get(i).getCommentId().contentEquals(commentId))
+                return i;
+        }
+        return -1;
     }
 }
