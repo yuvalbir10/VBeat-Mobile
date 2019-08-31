@@ -275,6 +275,30 @@ public class FirebasePostManager implements PostManager<String> {
         return listenerRegistration;
     }
 
+    public ListenerRegistration listenToNewPost(final NewPostListener postListener,final String firstPostId) {
+        return db.collection(POST_COLLECTION_NAME)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if(e != null) {
+                            Log.e(TAG, "listenToNewPost event listener had an exception", e);
+                            return;
+                        }
+
+                        if(queryDocumentSnapshots == null) {
+                            Log.e(TAG, "listenToNewPost: queryDocumentSnapshots == null");
+                            return;
+                        }
+
+                        if(!queryDocumentSnapshots.getDocuments().get(0).getId().equals(firstPostId)) {
+                            postListener.onNewPost();
+                        }
+                    }
+                });
+    }
+
 
     // time to check
     // time to use
@@ -379,5 +403,11 @@ public class FirebasePostManager implements PostManager<String> {
         // description will always be updated
         // if post is deleted isDeleted will be true
         void onPostChanged(String postId, String newDescription, boolean isDeleted);
+    }
+
+    public interface NewPostListener {
+        // notifies whenever a new post is uploaded
+        // does not notify which is the new post
+        void onNewPost();
     }
 }
