@@ -337,4 +337,11 @@ public class FirebasePostManager implements PostManager<String> {
             f.close();
         }
     }
+
+    public interface PostChangesListener {
+        // postId will always be populated
+        // if description was not changed it'll be null
+        // if post is deleted isDeleted will be true
+        void onPostChanged(String postId, String newDescription, boolean isDeleted);
+    }
 }
