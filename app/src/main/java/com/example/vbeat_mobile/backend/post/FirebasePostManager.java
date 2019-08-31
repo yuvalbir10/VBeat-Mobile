@@ -10,14 +10,18 @@ import com.example.vbeat_mobile.backend.comment.CommentModel;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,26 +47,26 @@ public class FirebasePostManager implements PostManager<String> {
         private static FirebasePostManager instance = new FirebasePostManager();
     }
 
-    public static FirebasePostManager getInstance(){
+    public static FirebasePostManager getInstance() {
         return FirebasePostManagerInstanceHolder.instance;
     }
 
-    private FirebasePostManager(){
+    private FirebasePostManager() {
         userManager = FirebaseUserManager.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 
     @Override
     public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri) throws UploadPostFailedException {
-        if(!userManager.isUserLoggedIn()) {
+        if (!userManager.isUserLoggedIn()) {
             throw new UploadPostFailedException("user not logged in");
         }
 
-        if(description == null || description.length() == 0) {
+        if (description == null || description.length() == 0) {
             throw new UploadPostFailedException("no description to post");
         }
 
-        if(!sanityCheckFile(imageUri) || !sanityCheckFile(musicUri)) {
+        if (!sanityCheckFile(imageUri) || !sanityCheckFile(musicUri)) {
             throw new UploadPostFailedException("unable to access image or music file");
         }
 
@@ -70,27 +74,27 @@ public class FirebasePostManager implements PostManager<String> {
         String remoteImagePath = null;
         try {
             remoteImagePath = uploadImage(imageUri);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new UploadPostFailedException(e.getMessage());
         }
 
         String remoteMusicPath = null;
         try {
             remoteMusicPath = uploadMusic(musicUri);
-        } catch(IOException e){
+        } catch (IOException e) {
             throw new UploadPostFailedException(e.getMessage());
         }
 
         Map<String, Object> firebaseMap = FirebasePostAdapter.toFirebaseMap(
-                    description,
-                    remoteImagePath,
-                    remoteMusicPath,
-                    userManager.getCurrentUser()
-                );
+                description,
+                remoteImagePath,
+                remoteMusicPath,
+                userManager.getCurrentUser()
+        );
 
         DocumentReference docRef = null;
         try {
-             docRef = Tasks.await(db.collection(postCollectionName).add(firebaseMap));
+            docRef = Tasks.await(db.collection(postCollectionName).add(firebaseMap));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "upload post interrupted", e);
@@ -120,37 +124,57 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
+    public List<VBeatPostModel> getUserPosts(String userId) {
+        Task<QuerySnapshot> querySnapshotTask = db.collection(postCollectionName)
+                .whereEqualTo("uploader_id", userId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get();
+
+        QuerySnapshot qs;
+        try {
+            qs = Tasks.await(querySnapshotTask);
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "unable to get specific user posts", e);
+            return null;
+        }
+        List<VBeatPostModel> posts = new LinkedList<>();
+
+        for(DocumentSnapshot ds : qs.getDocuments()) {
+            posts.add(new FirebasePostAdapter(ds));
+        }
+
+        return posts;
+    }
+
     // id of the last post
     @Override
     public VBeatPostCollection<String> getPosts(String cursor, int limit) {
-        // might not work we'll have to test
         DocumentSnapshot lastPostRendered;
         QuerySnapshot nextPostsQuery;
         try {
-            if(cursor==null){
+            if (cursor == null) {
                 nextPostsQuery = Tasks.await(
                         db.collection(postCollectionName).limit(limit).get());
-            }
-            else{
+            } else {
                 lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
                 nextPostsQuery = Tasks.await(
                         db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get());
             }
 
             // get n (limit) posts after the current post mentioned in cursor
-            LinkedList<VBeatPostModel> vbeatPostList =  new LinkedList<>();
+            LinkedList<VBeatPostModel> vbeatPostList = new LinkedList<>();
 
             for (DocumentSnapshot snapshot : nextPostsQuery.getDocuments()) {
                 vbeatPostList.add(new FirebasePostAdapter(snapshot));
             }
 
             String lastPostId = null;
-            if(vbeatPostList.size() != 0){
+            if (vbeatPostList.size() != 0) {
                 lastPostId = vbeatPostList.getLast().getPostId();
             }
 
             return new VBeatPostCollection<>(vbeatPostList, lastPostId);
-        } catch (ExecutionException | InterruptedException  e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.d(TAG, "getPosts interrupted", e);
             return null;
@@ -158,7 +182,6 @@ public class FirebasePostManager implements PostManager<String> {
     }
 
 
-    //ishay please implement this method
     @Override
     public void deletePost(String postId) throws DeletePostException, CommentException {
         List<CommentModel> comments = null;
@@ -167,8 +190,8 @@ public class FirebasePostManager implements PostManager<String> {
         } catch (CommentException e) {
             e.printStackTrace();
         }
-        
-        for(CommentModel comment:comments){
+
+        for (CommentModel comment : comments) {
             try {
                 FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
             } catch (CommentException e) {
@@ -187,10 +210,11 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
+
     // time to check
     // time to use
     // still a useful sanity check
-    private boolean sanityCheckFile(Uri filePath){
+    private boolean sanityCheckFile(Uri filePath) {
         return filePath != null && filePath.getPath() != null && new File(filePath.getPath()).exists();
     }
 
@@ -208,7 +232,7 @@ public class FirebasePostManager implements PostManager<String> {
 
     // uploads music and returns path
     private String uploadMusic(Uri localMusicPath) throws IOException {
-        if(localMusicPath.getPath() == null){
+        if (localMusicPath.getPath() == null) {
             throw new IOException("null music path");
         }
 
@@ -225,7 +249,7 @@ public class FirebasePostManager implements PostManager<String> {
 
         UploadTask.TaskSnapshot t;
         try {
-             t = Tasks.await(fileRef.putBytes(bArr));
+            t = Tasks.await(fileRef.putBytes(bArr));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "Tasks.await was interrupted during file upload", e);
@@ -233,14 +257,14 @@ public class FirebasePostManager implements PostManager<String> {
             throw new IOException("interrupted file upload", e);
         }
 
-        if(t.getMetadata() != null) {
+        if (t.getMetadata() != null) {
             return t.getMetadata().getPath();
         } else {
             throw new IOException("file upload failed due to unknown error");
         }
     }
 
-    private String createImageFilename(Uri localImagePath){
+    private String createImageFilename(Uri localImagePath) {
         return createFolderFilename("images", localImagePath);
     }
 
@@ -248,10 +272,10 @@ public class FirebasePostManager implements PostManager<String> {
         return createFolderFilename("music", localMusicPath);
     }
 
-    private String createFolderFilename(String folderName, Uri localFile){
+    private String createFolderFilename(String folderName, Uri localFile) {
         String filename = getRandomUUID();
 
-        if(localFile.getPath() != null ){
+        if (localFile.getPath() != null) {
             filename = new File(localFile.getPath()).getName();
         }
 
@@ -263,7 +287,7 @@ public class FirebasePostManager implements PostManager<String> {
         );
     }
 
-    private String getRandomUUID(){
+    private String getRandomUUID() {
         return UUID.randomUUID().toString();
     }
 

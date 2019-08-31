@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.ArrayList;
@@ -82,18 +83,7 @@ public class PostRepository {
                 }
 
                 List<PostViewModel> postViewModelList = new LinkedList<>();
-
-                for(Object post : postList) {
-                    if(!(post instanceof VBeatPostModel)) {
-                        Log.wtf(TAG, "post was not of type VBeatPostModel");
-                        throw new RuntimeException("Something really weird happened");
-                    }
-
-                    VBeatPostModel concretePost = (VBeatPostModel)post;
-                    postViewModelList.add(
-                            getViewModelFromModel(concretePost)
-                    );
-                }
+                modelListToViewModelList(postList, postViewModelList);
 
                 resPost.postValue(postViewModelList);
             }
@@ -101,6 +91,30 @@ public class PostRepository {
 
         return resPost;
     }
+
+
+
+
+    public LiveData<List<PostViewModel>> getPostsByUser(final String userId) {
+        final MutableLiveData<List<PostViewModel>> postsLiveData = new MutableLiveData<>();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<VBeatPostModel> postModels = FirebasePostManager.getInstance().getUserPosts(userId);
+                List<PostViewModel> viewModelList = new LinkedList<>();
+                modelListToViewModelList(postModels, viewModelList);
+
+                // if the get user post fails
+                // this posts null
+                // so it's a "transparent" error handling
+                postsLiveData.postValue(viewModelList);
+            }
+        }).start();
+
+        return postsLiveData;
+    }
+
 
     private PostViewModel getViewModelFromModel(VBeatPostModel model){
         return new PostViewModel(
@@ -110,5 +124,24 @@ public class PostRepository {
                 model.getRemoteMusicPath(),
                 model.getUploaderId()
         );
+    }
+
+    private void modelListToViewModelList(List postList, List<PostViewModel> postViewModelList) {
+        if(postList == null) {
+            Log.e(TAG, "modeListToViewModelList: postList == null");
+            return;
+        }
+
+        for(Object post : postList) {
+            if(!(post instanceof VBeatPostModel)) {
+                Log.wtf(TAG, "post was not of type VBeatPostModel");
+                throw new RuntimeException("Something really weird happened");
+            }
+
+            VBeatPostModel concretePost = (VBeatPostModel)post;
+            postViewModelList.add(
+                    getViewModelFromModel(concretePost)
+            );
+        }
     }
 }
