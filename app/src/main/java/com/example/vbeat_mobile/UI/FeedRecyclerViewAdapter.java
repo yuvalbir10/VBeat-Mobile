@@ -75,7 +75,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     @Override
     public PostRowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_row, parent, false);
-        return new PostRowViewHolder(view, clickListener);
+        return new PostRowViewHolder(view, clickListener, this);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return getDataList().size();
     }
 
-    class PostRowViewHolder extends RecyclerView.ViewHolder {
+    static class PostRowViewHolder extends RecyclerView.ViewHolder {
         ImageView postImage;
         TextView descriptionTextView;
         TextView usernameTextView;
@@ -98,8 +98,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         EditText commentEditText;
         String postId;
         ImageButton deleteButton;
+        private OnItemClickListener clickListener;
+        private FeedRecyclerViewAdapter feedRecyclerViewAdapter;
 
-        PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
+        PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener, FeedRecyclerViewAdapter feedRecyclerViewAdapter) {
             super(itemView);
             postImage = itemView.findViewById(R.id.post_imageView);
             descriptionTextView = itemView.findViewById(R.id.description_textView);
@@ -108,6 +110,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
             deleteButton = itemView.findViewById(R.id.delete_imageButton);
+
+            this.clickListener = clickListener;
+            this.feedRecyclerViewAdapter = feedRecyclerViewAdapter;
         }
 
         void bind(final PostViewModel post) {
@@ -141,24 +146,11 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     int index = getAdapterPosition();
                     if (clickListener != null) {
                         if (index != RecyclerView.NO_POSITION) {
-                            clickListener.onClick(index, getItem(index));
+                            clickListener.onClick(index, feedRecyclerViewAdapter.getItem(index));
                         }
                     }
                 }
             });
-
-
-            Log.d(TAG, "listening to post change called");
-            PostRepository.getInstance().listenToPostChange(postId).observeForever(new Observer<PostChangeData>() {
-                @Override
-                public void onChanged(PostChangeData postChangeData) {
-                    edit(postId,postChangeData.getNewDescription());
-                    if(postChangeData.getIsDeleted()){
-                        remove(postId);
-                    }
-                }
-            });
-
         }
 
         private void downloadAndDisplayImageInBackground(final PostViewModel post) {
@@ -184,7 +176,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     final String commentStr = commentEditText.getText().toString();
 
                     if(commentStr.contentEquals("")){
-                        UiUtils.showMessage(fromActivity, "Can't post empty comment...");
+                        UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Can't post empty comment...");
                         return;
                     }
 
@@ -193,9 +185,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         public void run() {
                             try {
                                 commentManager.comment(commentStr, postId);
-                                UiUtils.showMessage(fromActivity, "Commented Successfully!");
+                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Commented Successfully!");
 
-                                UiUtils.safeRunOnUiThread(fromActivity, new Runnable() {
+                                UiUtils.safeRunOnUiThread(feedRecyclerViewAdapter.fromActivity, new Runnable() {
                                     @Override
                                     public void run() {
                                         commentEditText.setText("");
@@ -203,7 +195,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                                 });
 
                             } catch (final CommentException e) {
-                                UiUtils.showMessage(fromActivity, "Error Commenting : " + e.getMessage());
+                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error Commenting : " + e.getMessage());
                             }
                         }
                     }).start();
@@ -222,10 +214,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                             try {
                                 FirebasePostManager.getInstance().deletePost(postId);
                                 
-                                remove(postId);
-                                UiUtils.showMessage(fromActivity, "Post deleted successfully!");
+                                feedRecyclerViewAdapter.remove(postId);
+                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Post deleted successfully!");
                             } catch (DeletePostException | CommentException e) {
-                                UiUtils.showMessage(fromActivity, "Error on deleting post...");
+                                UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error on deleting post...");
                             }
                         }
                     }).start();
@@ -266,7 +258,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             );
 
             ImageViewUtil.getInstance().displayAndCache(
-                    FeedRecyclerViewAdapter.this.fromActivity,
+                    feedRecyclerViewAdapter.fromActivity,
                     postImage,
                     remoteImageDownloadUri
             );

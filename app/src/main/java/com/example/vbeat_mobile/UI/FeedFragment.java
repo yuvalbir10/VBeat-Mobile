@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
@@ -80,10 +81,15 @@ public class FeedFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
+
+        // set up recycler view
         RecyclerView recyclerView = v.findViewById(R.id.posts_RecyclerView);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getContext()); //TODO : check if i passed the right context
+
+        // set up layout manager
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(layoutManager);
+
         progressBar = v.findViewById(R.id.loadmore_progressBar);
 
         // setting post list view model to hold the data
@@ -96,11 +102,17 @@ public class FeedFragment extends Fragment {
         recyclerView.setAdapter(feedAdapter);
 
         LiveData<List<PostViewModel>> data;
+        // get first posts on feed
         data = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
+
+        // wait for posts to load
         data.observeForever(new Observer<List<PostViewModel>>() {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
                 feedAdapter.addAll(postViewModels);
+
+                // set listener to update posts in live mode
+                listenOnPosts(postViewModels);
                 progressBar.setVisibility(View.INVISIBLE);
                 isLoading = false;
             }
@@ -149,9 +161,21 @@ public class FeedFragment extends Fragment {
                 return isLoading;
             }
         });
-
-
         return v;
+    }
+
+    private void listenOnPosts(List<PostViewModel> postViewModels) {
+        for(PostViewModel postViewModel : postViewModels) {
+            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
+                @Override
+                public void onChanged(PostChangeData postChangeData) {
+                    feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
+                    if(postChangeData.getIsDeleted()) {
+                        feedAdapter.remove(postChangeData.getPostId());
+                    }
+                }
+            });
+        }
     }
 
     private void loadNextPageInBackground() {
