@@ -65,16 +65,11 @@ public class ShowCommentsFragment extends Fragment {
         final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
         adapter.setActivity(getActivity());
 
-        LiveData<List<CommentViewModel>> data;
-        // get comments for current post
-        data = CommentRepository.getInstance().getComments(postID);
-
-        // set ViewModel live data list
-        commentListViewModel.setCommentViewModelLiveData(data);
-        commentListViewModel.getComments().observeForever(new Observer<List<CommentViewModel>>() {
+        // listen to live changes in comments
+        CommentRepository.getInstance().listenOnLiveCommentChanges(postID).observeForever(new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
-                adapter.addAll(commentViewModels);
+                adapter.setList(commentViewModels);
             }
         });
 
@@ -82,5 +77,4 @@ public class ShowCommentsFragment extends Fragment {
 
         return view;
     }
-
 }
