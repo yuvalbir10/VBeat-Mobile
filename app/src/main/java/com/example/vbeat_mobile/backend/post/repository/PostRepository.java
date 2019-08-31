@@ -47,7 +47,7 @@ public class PostRepository {
                 }
 
 
-                resPost.setValue(
+                resPost.postValue(
                         getViewModelFromModel(cachedPost)
                 );
             }

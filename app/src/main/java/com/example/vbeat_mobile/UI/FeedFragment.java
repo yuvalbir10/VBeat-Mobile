@@ -125,6 +125,24 @@ public class FeedFragment extends Fragment {
             }
         });
 
+        feedAdapter.setEditOnClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int index, PostViewModel post) {
+                View currentView = getView();
+                if (currentView == null) {
+                    Log.e(TAG, "currentView == null");
+                    throw new IllegalStateException(TAG + " currentView == null");
+                }
+
+                NavController navController = null;
+                navController = Navigation.findNavController(currentView);
+
+                FeedFragmentDirections.ActionFeedFragmentToEditPostFragment action = FeedFragmentDirections.actionFeedFragmentToEditPostFragment();
+                action.setPostId(post.getPostId());
+                navController.navigate(action);
+            }
+        });
+
 
         recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
