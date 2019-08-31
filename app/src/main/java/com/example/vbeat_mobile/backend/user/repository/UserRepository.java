@@ -9,6 +9,7 @@ import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,10 @@ public class UserRepository {
         }).start();
 
         return userViewModel;
+    }
+
+    public UserViewModel getCurrentUser(){
+        return getViewModelFromModel(FirebaseUserManager.getInstance().getCurrentUser());
     }
 
     public LiveData<List<VBeatUserModel>> getUsers(final List<String> userIds) {
