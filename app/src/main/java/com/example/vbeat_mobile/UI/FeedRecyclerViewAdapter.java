@@ -225,6 +225,18 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
         }
 
+
+        private void setupEditButton() {
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //TODO::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                }
+            });
+        }
+
+
+
         private void setupMusicButton(final PostViewModel post) {
             musicControlButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -250,14 +262,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
         }
 
-        private void setupEditButton() {
-            editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                }
-            });
-        }
 
         private void getAndDownloadImage(PostViewModel post) throws ExecutionException, InterruptedException {
             Uri remoteImageDownloadUri;
