@@ -2,6 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/myProfileFragment"
+        android:icon="@drawable/baseline_child_care_black_18dp"
         android:title="@string/my_profile" />
     <item
         android:id="@+id/feedFragment"

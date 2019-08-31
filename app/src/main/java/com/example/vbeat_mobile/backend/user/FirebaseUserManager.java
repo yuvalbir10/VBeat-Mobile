@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -52,6 +53,10 @@ public class FirebaseUserManager implements UserManager {
             throw new IllegalStateException("can't create account while user is logged in");
         }
 
+        if(!email.endsWith("@gmail.com")){
+            throw new UserRegistrationFailedException("we do not support email providers other than gmail!");
+        }
+
         Task<AuthResult> t = mAuth.createUserWithEmailAndPassword(email, password);
         FirebaseFirestore instance = FirebaseFirestore.getInstance();
 
@@ -62,8 +67,16 @@ public class FirebaseUserManager implements UserManager {
             Tasks.await(t);
             verifyResult(t);
 
+            String displayName = getDisplayNameFromEmail(email);
+            FirebaseUserManager.getInstance().getCurrentUser().setDisplayName(displayName);
+
+            // change user display name in firebase
+            UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName).build();
+            mAuth.getCurrentUser().updateProfile(userProfileChangeRequest);
+
             VBeatUserModel userToBeRegistered = new VBeatUserModel(
-                    email, getDisplayNameFromEmail(email),
+                    email, displayName,
                     Objects.requireNonNull(t.getResult()).getUser().getUid()
             );
             // write user details into users collection
