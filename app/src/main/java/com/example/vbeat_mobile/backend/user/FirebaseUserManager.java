@@ -70,7 +70,7 @@ public class FirebaseUserManager implements UserManager {
             String displayName = getDisplayNameFromEmail(email);
             FirebaseUserManager.getInstance().getCurrentUser().setDisplayName(displayName);
 
-            // change user display name
+            // change user display name in firebase
             UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
                     .setDisplayName(displayName).build();
             mAuth.getCurrentUser().updateProfile(userProfileChangeRequest);
