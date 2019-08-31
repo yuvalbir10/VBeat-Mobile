@@ -64,15 +64,20 @@ public class CommentRepository {
         ListenerRegistration listenerRegistration = FirebaseCommentManager.getInstance().listenOnCommentPageChanges(postId,
                 new FirebaseCommentManager.CommentPageChangesListener() {
                     @Override
-                    public void onCommentListChanged(List<CommentModel> newCommentList) {
-
-                        try {
-                            List<CommentViewModel> commentViewModelList =
-                                    convertCommentModelsToViewModels(newCommentList);
-                            commentListMutableLiveData.postValue(commentViewModelList);
-                        } catch (CommentException e) {
-                            Log.e(TAG, "Comment update failed", e);
-                        }
+                    public void onCommentListChanged(final List<CommentModel> newCommentList) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    List<CommentViewModel> commentViewModelList =
+                                            null;
+                                    try {
+                                        commentViewModelList = convertCommentModelsToViewModels(newCommentList);
+                                        commentListMutableLiveData.postValue(commentViewModelList);
+                                    } catch (CommentException e) {
+                                        Log.e(TAG, "failed to push comment changes", e);
+                                    }
+                                }
+                            }).start();
                     }
                 });
 

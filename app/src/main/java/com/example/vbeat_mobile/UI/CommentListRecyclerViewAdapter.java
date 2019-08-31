@@ -113,6 +113,11 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
         }
     }
 
+    public void setList(List<CommentViewModel> commentList) {
+        mData = commentList;
+        notifyDataSetChanged();
+    }
+
     private int findPositionById(String commentId){
         for (int i = 0; i < mData.size(); i++){
             if(mData.get(i).getCommentId().contentEquals(commentId))
