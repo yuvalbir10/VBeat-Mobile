@@ -9,14 +9,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
+import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
+import com.example.vbeat_mobile.viewmodel.UserViewModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -73,26 +77,35 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
         void bind(final CommentViewModel comment){
             usernameTextView.setText(comment.getUsername());
             commentTextView.setText(comment.getCommentText());
-            if(comment.getUserId().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
-                deleteImageButton.setVisibility(View.VISIBLE);
-                deleteImageButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        new Thread(new Runnable() {
+
+            UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+                @Override
+                public void onChanged(UserViewModel userViewModel) {
+                    if(comment.getUserId().contentEquals(userViewModel.getUserId())){
+                        deleteImageButton.setVisibility(View.VISIBLE);
+                        deleteImageButton.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void run() {
-                                try {
-                                    FirebaseCommentManager.getInstance().deleteComment(comment.getCommentId());
-                                    commentListRecyclerViewAdapter.remove(comment.getCommentId());
-                                    UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Deleted comment successfully!");
-                                } catch (final CommentException e) {
-                                    UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Error on deleting comment..." + e.getMessage());
-                                }
+                            public void onClick(View view) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        boolean success = CommentRepository.getInstance().deleteComment(comment.getCommentId());
+                                        if(success){
+                                            commentListRecyclerViewAdapter.remove(comment.getCommentId());
+                                            UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Deleted comment successfully!");
+                                        }
+                                        else{
+                                            UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Error on deleting comment...");
+                                        }
+                                    }
+                                }).start();
                             }
-                        }).start();
+                        });
                     }
-                });
-            }
+                }
+            });
+
+
         }
 
     }
