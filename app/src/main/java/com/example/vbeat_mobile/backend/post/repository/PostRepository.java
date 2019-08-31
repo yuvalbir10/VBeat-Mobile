@@ -134,6 +134,15 @@ public class PostRepository {
         return postViewModelMutableLiveData;
     }
 
+    public void listenToNewPost(final Runnable runOnNewPost, String lastPostId) {
+        FirebasePostManager.getInstance().listenToNewPost(new FirebasePostManager.NewPostListener() {
+            @Override
+            public void onNewPost() {
+                runOnNewPost.run();
+            }
+        }, lastPostId);
+    }
+
     public LiveData<List<PostViewModel>> getPostsByUser(final String userId) {
         final MutableLiveData<List<PostViewModel>> postsLiveData = new MutableLiveData<>();
 
