@@ -134,7 +134,9 @@ public class FirebasePostManager implements PostManager<String> {
             else{
                 lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
                 nextPostsQuery = Tasks.await(
-                        db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get());
+                        db.collection(postCollectionName)
+                                .orderBy("timestamp")
+                                .startAfter(lastPostRendered).limit(limit).get());
             }
 
             // get n (limit) posts after the current post mentioned in cursor
@@ -165,7 +167,7 @@ public class FirebasePostManager implements PostManager<String> {
         try {
             comments = FirebaseCommentManager.getInstance().getComments(postId);
         } catch (CommentException e) {
-            e.printStackTrace();
+            throw new DeletePostException("unable to get posts");
         }
         
         for(CommentModel comment:comments){
@@ -178,7 +180,7 @@ public class FirebasePostManager implements PostManager<String> {
         }
 
         try {
-            Void v = Tasks.await(
+            Tasks.await(
                     db.collection(postCollectionName).document(postId).delete()
             );
         } catch (ExecutionException | InterruptedException e) {

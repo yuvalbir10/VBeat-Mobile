@@ -2,6 +2,7 @@ package com.example.vbeat_mobile.backend.post;
 
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class FirebasePostAdapter extends VBeatPostModel {
         map.put("storage_image_path", remoteImagePath);
         map.put("storage_music_path", remoteMusicPath);
         map.put("uploader_id", uploader.getUserId());
+        map.put("timestamp", FieldValue.serverTimestamp());
 
         return map;
     }

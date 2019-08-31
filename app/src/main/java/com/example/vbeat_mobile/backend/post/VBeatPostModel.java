@@ -11,6 +11,7 @@ public class VBeatPostModel {
     protected String remoteMusicPath;
     protected String uploaderId;
 
+
     @PrimaryKey
     @NonNull
     protected String postId;
