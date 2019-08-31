@@ -88,7 +88,7 @@ public class MyProfileFragment extends Fragment {
                 NavController navController = null;
                 navController = Navigation.findNavController(currentView);
 
-                FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment();
+                MyProfileFragmentDirections.ActionMyProfileFragmentToShowCommentsFragment action = MyProfileFragmentDirections.actionMyProfileFragmentToShowCommentsFragment();
                 action.setPostId(post.getPostId());
                 navController.navigate(action);
             }
