@@ -59,6 +59,11 @@ public class PostRepository {
     public boolean editPost(String postId, String description) {
         try {
             FirebasePostManager.getInstance().editPost(postId, description);
+
+            // update post cache
+            VBeatPostModel postModel = postCache.getPost(postId);
+            postModel.setDescription(description);
+            postCache.savePost(postModel);
             return true;
         } catch (UploadPostFailedException e) {
             Log.e(TAG, "unable to edit post", e);
