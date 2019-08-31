@@ -25,6 +25,8 @@ import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
+import com.example.vbeat_mobile.viewmodel.UserViewModel;
+import com.google.android.gms.common.UserRecoverableException;
 
 import java.util.List;
 
@@ -51,7 +53,17 @@ public class MyProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_my_profile, container, false);
         postsRecyclerView = v.findViewById(R.id.posts_RecyclerView);
         usernameTextView = v.findViewById(R.id.username_textView);
-        usernameTextView.setText(FirebaseUserManager.getInstance().getCurrentUser().getDisplayName());
+
+
+        UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+            @Override
+            public void onChanged(UserViewModel userViewModel) {
+                usernameTextView.setText(
+                    userViewModel.getDisplayName()
+                );
+            }
+        });
+
         postsRecyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this.getContext());

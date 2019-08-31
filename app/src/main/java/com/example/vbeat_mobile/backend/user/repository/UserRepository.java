@@ -26,7 +26,7 @@ public class UserRepository {
         return UserRepositoryInstanceHolder.instance;
     }
 
-    private UserRepository(){
+    private UserRepository() {
         userCache = new UserCache();
     }
 
@@ -37,7 +37,7 @@ public class UserRepository {
             @Override
             public void run() {
                 VBeatUserModel userModel = userCache.get(userId);
-                if(userModel == null) {
+                if (userModel == null) {
                     try {
                         userModel = FirebaseUserManager.getInstance().getUser(userId);
                     } catch (UserBackendException e) {
@@ -52,8 +52,10 @@ public class UserRepository {
         return userViewModel;
     }
 
-    public UserViewModel getCurrentUser(){
-        return getViewModelFromModel(FirebaseUserManager.getInstance().getCurrentUser());
+    public LiveData<UserViewModel> getCurrentUser() {
+        return getUser(
+                FirebaseUserManager.getInstance().getCurrentUser().getUserId()
+        );
     }
 
     public LiveData<List<VBeatUserModel>> getUsers(final List<String> userIds) {
@@ -67,17 +69,17 @@ public class UserRepository {
                 List<String> remainingUserIds = removeFetchedIds(fetchedList, userIds);
 
                 // get remaining users and add them to the list
-                if(remainingUserIds.size() > 0){
+                if (remainingUserIds.size() > 0) {
                     boolean isSuccessful =
                             fetchRemainingUserIdsFromFirebase(fetchedList, remainingUserIds, userModelList);
                     // if we haven't managed to get user list
                     // fail the entire method
-                    if(!isSuccessful) {
+                    if (!isSuccessful) {
                         return;
                     }
                 }
 
-               userModelList.postValue(fetchedList);
+                userModelList.postValue(fetchedList);
             }
         }).start();
 
@@ -85,7 +87,7 @@ public class UserRepository {
     }
 
     public void saveUsers(List<VBeatUserModel> userModels) {
-        for(VBeatUserModel model : userModels) {
+        for (VBeatUserModel model : userModels) {
             userCache.save(model);
         }
     }
@@ -98,7 +100,7 @@ public class UserRepository {
             saveUsers(fromFirebase);
 
             fetchedList.addAll(
-                fromFirebase
+                    fromFirebase
             );
         } catch (UserBackendException e) {
             Log.e(TAG, "getUsers failed with exception", e);
@@ -111,7 +113,7 @@ public class UserRepository {
     }
 
     private List<String> removeFetchedIds(List<VBeatUserModel> fetchedList, List<String> userIds) {
-        for(VBeatUserModel model : fetchedList) {
+        for (VBeatUserModel model : fetchedList) {
             userIds.remove(model.getUserId());
         }
 
@@ -120,9 +122,9 @@ public class UserRepository {
 
     private List<VBeatUserModel> tryToLoadUsersFromCache(List<String> userIds) {
         List<VBeatUserModel> cacheList = new LinkedList<>();
-        for(String userId : userIds) {
+        for (String userId : userIds) {
             VBeatUserModel userModel = userCache.get(userId);
-            if(userModel != null) {
+            if (userModel != null) {
                 cacheList.add(userModel);
             }
         }
