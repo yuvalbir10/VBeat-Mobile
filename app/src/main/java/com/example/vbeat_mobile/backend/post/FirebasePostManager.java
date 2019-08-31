@@ -14,7 +14,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -32,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+
+import javax.annotation.Nullable;
 
 public class FirebasePostManager implements PostManager<String> {
     private static final String TAG = "FirebasePostManager";
@@ -239,6 +244,37 @@ public class FirebasePostManager implements PostManager<String> {
         }
     }
 
+    public ListenerRegistration listenToPostChanges(final String postId, final PostChangesListener postChangesListener) {
+        //noinspection UnnecessaryLocalVariable
+        ListenerRegistration listenerRegistration = db.collection(POST_COLLECTION_NAME)
+                .document(postId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if(e != null || documentSnapshot == null){
+                    // print document snapshot and/or exception
+                    Log.e(TAG, String.format("onEvent exception while listening to post documentSnapshot=%s",
+                            documentSnapshot == null ? "null" : documentSnapshot.toString()), e);
+                    return;
+                }
+                Log.d(TAG, String.format("snapshotListener called docSnapshot=%s", documentSnapshot));
+
+                if(!documentSnapshot.exists()) {
+                    postChangesListener.onPostChanged(postId, null, true);
+                } else {
+                    VBeatPostModel postModel = new FirebasePostAdapter(documentSnapshot);
+                    postChangesListener.onPostChanged(
+                            postId,
+                            postModel.getDescription(),
+                            false
+                    );
+                }
+            }
+        });
+
+        return listenerRegistration;
+    }
+
 
     // time to check
     // time to use
@@ -336,5 +372,12 @@ public class FirebasePostManager implements PostManager<String> {
         } finally {
             f.close();
         }
+    }
+
+    public interface PostChangesListener {
+        // postId will always be populated
+        // description will always be updated
+        // if post is deleted isDeleted will be true
+        void onPostChanged(String postId, String newDescription, boolean isDeleted);
     }
 }

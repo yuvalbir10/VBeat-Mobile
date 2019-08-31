@@ -51,4 +51,6 @@ public class PostViewModel extends ViewModel {
     public Date getUploadDate() {
         return uploadDate;
     }
+
+    public void setDescription(String other){ description = other; }
 }
