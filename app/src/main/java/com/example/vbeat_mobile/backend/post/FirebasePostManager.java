@@ -8,14 +8,12 @@ import android.util.Log;
 import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.comment.CommentModel;
 import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
-import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -37,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 
 public class FirebasePostManager implements PostManager<String> {
     private static final String TAG = "FirebasePostManager";
-    private static final String postCollectionName = "posts";
+    private static final String POST_COLLECTION_NAME = "posts";
     private FirebaseFirestore db;
 
     // if we're using the firebase post manager
@@ -96,7 +94,7 @@ public class FirebasePostManager implements PostManager<String> {
 
         DocumentReference docRef = null;
         try {
-            docRef = Tasks.await(db.collection(postCollectionName).add(firebaseMap));
+             docRef = Tasks.await(db.collection(POST_COLLECTION_NAME).add(firebaseMap));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "upload post interrupted", e);
@@ -125,7 +123,7 @@ public class FirebasePostManager implements PostManager<String> {
     public VBeatPostModel getPost(String postId) {
         try {
             DocumentSnapshot documentSnapshot = Tasks.await(
-                    db.collection(postCollectionName).document(postId).get()
+                    db.collection(POST_COLLECTION_NAME).document(postId).get()
             );
             return new FirebasePostAdapter(documentSnapshot);
         } catch (ExecutionException | InterruptedException e) {
@@ -136,7 +134,7 @@ public class FirebasePostManager implements PostManager<String> {
     }
 
     public List<VBeatPostModel> getUserPosts(String userId) {
-        Task<QuerySnapshot> querySnapshotTask = db.collection(postCollectionName)
+        Task<QuerySnapshot> querySnapshotTask = db.collection(POST_COLLECTION_NAME)
                 .whereEqualTo("uploader_id", userId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get();
@@ -165,11 +163,11 @@ public class FirebasePostManager implements PostManager<String> {
         try {
             if (cursor == null) {
                 nextPostsQuery = Tasks.await(
-                        db.collection(postCollectionName).limit(limit).get());
+                        db.collection(POST_COLLECTION_NAME).limit(limit).get());
             } else {
-                lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
+                lastPostRendered = Tasks.await(db.collection(POST_COLLECTION_NAME).document(cursor).get());
                 nextPostsQuery = Tasks.await(
-                        db.collection(postCollectionName)
+                        db.collection(POST_COLLECTION_NAME)
                                 .orderBy("timestamp", Query.Direction.DESCENDING)
                                 .startAfter(lastPostRendered)
                                 .limit(limit).get());
@@ -216,11 +214,22 @@ public class FirebasePostManager implements PostManager<String> {
 
         try {
             Tasks.await(
-                    db.collection(postCollectionName).document(postId).delete()
+                    db.collection(POST_COLLECTION_NAME).document(postId).delete()
             );
         } catch (ExecutionException | InterruptedException e) {
             Log.e(TAG, "unable to delete post", e);
             throw new DeletePostException(e.getMessage());
+        }
+    }
+
+    public void editPost(String postId, String description) throws UploadPostFailedException {
+        try {
+            Tasks.await(
+                    db.collection(POST_COLLECTION_NAME).document(postId).update("description", description)
+            );
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "edit post failed to update description", e);
+            throw new UploadPostFailedException(e.getMessage());
         }
     }
 
