@@ -221,7 +221,7 @@ public class FirebasePostManager implements PostManager<String> {
             throw new DeletePostException(e.getMessage());
         }
     }
-    
+
     public void editPost(String postId, String description) throws UploadPostFailedException {
         try {
             Tasks.await(
