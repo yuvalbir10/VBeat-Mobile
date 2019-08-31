@@ -7,7 +7,10 @@ import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
@@ -15,6 +18,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import javax.annotation.Nullable;
 
 public class FirebaseCommentManager {
     private static final String TAG = "FirebaseCommentManager";
@@ -46,7 +51,7 @@ public class FirebaseCommentManager {
             throw new CommentException(e.getMessage());
         }
 
-        for(DocumentSnapshot ds : qs.getDocuments()) {
+        for (DocumentSnapshot ds : qs.getDocuments()) {
             commentModelLinkedList.add(documentToCommentModel(ds));
         }
 
@@ -101,11 +106,48 @@ public class FirebaseCommentManager {
                                     "commentText", commentText
                             )
             );
-        } catch(ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             Log.e(TAG, "unable to edit comment", e);
             throw new CommentException(e.getMessage());
         }
 
+    }
+
+    public ListenerRegistration listenOnCommentPageChanges(
+            String postId,
+            final CommentPageChangesListener commentPageChangesListener
+    ) {
+        return FirebaseFirestore.getInstance()
+                .collection(COMMENT_COLLECTION)
+                .whereEqualTo("postId", postId)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(
+                            @Nullable QuerySnapshot queryDocumentSnapshots,
+                            @Nullable FirebaseFirestoreException e
+                    ) {
+
+                        if (e != null || queryDocumentSnapshots == null) {
+                            Log.e(TAG,
+                                    String.format(
+                                            "error onEvent e=%s, queryDocumentSnapshots=%s",
+                                            e != null ? e.getMessage():  "null",
+                                            queryDocumentSnapshots
+                                    ),
+                                    e
+                            );
+                        }
+                        List<CommentModel> commentList = new LinkedList<>();
+
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                            commentList.add(documentToCommentModel(documentSnapshot));
+                        }
+
+                        commentPageChangesListener.onCommentListChanged(
+                                commentList
+                        );
+                    }
+                });
     }
 
     private Map<String, Object> createFirebaseCommentFromParams(String commentText,
@@ -121,9 +163,13 @@ public class FirebaseCommentManager {
     private CommentModel documentToCommentModel(DocumentSnapshot ds) {
         return new CommentModel(
                 ds.getId(),
-                (String)ds.get("userId"),
-                (String)ds.get("commentText"),
-                (String)ds.get("postId")
+                (String) ds.get("userId"),
+                (String) ds.get("commentText"),
+                (String) ds.get("postId")
         );
+    }
+
+    public interface CommentPageChangesListener {
+        void onCommentListChanged(List<CommentModel> newCommentList);
     }
 }
