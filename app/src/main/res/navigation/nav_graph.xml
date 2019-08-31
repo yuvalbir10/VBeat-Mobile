@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_feedFragment_to_showCommentsFragment"
             app:destination="@id/showCommentsFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_editPostFragment"
+            app:destination="@id/editPostFragment" />
     </fragment>
 
     <fragment
@@ -100,5 +103,18 @@
         <action
             android:id="@+id/action_myProfileFragment_to_showCommentsFragment"
             app:destination="@id/showCommentsFragment" />
+        <action
+            android:id="@+id/action_myProfileFragment_to_editPostFragment"
+            app:destination="@id/editPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editPostFragment"
+        android:name="com.example.vbeat_mobile.UI.EditPostFragment"
+        android:label="fragment_edit_post"
+        tools:layout="@layout/fragment_edit_post" >
+        <argument
+            android:name="postId"
+            app:argType="string"
+            android:defaultValue="default" />
     </fragment>
 </navigation>
