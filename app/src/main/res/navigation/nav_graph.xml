@@ -92,4 +92,9 @@
             app:argType="string"
             android:defaultValue="default" />
     </fragment>
+    <fragment
+        android:id="@+id/myProfileFragment2"
+        android:name="com.example.vbeat_mobile.UI.MyProfileFragment"
+        android:label="fragment_my_profile"
+        tools:layout="@layout/fragment_my_profile" />
 </navigation>
