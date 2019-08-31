@@ -16,6 +16,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
@@ -53,6 +55,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     private PostListViewModel mData;
     private OnItemClickListener clickListener;
     private Activity fromActivity;
+    private OnItemClickListener editClickListener;
 
     public FeedRecyclerViewAdapter(PostListViewModel data) {
         mData = data;
@@ -69,6 +72,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         clickListener = listener;
+    }
+
+    public void setEditOnClickListener(OnItemClickListener listener){
+        editClickListener = listener;
     }
 
     @NonNull
@@ -98,6 +105,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         EditText commentEditText;
         String postId;
         ImageButton deleteButton;
+        ImageButton editButton;
 
         PostRowViewHolder(@NonNull View itemView, final OnItemClickListener clickListener) {
             super(itemView);
@@ -108,6 +116,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             commentButton = itemView.findViewById(R.id.post_comment_button);
             commentEditText = itemView.findViewById(R.id.comment_editText);
             deleteButton = itemView.findViewById(R.id.delete_imageButton);
+            editButton = itemView.findViewById(R.id.edit_imageButton);
         }
 
         void bind(final PostViewModel post) {
@@ -127,6 +136,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
             if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
                 deleteButton.setVisibility(View.VISIBLE);
+                editButton.setVisibility(View.VISIBLE);
             }
 
             downloadAndDisplayImageInBackground(post);
@@ -134,6 +144,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             setupMusicButton(post);
             setupDeleteButton();
             setupCommentButton();
+            setupEditButton();
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -221,7 +232,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                         public void run() {
                             try {
                                 FirebasePostManager.getInstance().deletePost(postId);
-                                
                                 remove(postId);
                                 UiUtils.showMessage(fromActivity, "Post deleted successfully!");
                             } catch (DeletePostException | CommentException e) {
@@ -232,6 +242,18 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 }
             });
         }
+
+
+        private void setupEditButton() {
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    editClickListener.onClick(getAdapterPosition(), getItem(getAdapterPosition()));
+                }
+            });
+        }
+
+
 
         private void setupMusicButton(final PostViewModel post) {
             musicControlButton.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +279,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 }
             });
         }
+
 
         private void getAndDownloadImage(PostViewModel post) throws ExecutionException, InterruptedException {
             Uri remoteImageDownloadUri;
