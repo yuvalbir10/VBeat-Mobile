@@ -211,6 +211,10 @@ public class FeedFragment extends Fragment {
 
     // side effect is sorting the list
     private String getFirstPostId(List<PostViewModel> postViewModels) {
+        if(postViewModels.size() == 0){
+            return null;
+        }
+
         // same comparator as in the FeedRecyclerViewAdapter
         // should not matter
         Collections.sort(postViewModels, new PostViewModelDateComparator());
@@ -218,6 +222,10 @@ public class FeedFragment extends Fragment {
     }
 
     private void showToastOnNewPost(String firstPostId){
+        if(firstPostId == null){
+            return;
+        }
+
         // remove if we're already subscribed
         if(newPostListenerRegistration != null) {
             newPostListenerRegistration.remove();
