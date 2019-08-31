@@ -7,9 +7,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class MyProfileFragment extends Fragment {
+    private static final String TAG = "MyProfileFragment";
     private RecyclerView postsRecyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private FeedRecyclerViewAdapter feedAdapter;
@@ -68,6 +72,25 @@ public class MyProfileFragment extends Fragment {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
                 feedAdapter.addAll(postViewModels);
+            }
+        });
+
+        feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int index, PostViewModel post) {
+                Log.d("TAG", "item click " + index);
+                View currentView = getView();
+                if (currentView == null) {
+                    Log.e(TAG, "currentView == null");
+                    throw new IllegalStateException(TAG + " currentView == null");
+                }
+
+                NavController navController = null;
+                navController = Navigation.findNavController(currentView);
+
+                FeedFragmentDirections.ActionFeedFragmentToShowCommentsFragment action = FeedFragmentDirections.actionFeedFragmentToShowCommentsFragment();
+                action.setPostId(post.getPostId());
+                navController.navigate(action);
             }
         });
 
