@@ -11,9 +11,12 @@ import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -97,12 +100,21 @@ public class FirebasePostManager implements PostManager<String> {
             throw new UploadPostFailedException(e.getMessage());
         }
 
+        Timestamp currentTimestamp = null;
+        try {
+            currentTimestamp = Tasks.await(docRef.get()).getTimestamp("timestamp");
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "unable to get timestamp from server", e);
+            throw new UploadPostFailedException("upload post failed");
+        }
+
         return new FirebasePostAdapter(
                 docRef.getId(),
                 description,
                 remoteImagePath,
                 remoteMusicPath,
-                userManager.getCurrentUser().getUserId()
+                userManager.getCurrentUser().getUserId(),
+                currentTimestamp
         );
     }
 
@@ -134,7 +146,10 @@ public class FirebasePostManager implements PostManager<String> {
             else{
                 lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
                 nextPostsQuery = Tasks.await(
-                        db.collection(postCollectionName).startAfter(lastPostRendered).limit(limit).get());
+                        db.collection(postCollectionName)
+                                .orderBy("timestamp", Query.Direction.DESCENDING)
+                                .startAfter(lastPostRendered)
+                                .limit(limit).get());
             }
 
             // get n (limit) posts after the current post mentioned in cursor
@@ -165,7 +180,7 @@ public class FirebasePostManager implements PostManager<String> {
         try {
             comments = FirebaseCommentManager.getInstance().getComments(postId);
         } catch (CommentException e) {
-            e.printStackTrace();
+            throw new DeletePostException("unable to get posts");
         }
         
         for(CommentModel comment:comments){
@@ -178,7 +193,7 @@ public class FirebasePostManager implements PostManager<String> {
         }
 
         try {
-            Void v = Tasks.await(
+            Tasks.await(
                     db.collection(postCollectionName).document(postId).delete()
             );
         } catch (ExecutionException | InterruptedException e) {

@@ -10,8 +10,12 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.vbeat_mobile.R;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.LruCache;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Request;
+import com.squareup.picasso.RequestCreator;
 
 public class ImageViewUtil {
     // 50 MB of Cache
@@ -59,11 +63,24 @@ public class ImageViewUtil {
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Picasso.get()
+                final RequestCreator r = Picasso.get()
                         .load(uri)
                         .fit()
-                        .centerCrop()
-                        .into(imageView);
+                        .centerCrop();
+
+                r.networkPolicy(NetworkPolicy.OFFLINE)
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                r.into(imageView);
+                            }
+                        });
+
             }
         });
     }
