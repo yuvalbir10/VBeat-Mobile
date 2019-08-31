@@ -4,6 +4,9 @@ package com.example.vbeat_mobile.UI;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,14 +15,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
+import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
+import com.example.vbeat_mobile.backend.user.UserManager;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
+import com.example.vbeat_mobile.viewmodel.PostListViewModel;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
+
+import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MyProfileFragment extends Fragment {
-    RecyclerView postsRecyclerView;
-    RecyclerView.LayoutManager layoutManager;
+    private RecyclerView postsRecyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private FeedRecyclerViewAdapter feedAdapter;
 
     public MyProfileFragment() {
         // Required empty public constructor
@@ -36,6 +48,25 @@ public class MyProfileFragment extends Fragment {
 
         layoutManager = new LinearLayoutManager(this.getContext());
         postsRecyclerView.setLayoutManager(layoutManager);
+
+
+        PostListViewModel postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
+
+        feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
+        feedAdapter.setActivity(getActivity());
+
+        postsRecyclerView.setAdapter(feedAdapter);
+
+        LiveData<List<PostViewModel>> data;
+        data = PostRepository.getInstance().getPostsByUser(FirebaseUserManager.getInstance().getCurrentUser().getUserId());
+
+        data.observeForever(new Observer<List<PostViewModel>>() {
+            @Override
+            public void onChanged(List<PostViewModel> postViewModels) {
+                feedAdapter.addAll(postViewModels);
+            }
+        });
+
 
         return v;
     }
