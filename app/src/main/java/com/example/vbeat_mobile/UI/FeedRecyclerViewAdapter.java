@@ -38,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -280,12 +282,28 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         // you should stop asking for more posts
         if(!isPostInList(r.getPostId())) {
             getDataList().add(r);
+            notifyItemInserted(getDataList().size() - 1);
         }
+    }
 
-        notifyItemInserted(getDataList().size() - 1);
+    private List<PostViewModel> sortByDate(List<PostViewModel> postViewModels){
+        Collections.sort(postViewModels, new Comparator<PostViewModel>() {
+            @Override
+            public int compare(PostViewModel postViewModel, PostViewModel t1) {
+                if(postViewModel.getUploadDate().before(t1.getUploadDate())) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        return postViewModels;
     }
 
     public void addAll(List<PostViewModel> moveResults) {
+        moveResults = sortByDate(moveResults);
+
         for (PostViewModel result : moveResults) {
             add(result);
         }

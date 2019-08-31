@@ -3,6 +3,10 @@ package com.example.vbeat_mobile.backend.post;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.vbeat_mobile.UI.FirebaseTimestampTypeConverter;
+import com.google.firebase.Timestamp;
 
 @Entity
 public class VBeatPostModel {
@@ -10,6 +14,9 @@ public class VBeatPostModel {
     protected String remoteImagePath;
     protected String remoteMusicPath;
     protected String uploaderId;
+
+    @TypeConverters(FirebaseTimestampTypeConverter.class)
+    public Timestamp uploadTime;
 
 
     @PrimaryKey
@@ -54,5 +61,9 @@ public class VBeatPostModel {
 
     public void setPostId(String postId) {
         this.postId = postId;
+    }
+
+    public Timestamp getUploadTime() {
+        return uploadTime;
     }
 }

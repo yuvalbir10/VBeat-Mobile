@@ -108,7 +108,8 @@ public class PostRepository {
                 model.getDescription(),
                 model.getRemoteImagePath(),
                 model.getRemoteMusicPath(),
-                model.getUploaderId()
+                model.getUploaderId(),
+                model.getUploadTime().toDate()
         );
     }
 }

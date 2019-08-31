@@ -11,9 +11,11 @@ import com.example.vbeat_mobile.backend.comment.FirebaseCommentManager;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -102,7 +104,8 @@ public class FirebasePostManager implements PostManager<String> {
                 description,
                 remoteImagePath,
                 remoteMusicPath,
-                userManager.getCurrentUser().getUserId()
+                userManager.getCurrentUser().getUserId(),
+                (Timestamp)firebaseMap.get("timestamp")
         );
     }
 
@@ -135,8 +138,9 @@ public class FirebasePostManager implements PostManager<String> {
                 lastPostRendered = Tasks.await(db.collection(postCollectionName).document(cursor).get());
                 nextPostsQuery = Tasks.await(
                         db.collection(postCollectionName)
-                                .orderBy("timestamp")
-                                .startAfter(lastPostRendered).limit(limit).get());
+                                .orderBy("timestamp", Query.Direction.DESCENDING)
+                                .startAfter(lastPostRendered)
+                                .limit(limit).get());
             }
 
             // get n (limit) posts after the current post mentioned in cursor

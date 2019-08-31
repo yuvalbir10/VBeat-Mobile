@@ -1,9 +1,11 @@
 package com.example.vbeat_mobile.backend.post;
 
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,12 +15,14 @@ public class FirebasePostAdapter extends VBeatPostModel {
             String description,
             String remoteImagePath,
             String remoteMusicPath,
-            String uploader) {
+            String uploader,
+            Timestamp date) {
         this.postId = postId;
         this.description = description;
         this.remoteImagePath = remoteImagePath;
         this.remoteMusicPath = remoteMusicPath;
         this.uploaderId = uploader;
+        this.uploadTime = date;
     }
 
     public FirebasePostAdapter(DocumentSnapshot ds){
@@ -27,6 +31,7 @@ public class FirebasePostAdapter extends VBeatPostModel {
         this.remoteImagePath = (String)ds.get("storage_image_path");
         this.remoteMusicPath = (String)ds.get("storage_music_path");
         this.uploaderId = (String)ds.get("uploader_id");
+        this.uploadTime = (Timestamp)ds.get("timestamp");
     }
 
     public static Map<String, Object> toFirebaseMap(String description,
