@@ -34,6 +34,16 @@ public class CommentRepository {
 
     }
 
+    public boolean comment(String postId, String commentText) {
+        try {
+            FirebaseCommentManager.getInstance().comment(commentText, postId);
+            return true;
+        } catch(CommentException e) {
+            Log.e(TAG, "failed to comment", e);
+            return false;
+        }
+    }
+
     public LiveData<List<CommentViewModel>> getComments(final String postId) {
         final MutableLiveData<List<CommentViewModel>> liveData = new MutableLiveData<>();
 
