@@ -240,7 +240,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    editClickListener.onClick(getAdapterPosition(), getItem(getAdapterPosition()));
+                    feedRecyclerViewAdapter.editClickListener.onClick(getAdapterPosition(), feedRecyclerViewAdapter.getItem(getAdapterPosition()));
                 }
             });
         }
