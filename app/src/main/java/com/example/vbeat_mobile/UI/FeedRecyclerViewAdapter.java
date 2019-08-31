@@ -148,6 +148,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             });
 
 
+            Log.d(TAG, "listening to post change called");
             PostRepository.getInstance().listenToPostChange(postId).observeForever(new Observer<PostChangeData>() {
                 @Override
                 public void onChanged(PostChangeData postChangeData) {
