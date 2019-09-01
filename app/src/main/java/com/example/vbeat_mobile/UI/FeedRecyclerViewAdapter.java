@@ -137,14 +137,20 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             if(post.getUploader().contentEquals(FirebaseUserManager.getInstance().getCurrentUser().getUserId())){
                 deleteButton.setVisibility(View.VISIBLE);
                 editButton.setVisibility(View.VISIBLE);
+                setupDeleteButton();
+                setupEditButton();
+            }
+            else{
+                deleteButton.setVisibility(View.INVISIBLE);
+                editButton.setVisibility(View.INVISIBLE);
             }
 
             downloadAndDisplayImageInBackground(post);
 
             setupMusicButton(post);
-            setupDeleteButton();
+
             setupCommentButton();
-            setupEditButton();
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
