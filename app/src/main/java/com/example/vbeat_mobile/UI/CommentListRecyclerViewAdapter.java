@@ -102,10 +102,11 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                             }
                         });
                     }
+                    else{
+                        deleteImageButton.setVisibility(View.INVISIBLE);
+                    }
                 }
             });
-
-
         }
 
     }

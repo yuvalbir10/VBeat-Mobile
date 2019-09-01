@@ -136,24 +136,32 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             descriptionTextView.setText(post.getDescription());
             postId = post.getPostId();
 
+
             UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
                 @Override
                 public void onChanged(UserViewModel userViewModel) {
                     if(post.getUploader().contentEquals(userViewModel.getUserId())){
                         deleteButton.setVisibility(View.VISIBLE);
                         editButton.setVisibility(View.VISIBLE);
+                        setupDeleteButton();
+                        setupEditButton();
+                    }
+                    else{
+                        deleteButton.setVisibility(View.INVISIBLE);
+                        editButton.setVisibility(View.INVISIBLE);
                     }
                 }
             });
 
 
 
+
             downloadAndDisplayImageInBackground(post);
 
             setupMusicButton(post);
-            setupDeleteButton();
+
             setupCommentButton();
-            setupEditButton();
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
