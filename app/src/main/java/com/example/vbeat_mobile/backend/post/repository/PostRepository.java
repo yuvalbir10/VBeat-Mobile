@@ -176,7 +176,7 @@ public class PostRepository {
         }
     }
 
-    public VBeatPostModel updloadPost(String description, Uri imageUri, Uri musicUri){
+    public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri){
         try{
             final VBeatPostModel uploadedPost = FirebasePostManager.getInstance().uploadPost(description, imageUri, musicUri);
             return uploadedPost;

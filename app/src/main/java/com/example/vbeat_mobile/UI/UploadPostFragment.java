@@ -3,8 +3,6 @@ package com.example.vbeat_mobile.UI;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -24,10 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
-import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
-import com.example.vbeat_mobile.utility.ExifUtil;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 import com.example.vbeat_mobile.utility.UiUtils;
@@ -121,7 +117,7 @@ public class UploadPostFragment extends Fragment {
             @Override
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
-                final VBeatPostModel uploadedPost = PostRepository.getInstance().updloadPost(description, imageUri, musicUri);
+                final VBeatPostModel uploadedPost = PostRepository.getInstance().uploadPost(description, imageUri, musicUri);
                 if(uploadedPost != null){
                     UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
