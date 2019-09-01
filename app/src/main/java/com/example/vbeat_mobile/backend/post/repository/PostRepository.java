@@ -1,5 +1,6 @@
 package com.example.vbeat_mobile.backend.post.repository;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -172,6 +173,17 @@ public class PostRepository {
         catch(DeletePostException | CommentException e) {
             Log.e(TAG, "delete post failed", e);
             return false;
+        }
+    }
+
+    public VBeatPostModel updloadPost(String description, Uri imageUri, Uri musicUri){
+        try{
+            final VBeatPostModel uploadedPost = FirebasePostManager.getInstance().uploadPost(description, imageUri, musicUri);
+            return uploadedPost;
+        }
+        catch(UploadPostFailedException e) {
+            Log.e(TAG, "delete post failed", e);
+            return null;
         }
     }
 
