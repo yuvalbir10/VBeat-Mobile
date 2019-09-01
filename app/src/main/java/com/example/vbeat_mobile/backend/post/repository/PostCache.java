@@ -26,4 +26,10 @@ public class PostCache {
     public List<VBeatPostModel> getAllPostsInCache(){
         return AppLocalDB.getInstance().db.postDao().getAll();
     }
+
+    public void updatePost(String postId, String descritpion) {
+        VBeatPostModel postModel = getPost(postId);
+        postModel.setDescription(descritpion);
+        savePost(postModel);
+    }
 }

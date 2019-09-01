@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.backend.post.repository.PostCache;
 import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
@@ -208,6 +209,8 @@ public class FeedFragment extends Fragment {
                 @Override
                 public void onChanged(PostChangeData postChangeData) {
                     feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
+                    PostRepository.getInstance().getPostCache()
+                            .updatePost(postChangeData.getPostId(), postChangeData.getNewDescription());
                     if(postChangeData.getIsDeleted()) {
                         feedAdapter.remove(postChangeData.getPostId());
                     }
