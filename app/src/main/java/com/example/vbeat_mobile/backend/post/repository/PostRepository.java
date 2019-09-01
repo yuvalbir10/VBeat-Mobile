@@ -187,6 +187,9 @@ public class PostRepository {
         }
     }
 
+    public PostCache getPostCache() {
+        return postCache;
+    }
 
     private PostViewModel getViewModelFromModel(VBeatPostModel model) {
         return new PostViewModel(
