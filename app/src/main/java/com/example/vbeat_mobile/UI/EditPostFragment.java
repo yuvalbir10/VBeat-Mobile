@@ -63,7 +63,13 @@ public class EditPostFragment extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        PostRepository.getInstance().editPost(postID, descriptionEditText.getText().toString());
+                        boolean success = PostRepository.getInstance().editPost(postID, descriptionEditText.getText().toString());
+                        if(success){
+                            UiUtils.showMessage(getActivity(), "Post edited successfully!");
+                        }
+                        else{
+                            UiUtils.showMessage(getActivity(), "Error on edit post...");
+                        }
                     }
                 }).start();
             }
