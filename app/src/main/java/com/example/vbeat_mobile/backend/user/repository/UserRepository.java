@@ -104,6 +104,10 @@ public class UserRepository {
         }
     }
 
+    public boolean isLoggedIn(){
+        return FirebaseUserManager.getInstance().isUserLoggedIn();
+    }
+
     private boolean fetchRemainingUserIdsFromFirebase(List<VBeatUserModel> fetchedList, List<String> remainingUserIds, MutableLiveData<List<VBeatUserModel>> userModelList) {
         try {
             List<VBeatUserModel> fromFirebase = FirebaseUserManager.getInstance().getUsers(remainingUserIds);
