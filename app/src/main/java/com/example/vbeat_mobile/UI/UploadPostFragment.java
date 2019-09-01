@@ -3,8 +3,6 @@ package com.example.vbeat_mobile.UI;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -24,11 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
-import com.example.vbeat_mobile.backend.post.FirebasePostManager;
-import com.example.vbeat_mobile.backend.post.PostManager;
-import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
-import com.example.vbeat_mobile.utility.ExifUtil;
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 import com.example.vbeat_mobile.utility.UiUtils;
@@ -49,7 +44,6 @@ public class UploadPostFragment extends Fragment {
     private ImageView imageView;
     private Button chooseImageButton, chooseMusicButton;
     private Uri imageUri, musicUri;
-    private PostManager<String> postManager;
     private Button postButton;
     private EditText descriptionEditText;
     private ProgressBar prBar;
@@ -71,7 +65,6 @@ public class UploadPostFragment extends Fragment {
         descriptionEditText = v.findViewById(R.id.description_editText);
         prBar = v.findViewById(R.id.progressBar);
 
-        postManager = FirebasePostManager.getInstance();
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,8 +117,8 @@ public class UploadPostFragment extends Fragment {
             @Override
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
-                try {
-                    final VBeatPostModel uploadedPost = postManager.uploadPost(description, imageUri, musicUri);
+                final VBeatPostModel uploadedPost = PostRepository.getInstance().uploadPost(description, imageUri, musicUri);
+                if(uploadedPost != null){
                     UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
@@ -136,30 +129,26 @@ public class UploadPostFragment extends Fragment {
                             handleUploadPostFinish(uploadedPost);
                         }
                     });
-                } catch (final UploadPostFailedException e) {
-                    //error if login failed
+                }
+                else{
+                    //error if upload post failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
-
-
                     UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
-                            errorTextView.setText(e.getMessage());
+                            errorTextView.setText("Upload post failed");
                             errorTextView.setVisibility(View.VISIBLE);
                         }
                     });
-
-                } finally {
-
-                    // hide progress bar & show login button
-                    UiUtils.safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            postButton.setEnabled(true);
-                            prBar.setVisibility(View.INVISIBLE);
-                        }
-                    });
                 }
+                // hide progress bar & show login button
+                UiUtils.safeRunOnUiThread(a, new Runnable() {
+                    @Override
+                    public void run() {
+                        postButton.setEnabled(true);
+                        prBar.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
         }).start();
     }
