@@ -2,6 +2,7 @@ package com.example.vbeat_mobile.UI;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.sip.SipSession;
 import android.os.Bundle;
@@ -195,6 +196,12 @@ public class FeedFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        newPostListenerRegistration.remove();
+    }
+
     private void listenOnPosts(List<PostViewModel> postViewModels) {
         for(PostViewModel postViewModel : postViewModels) {
             PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
@@ -233,10 +240,15 @@ public class FeedFragment extends Fragment {
             newPostListenerRegistration = null;
         }
 
+        final Context feedContext = FeedFragment.this.getContext();
+
         newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
             @Override
             public void run() {
-                //Toast.makeText(FeedFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show(); TODO:ishay check what we do with that line
+                Log.d(TAG, "new post was logged by PostRepository");
+                if(feedContext != null) {
+                    Toast.makeText(feedContext, feedContext.getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+                }
             }
         }, firstPostId);
     }
