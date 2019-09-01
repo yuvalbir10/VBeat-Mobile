@@ -16,9 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
-import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
-import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
 
@@ -29,7 +28,7 @@ import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
 public class SignUpFragment extends Fragment {
     private Button signupButton = null;
     private ProgressBar prBar = null;
-    private UserManager userManager;
+
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -42,7 +41,6 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         final View v =  inflater.inflate(R.layout.fragment_sign_up, container, false);
 
-        userManager = FirebaseUserManager.getInstance();
 
         signupButton = v.findViewById(R.id.sign_up_button);
         prBar = v.findViewById(R.id.indeterminateBar);
@@ -78,14 +76,15 @@ public class SignUpFragment extends Fragment {
             @Override
             public void run() {
                 Activity a = SignUpFragment.this.getActivity();
-                try {
-                    userManager.createAccount(username, password);
+
+                boolean success = UserRepository.getInstance().createAccount(username, password);
+                if(success){
                     handleSuccessfulSignUp(a);
-                } catch(final UserRegistrationFailedException e) {
-                    showRegistrationErrorMessage(a, e, v);
-                } finally {
-                    enableLoginUi(a);
                 }
+                else{
+                    showRegistrationErrorMessage(a, new UserRegistrationFailedException("Registration failed..."), v);
+                }
+                enableLoginUi(a);
             }
         }).start();
     }
