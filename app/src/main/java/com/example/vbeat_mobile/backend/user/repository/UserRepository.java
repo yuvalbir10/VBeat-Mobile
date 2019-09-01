@@ -5,8 +5,10 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserBackendException;
+import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
 
@@ -88,6 +90,17 @@ public class UserRepository {
     public void saveUsers(List<VBeatUserModel> userModels) {
         for (VBeatUserModel model : userModels) {
             userCache.save(model);
+        }
+    }
+
+    public boolean login(String username, String password){
+        try{
+            FirebaseUserManager.getInstance().login(username, password);
+            return true;
+        }
+        catch (UserLoginFailedException e) {
+            Log.e(TAG, "login failed", e);
+            return false;
         }
     }
 
