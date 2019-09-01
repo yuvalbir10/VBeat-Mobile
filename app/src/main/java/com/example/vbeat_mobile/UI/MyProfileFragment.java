@@ -17,8 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
+import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserManager;
@@ -27,7 +29,9 @@ import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
 import com.google.android.gms.common.UserRecoverableException;
+import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -40,6 +44,7 @@ public class MyProfileFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private FeedRecyclerViewAdapter feedAdapter;
     private TextView usernameTextView;
+    private ListenerRegistration newPostListenerRegistration = null;
 
     public MyProfileFragment() {
         // Required empty public constructor
@@ -84,6 +89,8 @@ public class MyProfileFragment extends Fragment {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {
                 feedAdapter.addAll(postViewModels);
+                listenOnPosts(postViewModels);
+                showToastOnNewPost(getFirstPostId(postViewModels));
             }
         });
 
@@ -126,6 +133,51 @@ public class MyProfileFragment extends Fragment {
 
 
         return v;
+    }
+
+    private void listenOnPosts(List<PostViewModel> postViewModels) {
+        for(PostViewModel postViewModel : postViewModels) {
+            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
+                @Override
+                public void onChanged(PostChangeData postChangeData) {
+                    feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
+                    if(postChangeData.getIsDeleted()) {
+                        feedAdapter.remove(postChangeData.getPostId());
+                    }
+                }
+            });
+        }
+    }
+
+    private void showToastOnNewPost(String firstPostId){
+        if(firstPostId == null){
+            return;
+        }
+
+        // remove if we're already subscribed
+        if(newPostListenerRegistration != null) {
+            newPostListenerRegistration.remove();
+            // good practice
+            newPostListenerRegistration = null;
+        }
+
+        newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MyProfileFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+            }
+        }, firstPostId);
+    }
+
+    private String getFirstPostId(List<PostViewModel> postViewModels) {
+        if(postViewModels.size() == 0){
+            return null;
+        }
+
+        // same comparator as in the FeedRecyclerViewAdapter
+        // should not matter
+        Collections.sort(postViewModels, new PostViewModelDateComparator());
+        return postViewModels.get(0).getPostId();
     }
 
 }
