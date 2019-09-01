@@ -207,10 +207,16 @@ public class FeedFragment extends Fragment {
         for(PostViewModel postViewModel : postViewModels) {
             PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
                 @Override
-                public void onChanged(PostChangeData postChangeData) {
+                public void onChanged(final PostChangeData postChangeData) {
                     feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
-                    PostRepository.getInstance().getPostCache()
-                            .updatePost(postChangeData.getPostId(), postChangeData.getNewDescription());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            PostRepository.getInstance().getPostCache()
+                                    .updatePost(postChangeData.getPostId(), postChangeData.getNewDescription());
+                        }
+                    }).start();
+
                     if(postChangeData.getIsDeleted()) {
                         feedAdapter.remove(postChangeData.getPostId());
                     }
