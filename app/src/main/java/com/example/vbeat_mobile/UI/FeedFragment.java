@@ -245,6 +245,7 @@ public class FeedFragment extends Fragment {
         newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "new post was logged by PostRepository");
                 if(feedContext != null) {
                     Toast.makeText(feedContext, feedContext.getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
                 }
