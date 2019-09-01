@@ -254,6 +254,11 @@ public class FeedFragment extends Fragment {
                 Log.d(TAG, String.format("onChanged called %d", postViewModels.size()));
 
                 feedAdapter.addAll(postViewModels);
+
+
+                // set listener to update posts in live mode
+                listenOnPosts(postViewModels);
+
                 progressBar.setVisibility(View.INVISIBLE);
                 isLoading = false;
             }
