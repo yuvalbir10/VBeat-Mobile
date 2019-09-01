@@ -19,9 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
-import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
-import com.example.vbeat_mobile.backend.user.UserManager;
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -37,7 +36,6 @@ public class LogInFragment extends Fragment {
 
     private Button loginButton = null;
     private ProgressBar prBar = null;
-    private UserManager userManager;
 
     public LogInFragment() {
         // Required empty public constructor
@@ -49,7 +47,6 @@ public class LogInFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View v =  inflater.inflate(R.layout.fragment_log_in, container, false);
-        userManager = FirebaseUserManager.getInstance();
 
         loginButton = v.findViewById(R.id.log_in_button);
         prBar = v.findViewById(R.id.indeterminateBar);
@@ -88,15 +85,17 @@ public class LogInFragment extends Fragment {
             @Override
             public void run() {
                 Activity a = LogInFragment.this.getActivity();
-                try {
-                    userManager.login(username, password);
+
+                boolean success = UserRepository.getInstance().login(username,password);
+                if(success){
                     UiUtils.safeRunOnUiThread(a,new Runnable() {
                         @Override
                         public void run() {
                             handleSuccessfulLogin();
                         }
                     });
-                } catch(final UserLoginFailedException e) {
+                }
+                else{
                     //error if login failed
                     final TextView errorTextView = v.findViewById(R.id.error_textView);
 
@@ -104,22 +103,21 @@ public class LogInFragment extends Fragment {
                     UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override
                         public void run() {
-                            errorTextView.setText(e.getMessage());
+                            errorTextView.setText("error on login...");
                             errorTextView.setVisibility(View.VISIBLE);
                         }
                     });
-
-                } finally {
-
-                    // hide progress bar & show login button
-                    UiUtils.safeRunOnUiThread(a, new Runnable() {
-                        @Override
-                        public void run() {
-                            loginButton.setEnabled(true);
-                            prBar.setVisibility(View.INVISIBLE);
-                        }
-                    });
                 }
+
+                // hide progress bar & show login button
+                UiUtils.safeRunOnUiThread(a, new Runnable() {
+                    @Override
+                    public void run() {
+                        loginButton.setEnabled(true);
+                        prBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+
             }
         }).start();
     }

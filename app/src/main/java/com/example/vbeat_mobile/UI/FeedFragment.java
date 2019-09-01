@@ -249,7 +249,6 @@ public class FeedFragment extends Fragment {
                 if(feedContext != null) {
                     Toast.makeText(feedContext, feedContext.getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
                 }
-
             }
         }, firstPostId);
     }

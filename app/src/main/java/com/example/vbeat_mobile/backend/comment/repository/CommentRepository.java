@@ -94,6 +94,17 @@ public class CommentRepository {
         return commentListMutableLiveData;
     }
 
+    public boolean deleteComment(String commentId){
+        try{
+            FirebaseCommentManager.getInstance().deleteComment(commentId);
+            return true;
+        }
+        catch(CommentException e) {
+            Log.e(TAG, "delete comment failed", e);
+            return false;
+        }
+    }
+
     private List<CommentViewModel> convertCommentModelsToViewModels(List<CommentModel> commentModels) throws CommentException {
         List<String> userIds = new LinkedList<>();
         List<CommentViewModel> commentViewModels = new LinkedList<>();
