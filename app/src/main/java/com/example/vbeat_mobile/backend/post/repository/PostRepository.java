@@ -1,15 +1,17 @@
 package com.example.vbeat_mobile.backend.post.repository;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.vbeat_mobile.backend.comment.CommentException;
+import com.example.vbeat_mobile.backend.post.DeletePostException;
 import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
-import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -161,6 +163,28 @@ public class PostRepository {
         }).start();
 
         return postsLiveData;
+    }
+
+    public boolean deletePost(String postId){
+        try{
+            FirebasePostManager.getInstance().deletePost(postId);
+            return true;
+        }
+        catch(DeletePostException | CommentException e) {
+            Log.e(TAG, "delete post failed", e);
+            return false;
+        }
+    }
+
+    public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri){
+        try{
+            final VBeatPostModel uploadedPost = FirebasePostManager.getInstance().uploadPost(description, imageUri, musicUri);
+            return uploadedPost;
+        }
+        catch(UploadPostFailedException e) {
+            Log.e(TAG, "delete post failed", e);
+            return null;
+        }
     }
 
 

@@ -70,6 +70,8 @@ public class EditPostFragment extends Fragment {
                         else{
                             UiUtils.showMessage(getActivity(), "Error on edit post...");
                         }
+
+
                     }
                 }).start();
             }

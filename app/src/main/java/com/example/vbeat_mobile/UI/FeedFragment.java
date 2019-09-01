@@ -236,7 +236,7 @@ public class FeedFragment extends Fragment {
         newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(FeedFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+                //Toast.makeText(FeedFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show(); TODO:ishay check what we do with that line
             }
         }, firstPostId);
     }

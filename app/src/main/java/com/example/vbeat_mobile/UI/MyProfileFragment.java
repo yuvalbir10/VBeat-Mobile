@@ -82,17 +82,29 @@ public class MyProfileFragment extends Fragment {
 
         postsRecyclerView.setAdapter(feedAdapter);
 
-        LiveData<List<PostViewModel>> data;
-        data = PostRepository.getInstance().getPostsByUser(FirebaseUserManager.getInstance().getCurrentUser().getUserId());
 
-        data.observeForever(new Observer<List<PostViewModel>>() {
+
+
+
+
+        UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
             @Override
-            public void onChanged(List<PostViewModel> postViewModels) {
-                feedAdapter.addAll(postViewModels);
-                listenOnPosts(postViewModels);
-                showToastOnNewPost(getFirstPostId(postViewModels));
+            public void onChanged(UserViewModel userViewModel) {
+                LiveData<List<PostViewModel>> data;
+                data = PostRepository.getInstance().getPostsByUser(userViewModel.getUserId());
+                data.observeForever(new Observer<List<PostViewModel>>() {
+                    @Override
+                    public void onChanged(List<PostViewModel> postViewModels) {
+                        feedAdapter.addAll(postViewModels);
+                        listenOnPosts(postViewModels);
+                        showToastOnNewPost(getFirstPostId(postViewModels));
+                    }
+                });
             }
         });
+
+
+
 
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
