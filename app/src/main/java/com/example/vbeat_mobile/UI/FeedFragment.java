@@ -255,8 +255,6 @@ public class FeedFragment extends Fragment {
 
                 feedAdapter.addAll(postViewModels);
 
-                // show toast whenever new post is made
-                showToastOnNewPost(getFirstPostId(postViewModels));
 
                 // set listener to update posts in live mode
                 listenOnPosts(postViewModels);
