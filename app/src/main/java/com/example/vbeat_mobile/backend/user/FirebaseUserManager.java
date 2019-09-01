@@ -125,6 +125,8 @@ public class FirebaseUserManager implements UserManager {
 
     @Override
     public VBeatUserModel getCurrentUser() {
+        if(mAuth.getCurrentUser() == null)
+            return null;
         return new FirebaseUserAdapter(mAuth.getCurrentUser());
     }
 
