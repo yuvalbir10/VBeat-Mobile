@@ -185,17 +185,17 @@ public class MyProfileFragment extends Fragment {
             newPostListenerRegistration = null;
         }
 
-        final Context c = getContext();
-
-        newPostListenerRegistration = PostViewModel.listenToNewPost(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "new post was logged");
-                if(c != null){
-                    Toast.makeText(MyProfileFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, firstPostId);
+//        final Context c = getContext();
+//
+//        newPostListenerRegistration = PostViewModel.listenToNewPost(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.d(TAG, "new post was logged");
+//                if(c != null){
+//                    Toast.makeText(MyProfileFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        }, firstPostId);
     }
 
     private String getFirstPostId(List<PostViewModel> postViewModels) {
