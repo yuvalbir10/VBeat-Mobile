@@ -268,7 +268,6 @@ public class FeedFragment extends Fragment {
     }
 
     private void loadNextPageInBackground() {
-        //TODO: move to another thread
         Log.d(TAG, "loadNextPageInBackground is called");
         progressBar.setVisibility(View.VISIBLE);
 
