@@ -17,20 +17,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
-import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
-import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
+
 import com.example.vbeat_mobile.viewmodel.CurrentUserViewModel;
+
+import com.example.vbeat_mobile.utility.UiUtils;
+
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
-import com.google.android.gms.common.UserRecoverableException;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.Collections;
@@ -47,6 +49,7 @@ public class MyProfileFragment extends Fragment {
     private FeedRecyclerViewAdapter feedAdapter;
     private TextView usernameTextView;
     private ListenerRegistration newPostListenerRegistration = null;
+    private ImageButton signOutImageButton;
 
     public MyProfileFragment() {
         // Required empty public constructor
@@ -60,6 +63,7 @@ public class MyProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_my_profile, container, false);
         postsRecyclerView = v.findViewById(R.id.posts_RecyclerView);
         usernameTextView = v.findViewById(R.id.username_textView);
+        signOutImageButton = v.findViewById(R.id.signOut_imageButton);
 
 
         CurrentUserViewModel.getCurrentUser().observeForever(new Observer<UserViewModel>() {
@@ -137,6 +141,13 @@ public class MyProfileFragment extends Fragment {
             }
         });
 
+        signOutImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signOut();
+            }
+        });
+
 
         return v;
     }
@@ -198,4 +209,23 @@ public class MyProfileFragment extends Fragment {
         return postViewModels.get(0).getPostId();
     }
 
+    private void signOut(){
+        boolean success = UserRepository.getInstance().logout();
+        if(success){
+            UiUtils.showMessage(getActivity(),"Signed out successfully!");
+            View currentView = getView();
+            if (currentView == null) {
+                Log.e(TAG, "currentView == null");
+                throw new IllegalStateException(TAG + " currentView == null");
+            }
+
+            NavController navController = null;
+            navController = Navigation.findNavController(currentView);
+
+            navController.navigate(R.id.action_myProfileFragment_to_initialFragment);
+        }
+        else{
+            UiUtils.showMessage(getActivity(),"Error on sign out...");
+        }
+    }
 }

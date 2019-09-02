@@ -204,6 +204,10 @@ public class FirebaseUserManager implements UserManager {
         return getModelFromFirebase(ds);
     }
 
+    public void logout() throws UserLogoutFailedException {
+        FirebaseAuth.getInstance().signOut();
+    }
+
     private static Map<String, Object> createFirebaseFromModel(VBeatUserModel vBeatUserModel) {
         Map<String, Object> obj = new HashMap<>();
         obj.put("display_name", vBeatUserModel.getDisplayName());

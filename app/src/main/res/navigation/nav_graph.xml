@@ -106,6 +106,9 @@
         <action
             android:id="@+id/action_myProfileFragment_to_editPostFragment"
             app:destination="@id/editPostFragment" />
+        <action
+            android:id="@+id/action_myProfileFragment_to_initialFragment"
+            app:destination="@id/initialFragment" />
     </fragment>
     <fragment
         android:id="@+id/editPostFragment"
