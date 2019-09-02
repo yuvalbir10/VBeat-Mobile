@@ -26,6 +26,7 @@ import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
+import com.example.vbeat_mobile.viewmodel.CurrentUserViewModel;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
@@ -61,7 +62,7 @@ public class MyProfileFragment extends Fragment {
         usernameTextView = v.findViewById(R.id.username_textView);
 
 
-        UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+        CurrentUserViewModel.getCurrentUser().observeForever(new Observer<UserViewModel>() {
             @Override
             public void onChanged(UserViewModel userViewModel) {
                 usernameTextView.setText(
@@ -83,11 +84,11 @@ public class MyProfileFragment extends Fragment {
 
         postsRecyclerView.setAdapter(feedAdapter);
 
-        UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+        CurrentUserViewModel.getCurrentUser().observeForever(new Observer<UserViewModel>() {
             @Override
             public void onChanged(UserViewModel userViewModel) {
                 LiveData<List<PostViewModel>> data;
-                data = PostRepository.getInstance().getPostsByUser(userViewModel.getUserId());
+                data = PostListViewModel.getPostsByUser(userViewModel.getUserId());
                 data.observeForever(new Observer<List<PostViewModel>>() {
                     @Override
                     public void onChanged(List<PostViewModel> postViewModels) {
@@ -150,7 +151,7 @@ public class MyProfileFragment extends Fragment {
 
     private void listenOnPosts(List<PostViewModel> postViewModels) {
         for(PostViewModel postViewModel : postViewModels) {
-            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
+            PostViewModel.listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
                 @Override
                 public void onChanged(PostChangeData postChangeData) {
                     feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
@@ -176,7 +177,7 @@ public class MyProfileFragment extends Fragment {
 
         final Context c = getContext();
 
-        newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
+        newPostListenerRegistration = PostViewModel.listenToNewPost(new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "new post was logged");

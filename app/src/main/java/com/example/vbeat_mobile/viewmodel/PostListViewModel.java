@@ -22,4 +22,8 @@ public class PostListViewModel extends ViewModel {
     public static LiveData<List<PostViewModel>> getPosts(String cursor, int limit) {
         return PostRepository.getInstance().getPosts(cursor, limit);
     }
+
+    public static LiveData<List<PostViewModel>> getPostsByUser(String userId) {
+        return PostRepository.getInstance().getPostsByUser(userId);
+    }
 }
