@@ -49,7 +49,7 @@ public class EditPostFragment extends Fragment {
                 .fromBundle(Objects.requireNonNull(getArguments()));
         final String postID = args.getPostId();
 
-        LiveData<PostViewModel> post = PostRepository.getInstance().getPost(postID);
+        LiveData<PostViewModel> post = PostViewModel.getPost(postID);
         post.observeForever(new Observer<PostViewModel>() {
             @Override
             public void onChanged(PostViewModel postViewModel) {

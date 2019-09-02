@@ -1,6 +1,9 @@
 package com.example.vbeat_mobile.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 
 import java.util.Date;
 
@@ -53,4 +56,8 @@ public class PostViewModel extends ViewModel {
     }
 
     public void setDescription(String other){ description = other; }
+
+    public static LiveData<PostViewModel> getPost(String postId) {
+        return PostRepository.getInstance().getPost(postId);
+    }
 }
