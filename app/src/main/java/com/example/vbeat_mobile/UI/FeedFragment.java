@@ -200,7 +200,9 @@ public class FeedFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        newPostListenerRegistration.remove();
+        if(newPostListenerRegistration != null) {
+            newPostListenerRegistration.remove();
+        }
     }
 
     private void listenOnPosts(List<PostViewModel> postViewModels) {
