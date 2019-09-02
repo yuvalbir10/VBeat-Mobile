@@ -40,4 +40,8 @@ public class UserViewModel extends ViewModel {
     public static boolean isLoggedIn(){
         return UserRepository.getInstance().isLoggedIn();
     }
+
+    public static boolean createAccount(String email, String password){
+        return UserRepository.getInstance().createAccount(email, password);
+    }
 }

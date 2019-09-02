@@ -27,6 +27,7 @@ import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.URIUtils;
 import com.example.vbeat_mobile.utility.UiUtils;
+import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class UploadPostFragment extends Fragment {
             @Override
             public void run() {
                 Activity a = UploadPostFragment.this.getActivity();
-                final VBeatPostModel uploadedPost = PostRepository.getInstance().uploadPost(description, imageUri, musicUri);
+                final VBeatPostModel uploadedPost = PostViewModel.uploadPost(description, imageUri, musicUri);
                 if(uploadedPost != null){
                     UiUtils.safeRunOnUiThread(a, new Runnable() {
                         @Override

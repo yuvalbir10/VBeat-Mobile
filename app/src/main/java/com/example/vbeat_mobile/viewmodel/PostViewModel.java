@@ -1,8 +1,11 @@
 package com.example.vbeat_mobile.viewmodel;
 
+import android.net.Uri;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.vbeat_mobile.backend.post.VBeatPostModel;
 import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -82,5 +85,9 @@ public class PostViewModel extends ViewModel {
 
     public static boolean deletePost(String postId) {
         return PostRepository.getInstance().deletePost(postId);
+    }
+
+    public static VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri) {
+        return PostRepository.getInstance().uploadPost(description, imageUri, musicUri);
     }
 }

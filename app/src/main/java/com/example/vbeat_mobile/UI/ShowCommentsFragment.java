@@ -75,7 +75,6 @@ public class ShowCommentsFragment extends Fragment {
         });
 
         commentsRecyclerView.setAdapter(adapter);
-
         return view;
     }
 }
