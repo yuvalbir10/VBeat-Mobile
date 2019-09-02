@@ -171,7 +171,6 @@ public class MyProfileFragment extends Fragment {
         // remove if we're already subscribed
         if(newPostListenerRegistration != null) {
             newPostListenerRegistration.remove();
-            // good practice
             newPostListenerRegistration = null;
         }
 

@@ -67,7 +67,7 @@ public class ShowCommentsFragment extends Fragment {
         adapter.setActivity(getActivity());
 
         // listen to live changes in comments
-        CommentRepository.getInstance().listenOnLiveCommentChanges(postID).observe(this, new Observer<List<CommentViewModel>>() {
+        commentListViewModel.getComments(postID).observe(this, new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
                 adapter.setList(commentViewModels);
