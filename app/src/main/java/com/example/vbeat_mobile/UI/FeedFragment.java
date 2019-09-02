@@ -114,6 +114,13 @@ public class FeedFragment extends Fragment {
         feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
         feedAdapter.setActivity(getActivity());
 
+        feedAdapter.setRemoveListener(new FeedRecyclerViewAdapter.RemoveListener() {
+            @Override
+            public void onRemove() {
+                updateFirstPost();
+            }
+        });
+
         recyclerView.setAdapter(feedAdapter);
 
         LiveData<List<PostViewModel>> data;
