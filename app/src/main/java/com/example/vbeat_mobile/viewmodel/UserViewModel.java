@@ -1,11 +1,13 @@
 package com.example.vbeat_mobile.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 public class UserViewModel extends ViewModel {
     private String userId;
     private String email;
     private String displayName;
+
 
     public UserViewModel(String userId, String email, String displayName) {
         this.userId = userId;
