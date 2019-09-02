@@ -56,10 +56,16 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     private OnItemClickListener clickListener;
     private Activity fromActivity;
     private OnItemClickListener editClickListener;
+    private RemoveListener removeListener;
 
     public FeedRecyclerViewAdapter(PostListViewModel data) {
         mData = data;
         mData.setPostList(new ArrayList<PostViewModel>());
+        removeListener = null;
+    }
+
+    public void setRemoveListener(RemoveListener removeListener) {
+        this.removeListener = removeListener;
     }
 
     public void setActivity(Activity a) {
@@ -237,6 +243,10 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                             if(success){
                                 feedRecyclerViewAdapter.remove(postId);
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Post deleted successfully!");
+
+                                if(feedRecyclerViewAdapter.removeListener != null) {
+                                    feedRecyclerViewAdapter.removeListener.onRemove();
+                                }
                             }
                             else{
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Error on deleting post...");
@@ -408,4 +418,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         }
     }
 
+    public interface RemoveListener {
+        public void onRemove();
+    }
 }

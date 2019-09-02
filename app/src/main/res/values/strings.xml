@@ -14,5 +14,5 @@
     <string name="username_text_label">username</string>
     <string name="add_a_comment_hint">Add a comment...</string>
     <string name="media_button">Media Button</string>
-    <string name="home_button_refresh_new_post">New post! Press the home button to refresh</string>
+    <string name="home_button_refresh_new_post">Feed was changed! Press the home button to refresh</string>
 </resources>
