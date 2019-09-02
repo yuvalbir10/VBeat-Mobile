@@ -1,6 +1,7 @@
 package com.example.vbeat_mobile.UI;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -147,6 +148,14 @@ public class MyProfileFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(newPostListenerRegistration != null){
+            newPostListenerRegistration.remove();
+        }
+    }
+
     private void listenOnPosts(List<PostViewModel> postViewModels) {
         for(PostViewModel postViewModel : postViewModels) {
             PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
@@ -173,10 +182,15 @@ public class MyProfileFragment extends Fragment {
             newPostListenerRegistration = null;
         }
 
+        final Context c = getContext();
+
         newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MyProfileFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "new post was logged");
+                if(c != null){
+                    Toast.makeText(MyProfileFragment.this.getContext(), getString(R.string.home_button_refresh_new_post) , Toast.LENGTH_SHORT).show();
+                }
             }
         }, firstPostId);
     }
