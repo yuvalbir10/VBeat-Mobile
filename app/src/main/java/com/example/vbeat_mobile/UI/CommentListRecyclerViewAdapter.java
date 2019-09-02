@@ -94,7 +94,7 @@ public class CommentListRecyclerViewAdapter extends RecyclerView.Adapter<Comment
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        boolean success = CommentRepository.getInstance().deleteComment(comment.getCommentId());
+                                        boolean success = CommentViewModel.deleteComment(comment.getCommentId());
                                         if(success){
                                             commentListRecyclerViewAdapter.remove(comment.getCommentId());
                                             UiUtils.showMessage(commentListRecyclerViewAdapter.fromActivity, "Deleted comment successfully!");

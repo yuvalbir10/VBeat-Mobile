@@ -1,6 +1,5 @@
 package com.example.vbeat_mobile.viewmodel;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 public class UserViewModel extends ViewModel {
