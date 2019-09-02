@@ -60,4 +60,8 @@ public class PostViewModel extends ViewModel {
     public static LiveData<PostViewModel> getPost(String postId) {
         return PostRepository.getInstance().getPost(postId);
     }
+
+    public static boolean editPost(String postId, String description) {
+        return PostRepository.getInstance().editPost(postId, description);
+    }
 }
