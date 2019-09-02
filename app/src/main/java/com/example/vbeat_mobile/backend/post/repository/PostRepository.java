@@ -12,6 +12,7 @@ import com.example.vbeat_mobile.backend.post.FirebasePostManager;
 import com.example.vbeat_mobile.backend.post.UploadPostFailedException;
 import com.example.vbeat_mobile.backend.post.VBeatPostCollection;
 import com.example.vbeat_mobile.backend.post.VBeatPostModel;
+import com.example.vbeat_mobile.utility.ListenerRemoverLiveData;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -112,30 +113,30 @@ public class PostRepository {
     }
 
 
-    public LiveData<PostChangeData> listenToPostChange(String postId) {
-        final MutableLiveData<PostChangeData> postViewModelMutableLiveData = new MutableLiveData<>();
-
-        ListenerRegistration firebaseListener =
-                FirebasePostManager.getInstance().listenToPostChanges(postId,
+    public LiveData<PostChangeData> listenToPostChange(final String postId) {
+        return new ListenerRemoverLiveData<>(new ListenerRemoverLiveData.FirebaseListenerCreator<PostChangeData>() {
+            @Override
+            public ListenerRegistration createListener(final MutableLiveData<PostChangeData> liveData) {
+                return FirebasePostManager.getInstance().listenToPostChanges(postId,
                         new FirebasePostManager.PostChangesListener() {
                             @Override
-                            public void onPostChanged(String postId,
+                            public void onPostChanged(String postId1,
                                                       String newDescription,
                                                       boolean isDeleted) {
-                                postViewModelMutableLiveData.postValue(
+                                liveData.postValue(
                                         new PostChangeData(
-                                                postId,
+                                                postId1,
                                                 newDescription,
                                                 isDeleted
                                         )
                                 );
                             }
                         });
-
-
-        return postViewModelMutableLiveData;
+            }
+        });
     }
 
+    // cleaned by caller
     public ListenerRegistration listenToNewPost(final Runnable runOnNewPost, String firstPostId) {
         return FirebasePostManager.getInstance().listenToNewPost(new FirebasePostManager.NewPostListener() {
             @Override
@@ -165,23 +166,20 @@ public class PostRepository {
         return postsLiveData;
     }
 
-    public boolean deletePost(String postId){
-        try{
+    public boolean deletePost(String postId) {
+        try {
             FirebasePostManager.getInstance().deletePost(postId);
             return true;
-        }
-        catch(DeletePostException | CommentException e) {
+        } catch (DeletePostException | CommentException e) {
             Log.e(TAG, "delete post failed", e);
             return false;
         }
     }
 
-    public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri){
-        try{
-            final VBeatPostModel uploadedPost = FirebasePostManager.getInstance().uploadPost(description, imageUri, musicUri);
-            return uploadedPost;
-        }
-        catch(UploadPostFailedException e) {
+    public VBeatPostModel uploadPost(String description, Uri imageUri, Uri musicUri) {
+        try {
+            return FirebasePostManager.getInstance().uploadPost(description, imageUri, musicUri);
+        } catch (UploadPostFailedException e) {
             Log.e(TAG, "delete post failed", e);
             return null;
         }
