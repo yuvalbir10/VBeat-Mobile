@@ -1,6 +1,10 @@
 package com.example.vbeat_mobile.viewmodel;
 
-public class CommentViewModel {
+import androidx.lifecycle.ViewModel;
+
+import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
+
+public class CommentViewModel extends ViewModel {
     private String username;
     private String commentText;
     private String userId;
@@ -32,5 +36,13 @@ public class CommentViewModel {
 
     public String getCommentId(){
         return commentId;
+    }
+
+    public static boolean deleteComment(String commentId) {
+        return CommentRepository.getInstance().deleteComment(commentId);
+    }
+
+    public static boolean comment(String postId, String commentText) {
+        return CommentRepository.getInstance().comment(postId, commentText);
     }
 }

@@ -3,6 +3,8 @@ package com.example.vbeat_mobile.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.vbeat_mobile.backend.post.repository.PostRepository;
+
 import java.util.List;
 
 public class PostListViewModel extends ViewModel {
@@ -15,5 +17,13 @@ public class PostListViewModel extends ViewModel {
 
     public void setPostList(List<PostViewModel> postList) {
         this.postList = postList;
+    }
+
+    public static LiveData<List<PostViewModel>> getPosts(String cursor, int limit) {
+        return PostRepository.getInstance().getPosts(cursor, limit);
+    }
+
+    public static LiveData<List<PostViewModel>> getPostsByUser(String userId) {
+        return PostRepository.getInstance().getPostsByUser(userId);
     }
 }

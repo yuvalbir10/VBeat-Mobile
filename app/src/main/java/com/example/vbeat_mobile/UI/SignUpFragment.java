@@ -20,6 +20,7 @@ import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.UiUtils;
 import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
+import com.example.vbeat_mobile.viewmodel.UserViewModel;
 
 
 /**
@@ -77,7 +78,7 @@ public class SignUpFragment extends Fragment {
             public void run() {
                 Activity a = SignUpFragment.this.getActivity();
 
-                boolean success = UserRepository.getInstance().createAccount(username, password);
+                boolean success = UserViewModel.createAccount(username, password);
                 if(success){
                     handleSuccessfulSignUp(a);
                 }

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vbeat_mobile.R;
@@ -29,6 +30,8 @@ import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.utility.ImageViewUtil;
 import com.example.vbeat_mobile.utility.UiUtils;
+import com.example.vbeat_mobile.viewmodel.CommentViewModel;
+import com.example.vbeat_mobile.viewmodel.CurrentUserViewModel;
 import com.example.vbeat_mobile.viewmodel.PostListViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
@@ -123,8 +126,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
         void bind(final PostViewModel post) {
 
-            final LiveData<UserViewModel> liveUser = UserRepository.getInstance()
-                    .getUser(post.getUploader());
+            final LiveData<UserViewModel> liveUser = UserViewModel.getUser(post.getUploader());
             liveUser.observeForever(new Observer<UserViewModel>() {
                         @Override
                         public void onChanged(UserViewModel userViewModel) {
@@ -136,8 +138,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             descriptionTextView.setText(post.getDescription());
             postId = post.getPostId();
 
-
-            UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
+            CurrentUserViewModel.getCurrentUser().observeForever(new Observer<UserViewModel>() {
                 @Override
                 public void onChanged(UserViewModel userViewModel) {
                     if(post.getUploader().contentEquals(userViewModel.getUserId())){
@@ -205,7 +206,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            boolean success = CommentRepository.getInstance().comment(postId, commentStr);
+                            boolean success = CommentViewModel.comment(postId, commentStr);
                             if(success){
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Commented Successfully!");
                                 UiUtils.safeRunOnUiThread(feedRecyclerViewAdapter.fromActivity, new Runnable() {
@@ -232,7 +233,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            boolean success = PostRepository.getInstance().deletePost(postId);
+                            boolean success = PostViewModel.deletePost(postId);
                             if(success){
                                 feedRecyclerViewAdapter.remove(postId);
                                 UiUtils.showMessage(feedRecyclerViewAdapter.fromActivity, "Post deleted successfully!");

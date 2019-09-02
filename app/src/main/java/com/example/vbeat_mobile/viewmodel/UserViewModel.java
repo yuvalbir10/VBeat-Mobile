@@ -1,11 +1,15 @@
 package com.example.vbeat_mobile.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 
 public class UserViewModel extends ViewModel {
     private String userId;
     private String email;
     private String displayName;
+
 
     public UserViewModel(String userId, String email, String displayName) {
         this.userId = userId;
@@ -23,5 +27,21 @@ public class UserViewModel extends ViewModel {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public static LiveData<UserViewModel> getUser(String userId) {
+        return UserRepository.getInstance().getUser(userId);
+    }
+
+    public static boolean login(String username, String password) {
+        return UserRepository.getInstance().login(username, password);
+    }
+
+    public static boolean isLoggedIn(){
+        return UserRepository.getInstance().isLoggedIn();
+    }
+
+    public static boolean createAccount(String email, String password){
+        return UserRepository.getInstance().createAccount(email, password);
     }
 }

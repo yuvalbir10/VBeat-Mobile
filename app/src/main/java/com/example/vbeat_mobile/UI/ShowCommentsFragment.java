@@ -18,6 +18,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.comment.repository.CommentRepository;
 import com.example.vbeat_mobile.viewmodel.CommentListViewModel;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
+import com.example.vbeat_mobile.viewmodel.CurrentUserViewModel;
 import com.example.vbeat_mobile.viewmodel.PostViewModel;
 
 import java.util.List;
@@ -62,11 +63,11 @@ public class ShowCommentsFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         commentsRecyclerView.setLayoutManager(layoutManager);
 
-        final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter();
+        final CommentListRecyclerViewAdapter adapter = new CommentListRecyclerViewAdapter(ViewModelProviders.of(this).get(CurrentUserViewModel.class));
         adapter.setActivity(getActivity());
 
         // listen to live changes in comments
-        CommentRepository.getInstance().listenOnLiveCommentChanges(postID).observe(this, new Observer<List<CommentViewModel>>() {
+        commentListViewModel.getComments(postID).observe(this, new Observer<List<CommentViewModel>>() {
             @Override
             public void onChanged(List<CommentViewModel> commentViewModels) {
                 adapter.setList(commentViewModels);
@@ -74,7 +75,6 @@ public class ShowCommentsFragment extends Fragment {
         });
 
         commentsRecyclerView.setAdapter(adapter);
-
         return view;
     }
 }
