@@ -24,7 +24,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private NavController navController;
-    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeBottomNavigationBar(){
         // as shown in presentation
-        bottomNavigationView = findViewById(R.id.bottom_nav_bar);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
 
