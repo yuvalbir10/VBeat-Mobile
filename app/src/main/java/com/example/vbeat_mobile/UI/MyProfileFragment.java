@@ -37,6 +37,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -212,6 +213,7 @@ public class MyProfileFragment extends Fragment {
     private void signOut(){
         boolean success = UserRepository.getInstance().logout();
         if(success){
+            BottomNavigationViewManager.enable(Objects.requireNonNull(getActivity()), false);
             UiUtils.showMessage(getActivity(),"Signed out successfully!");
             View currentView = getView();
             if (currentView == null) {
