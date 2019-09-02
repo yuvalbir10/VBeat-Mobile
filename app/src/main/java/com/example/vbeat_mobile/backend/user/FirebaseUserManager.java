@@ -205,7 +205,7 @@ public class FirebaseUserManager implements UserManager {
     }
 
     public void logout() throws UserLogoutFailedException {
-        //TODO: ishay please complete this function
+        FirebaseAuth.getInstance().signOut();
     }
 
     private static Map<String, Object> createFirebaseFromModel(VBeatUserModel vBeatUserModel) {
