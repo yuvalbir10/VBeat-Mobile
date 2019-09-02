@@ -12,6 +12,7 @@ import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
+import com.example.vbeat_mobile.utility.ListenerRemoverLiveData;
 import com.example.vbeat_mobile.viewmodel.CommentViewModel;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -38,7 +39,7 @@ public class CommentRepository {
         try {
             FirebaseCommentManager.getInstance().comment(commentText, postId);
             return true;
-        } catch(CommentException e) {
+        } catch (CommentException e) {
             Log.e(TAG, "failed to comment", e);
             return false;
         }
@@ -67,39 +68,38 @@ public class CommentRepository {
         return liveData;
     }
 
-    public LiveData<List<CommentViewModel>> listenOnLiveCommentChanges(String postId) {
-        final MutableLiveData<List<CommentViewModel>> commentListMutableLiveData = new MutableLiveData<>();
-
-
-        ListenerRegistration listenerRegistration = FirebaseCommentManager.getInstance().listenOnCommentPageChanges(postId,
-                new FirebaseCommentManager.CommentPageChangesListener() {
-                    @Override
-                    public void onCommentListChanged(final List<CommentModel> newCommentList) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    List<CommentViewModel> commentViewModelList =
-                                            null;
-                                    try {
-                                        commentViewModelList = convertCommentModelsToViewModels(newCommentList);
-                                        commentListMutableLiveData.postValue(commentViewModelList);
-                                    } catch (CommentException e) {
-                                        Log.e(TAG, "failed to push comment changes", e);
+    public LiveData<List<CommentViewModel>> listenOnLiveCommentChanges(final String postId) {
+        return new ListenerRemoverLiveData<>(new ListenerRemoverLiveData.FirebaseListenerCreator<List<CommentViewModel>>() {
+            @Override
+            public ListenerRegistration createListener(final MutableLiveData<List<CommentViewModel>> liveData) {
+                return FirebaseCommentManager.getInstance().listenOnCommentPageChanges(postId,
+                        new FirebaseCommentManager.CommentPageChangesListener() {
+                            @Override
+                            public void onCommentListChanged(final List<CommentModel> newCommentList) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        List<CommentViewModel> commentViewModelList =
+                                                null;
+                                        try {
+                                            commentViewModelList = convertCommentModelsToViewModels(newCommentList);
+                                            liveData.postValue(commentViewModelList);
+                                        } catch (CommentException e) {
+                                            Log.e(TAG, "failed to push comment changes", e);
+                                        }
                                     }
-                                }
-                            }).start();
-                    }
-                });
-
-        return commentListMutableLiveData;
+                                }).start();
+                            }
+                        });
+            }
+        });
     }
 
-    public boolean deleteComment(String commentId){
-        try{
+    public boolean deleteComment(String commentId) {
+        try {
             FirebaseCommentManager.getInstance().deleteComment(commentId);
             return true;
-        }
-        catch(CommentException e) {
+        } catch (CommentException e) {
             Log.e(TAG, "delete comment failed", e);
             return false;
         }

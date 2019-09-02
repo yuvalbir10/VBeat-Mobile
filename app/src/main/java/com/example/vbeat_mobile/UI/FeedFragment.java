@@ -41,6 +41,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -54,6 +55,7 @@ public class FeedFragment extends Fragment {
 
     private FeedRecyclerViewAdapter feedAdapter;
     private ProgressBar progressBar;
+    private List<Observer> observerList;
 
     static MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -107,6 +109,8 @@ public class FeedFragment extends Fragment {
         // setting post list view model to hold the data
         // to survive configuration changes
         PostListViewModel postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
+
+        observerList = new LinkedList<>();
 
         feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
         feedAdapter.setActivity(getActivity());
@@ -207,7 +211,7 @@ public class FeedFragment extends Fragment {
 
     private void listenOnPosts(List<PostViewModel> postViewModels) {
         for(PostViewModel postViewModel : postViewModels) {
-            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observeForever(new Observer<PostChangeData>() {
+            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observe(this, new Observer<PostChangeData>() {
                 @Override
                 public void onChanged(final PostChangeData postChangeData) {
                     feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());

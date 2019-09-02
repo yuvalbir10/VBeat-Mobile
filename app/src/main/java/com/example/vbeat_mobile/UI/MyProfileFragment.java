@@ -83,11 +83,6 @@ public class MyProfileFragment extends Fragment {
 
         postsRecyclerView.setAdapter(feedAdapter);
 
-
-
-
-
-
         UserRepository.getInstance().getCurrentUser().observeForever(new Observer<UserViewModel>() {
             @Override
             public void onChanged(UserViewModel userViewModel) {
@@ -103,9 +98,6 @@ public class MyProfileFragment extends Fragment {
                 });
             }
         });
-
-
-
 
         feedAdapter.setOnItemClickListener(new FeedRecyclerViewAdapter.OnItemClickListener() {
             @Override
