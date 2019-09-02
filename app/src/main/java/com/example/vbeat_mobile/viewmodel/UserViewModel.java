@@ -32,4 +32,8 @@ public class UserViewModel extends ViewModel {
     public static LiveData<UserViewModel> getUser(String userId) {
         return UserRepository.getInstance().getUser(userId);
     }
+
+    public static boolean login(String username, String password) {
+        return UserRepository.getInstance().login(username, password);
+    }
 }

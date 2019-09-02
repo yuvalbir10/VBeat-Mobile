@@ -22,6 +22,7 @@ import com.example.vbeat_mobile.R;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
 import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 import com.example.vbeat_mobile.viewmodel.RedirectionUtils;
+import com.example.vbeat_mobile.viewmodel.UserViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Objects;
@@ -86,7 +87,7 @@ public class LogInFragment extends Fragment {
             public void run() {
                 Activity a = LogInFragment.this.getActivity();
 
-                boolean success = UserRepository.getInstance().login(username,password);
+                boolean success = UserViewModel.login(username,password);
                 if(success){
                     UiUtils.safeRunOnUiThread(a,new Runnable() {
                         @Override
