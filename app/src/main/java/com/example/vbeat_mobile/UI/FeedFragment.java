@@ -119,7 +119,7 @@ public class FeedFragment extends Fragment {
 
         LiveData<List<PostViewModel>> data;
         // get first posts on feed
-        data = PostRepository.getInstance().getPosts(null, POSTS_PER_PAGE);
+        data = PostListViewModel.getPosts(null, POSTS_PER_PAGE);
 
         // wait for posts to load
         data.observeForever(new Observer<List<PostViewModel>>() {
