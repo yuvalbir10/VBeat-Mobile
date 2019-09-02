@@ -79,4 +79,8 @@ public class PostViewModel extends ViewModel {
     public static ListenerRegistration listenToNewPost(Runnable r, String firstPostId){
         return PostRepository.getInstance().listenToNewPost(r, firstPostId);
     }
+
+    public static boolean deletePost(String postId) {
+        return PostRepository.getInstance().deletePost(postId);
+    }
 }

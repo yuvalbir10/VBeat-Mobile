@@ -11,7 +11,7 @@ public class CurrentUserViewModel extends ViewModel {
     // we'll just fetch it every time and UserRepository
     // will cache it if needed
     // user is not editable anyway
-    public LiveData<UserViewModel> getCurrentUser(){
+    public static LiveData<UserViewModel> getCurrentUser(){
         return UserRepository.getInstance().getCurrentUser();
     }
 }

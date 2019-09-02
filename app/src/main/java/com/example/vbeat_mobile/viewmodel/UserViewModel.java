@@ -1,6 +1,9 @@
 package com.example.vbeat_mobile.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.vbeat_mobile.backend.user.repository.UserRepository;
 
 public class UserViewModel extends ViewModel {
     private String userId;
@@ -24,5 +27,9 @@ public class UserViewModel extends ViewModel {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public static LiveData<UserViewModel> getUser(String userId) {
+        return UserRepository.getInstance().getUser(userId);
     }
 }

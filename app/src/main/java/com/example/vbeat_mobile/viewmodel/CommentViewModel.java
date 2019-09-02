@@ -41,4 +41,8 @@ public class CommentViewModel extends ViewModel {
     public static boolean deleteComment(String commentId) {
         return CommentRepository.getInstance().deleteComment(commentId);
     }
+
+    public static boolean comment(String postId, String commentText) {
+        return CommentRepository.getInstance().comment(postId, commentText);
+    }
 }
