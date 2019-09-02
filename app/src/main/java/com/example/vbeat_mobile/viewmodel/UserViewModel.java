@@ -36,4 +36,8 @@ public class UserViewModel extends ViewModel {
     public static boolean login(String username, String password) {
         return UserRepository.getInstance().login(username, password);
     }
+
+    public static boolean isLoggedIn(){
+        return UserRepository.getInstance().isLoggedIn();
+    }
 }
