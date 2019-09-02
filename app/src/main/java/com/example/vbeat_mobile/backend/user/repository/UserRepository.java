@@ -9,6 +9,7 @@ import com.example.vbeat_mobile.backend.comment.CommentException;
 import com.example.vbeat_mobile.backend.user.FirebaseUserManager;
 import com.example.vbeat_mobile.backend.user.UserBackendException;
 import com.example.vbeat_mobile.backend.user.UserLoginFailedException;
+import com.example.vbeat_mobile.backend.user.UserLogoutFailedException;
 import com.example.vbeat_mobile.backend.user.UserRegistrationFailedException;
 import com.example.vbeat_mobile.backend.user.VBeatUserModel;
 import com.example.vbeat_mobile.viewmodel.UserViewModel;
@@ -101,6 +102,17 @@ public class UserRepository {
         }
         catch (UserLoginFailedException e) {
             Log.e(TAG, "login failed", e);
+            return false;
+        }
+    }
+
+    public boolean logout(){
+        try{
+            FirebaseUserManager.getInstance().logout();
+            return true;
+        }
+        catch (UserLogoutFailedException e) {
+            Log.e(TAG, "logout failed", e);
             return false;
         }
     }
