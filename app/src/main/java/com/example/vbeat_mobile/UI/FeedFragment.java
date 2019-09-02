@@ -55,14 +55,13 @@ public class FeedFragment extends Fragment {
 
     private FeedRecyclerViewAdapter feedAdapter;
     private ProgressBar progressBar;
-    private List<Observer> observerList;
 
     static MediaPlayer mediaPlayer = new MediaPlayer();
 
     private boolean isLoading = false;
     private boolean isLastPage = false;
 
-    private static final int TOTAL_PAGES = 100; // TODO: change it according to the DBs total pages
+    private static final int TOTAL_PAGES = 100;
     private int POSTS_PER_PAGE = 5;
 
     // in order to signal firebase
@@ -110,7 +109,7 @@ public class FeedFragment extends Fragment {
         // to survive configuration changes
         PostListViewModel postListViewModel = ViewModelProviders.of(this).get(PostListViewModel.class);
 
-        observerList = new LinkedList<>();
+        List<Observer> observerList = new LinkedList<>();
 
         feedAdapter = new FeedRecyclerViewAdapter(postListViewModel);
         feedAdapter.setActivity(getActivity());
@@ -225,6 +224,8 @@ public class FeedFragment extends Fragment {
                     if(postChangeData.getIsDeleted()) {
                         feedAdapter.remove(postChangeData.getPostId());
                     }
+
+                    updateFirstPost();
                 }
             });
         }
@@ -288,5 +289,15 @@ public class FeedFragment extends Fragment {
                 isLoading = false;
             }
         });
+    }
+
+    private void updateFirstPost() {
+        if(newPostListenerRegistration != null) {
+            newPostListenerRegistration.remove();
+        }
+
+        if(feedAdapter.getItemCount() != 0) {
+            showToastOnNewPost(feedAdapter.getDataList().get(0).getPostId());
+        }
     }
 }
