@@ -211,15 +211,14 @@ public class FeedFragment extends Fragment {
 
     private void listenOnPosts(List<PostViewModel> postViewModels) {
         for(PostViewModel postViewModel : postViewModels) {
-            PostRepository.getInstance().listenToPostChange(postViewModel.getPostId()).observe(this, new Observer<PostChangeData>() {
+            PostViewModel.listenToPostChange(postViewModel.getPostId()).observe(this, new Observer<PostChangeData>() {
                 @Override
                 public void onChanged(final PostChangeData postChangeData) {
                     feedAdapter.edit(postChangeData.getPostId(), postChangeData.getNewDescription());
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            PostRepository.getInstance().getPostCache()
-                                    .updatePost(postChangeData.getPostId(), postChangeData.getNewDescription());
+                            PostViewModel.updatePostInCache(postChangeData.getPostId(), postChangeData.getNewDescription());
                         }
                     }).start();
 
@@ -257,7 +256,7 @@ public class FeedFragment extends Fragment {
 
         final Context feedContext = FeedFragment.this.getContext();
 
-        newPostListenerRegistration = PostRepository.getInstance().listenToNewPost(new Runnable() {
+        newPostListenerRegistration = PostViewModel.listenToNewPost(new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "new post was logged by PostRepository");
@@ -274,7 +273,7 @@ public class FeedFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         LiveData<List<PostViewModel>> mData;
-        mData = PostRepository.getInstance().getPosts(feedAdapter.getDataList().get(feedAdapter.getDataList().size() - 1).getPostId(), POSTS_PER_PAGE);
+        mData = PostListViewModel.getPosts(feedAdapter.getDataList().get(feedAdapter.getDataList().size() - 1).getPostId(), POSTS_PER_PAGE);
         mData.observeForever(new Observer<List<PostViewModel>>() {
             @Override
             public void onChanged(List<PostViewModel> postViewModels) {

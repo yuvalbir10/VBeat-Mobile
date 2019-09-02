@@ -3,7 +3,9 @@ package com.example.vbeat_mobile.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.vbeat_mobile.backend.post.repository.PostChangeData;
 import com.example.vbeat_mobile.backend.post.repository.PostRepository;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.Date;
 
@@ -63,5 +65,18 @@ public class PostViewModel extends ViewModel {
 
     public static boolean editPost(String postId, String description) {
         return PostRepository.getInstance().editPost(postId, description);
+    }
+
+    public static LiveData<PostChangeData> listenToPostChange(String postId) {
+        return PostRepository.getInstance().listenToPostChange(postId);
+    }
+
+    public static void updatePostInCache(String postId, String description) {
+        PostRepository.getInstance().getPostCache()
+                .updatePost(postId, description);
+    }
+
+    public static ListenerRegistration listenToNewPost(Runnable r, String firstPostId){
+        return PostRepository.getInstance().listenToNewPost(r, firstPostId);
     }
 }
